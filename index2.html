@@ -1,0 +1,212 @@
+<!-- The full updated code is long, so I will now give it to you in parts to keep it organized -->
+
+<!-- 🧱 PART 1: HEAD & STYLES -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Secure P2P Chat + Video</title>
+  <script src="https://cdn.jsdelivr.net/npm/simple-peer@9.11.1/simplepeer.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
+  <style>
+    body { font-family: sans-serif; background: #121212; color: #eee; padding: 20px; }
+    input, textarea, button {
+      width: 100%; padding: 10px; margin: 10px 0;
+      font-size: 1em; background: #1e1e1e; color: #eee;
+      border: 1px solid #333; border-radius: 5px;
+    }
+    button { cursor: pointer; background: #333; }
+    #chat {
+      border: 1px solid #444; background: #1a1a1a;
+      padding: 10px; min-height: 100px; max-height: 300px;
+      overflow-y: auto; font-family: monospace;
+    }
+    video { width: 48%; margin: 5px 0; background: #000; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <h2>🔐 Secure P2P Chat + Video (Auto Offer)</h2>
+
+<!-- 🧱 PART 2: PASSWORD & AUTO-OFFER -->
+  <label>Password (8+ chars):</label>
+  <input id="password" type="password" placeholder="Enter shared password" />
+  <div id="offerSection" class="hidden">
+    <label>Offer (send this to peer):</label>
+    <textarea id="offerOut" readonly></textarea>
+    <button onclick="copyOffer()">📋 Copy Offer</button>
+  </div>
+
+<!-- 🧱 PART 3: ANSWER SECTION -->
+  <label>Paste Answer from peer:</label>
+  <textarea id="answerIn" placeholder="Paste answer here..."></textarea>
+  <button onclick="acceptAnswer()">Connect</button>
+
+<!-- 🧱 PART 4: CHAT + VIDEO INTERFACE -->
+  <hr>
+  <div id="chat">🔒 Waiting for messages...</div>
+  <input id="message" placeholder="Type a message..." />
+  <button onclick="sendMessage()">Send Encrypted</button>
+  <button onclick="downloadHistory()">💾 Save Chat</button>
+  <button onclick="clearChat()">🗑 Clear Chat</button>
+  <hr>
+  <video id="localVideo" autoplay muted></video>
+  <video id="remoteVideo" autoplay></video>
+  <audio id="notifySound" src="https://notificationsounds.com/notification-sounds/light-528/download/mp3" preload="auto"></audio>
+
+<!-- 🧱 PART 5: SCRIPT -->
+<script>
+let peer;
+let connected = false;
+let chatHistory = [];
+let localStream = null;
+let expirationMinutes = 30;
+
+const passwordInput = document.getElementById('password');
+const chat = document.getElementById('chat');
+const messageInput = document.getElementById('message');
+const localVideo = document.getElementById('localVideo');
+const remoteVideo = document.getElementById('remoteVideo');
+const offerOut = document.getElementById('offerOut');
+const offerSection = document.getElementById('offerSection');
+const notifySound = document.getElementById('notifySound');
+
+function getKey() {
+  const pass = passwordInput.value;
+  if (pass.length < 8) throw new Error("Password must be at least 8 characters.");
+  return CryptoJS.SHA256(pass).toString();
+}
+
+function encrypt(text) {
+  return CryptoJS.AES.encrypt(text, getKey()).toString();
+}
+
+function decrypt(cipher) {
+  try {
+    const bytes = CryptoJS.AES.decrypt(cipher, getKey());
+    return bytes.toString(CryptoJS.enc.Utf8) || "[Invalid Password]";
+  } catch {
+    return "[Decryption Failed]";
+  }
+}
+
+function storeHistory() {
+  const encrypted = CryptoJS.AES.encrypt(JSON.stringify({
+    data: chatHistory,
+    timestamp: Date.now()
+  }), getKey()).toString();
+  localStorage.setItem("secure_chat", encrypted);
+}
+
+function loadHistory() {
+  try {
+    const encrypted = localStorage.getItem("secure_chat");
+    if (!encrypted) return;
+    const bytes = CryptoJS.AES.decrypt(encrypted, getKey());
+    const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    const age = (Date.now() - decrypted.timestamp) / 60000;
+    if (age < expirationMinutes) {
+      chatHistory = decrypted.data;
+      updateChatDisplay();
+    } else {
+      clearChat();
+    }
+  } catch {
+    chatHistory = [];
+  }
+}
+
+function autoCreateOffer() {
+  getKey(); loadHistory();
+  navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    .then(stream => {
+      localStream = stream;
+      localVideo.srcObject = stream;
+      peer = new SimplePeer({ initiator: true, trickle: false, stream });
+      peer.on('signal', data => {
+        offerOut.value = JSON.stringify(data);
+        offerSection.classList.remove("hidden");
+      });
+      setupPeerEvents();
+    })
+    .catch(err => alert("Permission denied for camera/mic"));
+}
+
+function acceptAnswer() {
+  try {
+    peer.signal(JSON.parse(document.getElementById('answerIn').value));
+  } catch {
+    alert("Invalid answer format.");
+  }
+}
+
+function setupPeerEvents() {
+  peer.on('connect', () => {
+    connected = true;
+    appendMessage("🔗 Connected securely.");
+  });
+
+  peer.on('data', data => {
+    const decrypted = decrypt(data.toString());
+    appendMessage("👤 Peer", decrypted);
+    notifySound.play().catch(() => {});
+    storeHistory();
+  });
+
+  peer.on('stream', stream => {
+    remoteVideo.srcObject = stream;
+  });
+
+  peer.on('error', err => {
+    appendMessage("❌ Error: " + err.message);
+  });
+}
+
+function sendMessage() {
+  if (!connected) return alert("You are not connected.");
+  const msg = messageInput.value.trim();
+  if (!msg) return;
+  peer.send(encrypt(msg));
+  appendMessage("🧑 You", msg);
+  messageInput.value = "";
+  storeHistory();
+}
+
+function appendMessage(who, text = "") {
+  chatHistory.push({ from: who, text });
+  updateChatDisplay();
+}
+
+function updateChatDisplay() {
+  chat.innerHTML = chatHistory.map(m => `<div><b>${m.from}:</b> ${m.text}</div>`).join("");
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function downloadHistory() {
+  const lines = chatHistory.map(m => `${m.from}: ${m.text}`).join('\n');
+  const blob = new Blob([lines], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "secure_chat_history.txt";
+  a.click();
+}
+
+function clearChat() {
+  chatHistory = [];
+  localStorage.removeItem("secure_chat");
+  updateChatDisplay();
+}
+
+function copyOffer() {
+  navigator.clipboard.writeText(offerOut.value).then(() =>
+    alert("Offer copied to clipboard.")
+  ).catch(() => alert("Failed to copy."));
+}
+
+passwordInput.addEventListener("change", () => {
+  if (passwordInput.value.length >= 8) autoCreateOffer();
+});
+</script>
+</body>
+</html>
