@@ -2,99 +2,139 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Secure QR P2P Chat (with fallback)</title>
+  <title>Secure QR P2P Chat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.jsdelivr.net/npm/simple-peer@9.11.1/simplepeer.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
   <style>
-    body { background:#000; color:#fff; font-family:sans-serif; padding:10px }
-    input, button { width:100%; margin:5px 0; padding:10px; }
-    #chat { background:#111; padding:10px; height:150px; overflow:auto; font-family:monospace }
-    video { width:48%; margin:5px 0; background:#222 }
+    body { background:#000; color:#fff; font-family:sans-serif; padding:10px; margin:0; }
+    .page { display: none; }
+    .show { display: block; }
+    input, button { width: 100%; margin: 10px 0; padding: 12px; font-size: 16px; }
+    #chat { background: #111; padding: 10px; height: 150px; overflow: auto; font-family: monospace }
+    video { width: 48%; margin: 5px 0; background: #222 }
   </style>
 </head>
 <body>
-  <h2>🔐 Secure QR P2P Chat</h2>
-  <input id="pwd" type="password" placeholder="Shared password (≥8 chars)">
-  <button onclick="startOffer()">📤 Generate Offer QR</button>
-  <div id="qr"></div>
-  <button onclick="startScan()">📷 Scan Offer QR</button>
-  <div id="reader" style="width:100%;height:300px"></div>
+  <!-- Page 1: Enter password -->
+  <div id="page1" class="page show">
+    <h2>🔐 Enter Chat Password</h2>
+    <input id="pwd" type="password" placeholder="Password (min 8 chars)">
+    <button onclick="goToPage2()">Next</button>
+  </div>
 
-  <div id="chat">💬 Waiting for connection...</div>
-  <input id="msg" disabled placeholder="Type message">
-  <button id="sendBtn" disabled onclick="sendMsg()">Send</button>
+  <!-- Page 2: Choose to generate or scan -->
+  <div id="page2" class="page">
+    <h2>🔗 Connect</h2>
+    <button onclick="startOffer()">📤 Generate Offer QR</button>
+    <button onclick="startScan()">📷 Scan Offer QR</button>
+  </div>
 
-  <video id="me" autoplay muted playsinline></video>
-  <video id="you" autoplay playsinline></video>
-  <audio id="notif" src="https://notificationsounds.com/notification-sounds/light-528/download/mp3" preload="auto"></audio>
+  <!-- Page 3: QR or Camera -->
+  <div id="page3" class="page">
+    <h2 id="modeTitle">QR Code / Camera</h2>
+    <div id="qr"></div>
+    <div id="reader" style="width:100%;height:300px"></div>
+  </div>
+
+  <!-- Page 4: Chat and Video -->
+  <div id="page4" class="page">
+    <h2>💬 Chat</h2>
+    <div id="chat">Waiting for connection...</div>
+    <input id="msg" disabled placeholder="Type a message">
+    <button id="sendBtn" disabled onclick="sendMsg()">Send</button>
+    <video id="me" autoplay muted playsinline></video>
+    <video id="you" autoplay playsinline></video>
+    <audio id="notif" src="https://notificationsounds.com/notification-sounds/light-528/download/mp3" preload="auto"></audio>
+  </div>
 
 <script>
-let peer, stream;
+let peer, stream, password;
 const pwdEl = document.getElementById("pwd");
 const qrEl = document.getElementById("qr");
+const readerDiv = document.getElementById("reader");
 const chatEl = document.getElementById("chat");
 const msgEl = document.getElementById("msg");
 const sendBtn = document.getElementById("sendBtn");
 const meVid = document.getElementById("me"), youVid = document.getElementById("you");
-const readerDiv = document.getElementById("reader");
 const notif = document.getElementById("notif");
 
-function key() {
-  const p = pwdEl.value;
-  if (p.length < 8) throw "Password too short";
-  return CryptoJS.SHA256(p).toString();
+function switchPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
 }
-function enc(t){ return CryptoJS.AES.encrypt(t, key()).toString(); }
-function dec(c){ try{return CryptoJS.AES.decrypt(c, key()).toString(CryptoJS.enc.Utf8);}catch(e){return "[Decrypt error]"} }
-function log(txt){ chatEl.innerHTML += `<div>${txt}</div>`; chatEl.scrollTop = chatEl.scrollHeight; }
+
+function goToPage2() {
+  if (pwdEl.value.length < 8) return alert("Password must be at least 8 characters");
+  password = pwdEl.value;
+  switchPage("page2");
+}
+
+function key() {
+  return CryptoJS.SHA256(password).toString();
+}
+function enc(t) { return CryptoJS.AES.encrypt(t, key()).toString(); }
+function dec(c) {
+  try {
+    return CryptoJS.AES.decrypt(c, key()).toString(CryptoJS.enc.Utf8);
+  } catch (e) {
+    return "[Decrypt error]";
+  }
+}
+function log(txt) {
+  chatEl.innerHTML += `<div>${txt}</div>`;
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
 
 async function getMedia() {
   try {
     return await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
   } catch (e) {
-    log("⚠️ No camera/mic found – using chat only.");
+    log("⚠️ No camera/mic found – chat only mode");
     return null;
   }
 }
 
 async function startOffer() {
-  try { key(); } catch (e) { alert(e); return; }
-  readerDiv.innerHTML = "";
-  qrEl.innerHTML = "";
-
   stream = await getMedia();
   if (stream) meVid.srcObject = stream;
-
   peer = new SimplePeer({ initiator: true, trickle: false, stream: stream || undefined });
   peer.on("signal", offer => {
     const s = enc(JSON.stringify(offer));
     QRCode.toCanvas(s).then(canvas => {
       qrEl.innerHTML = "";
       qrEl.appendChild(canvas);
+      switchPage("page3");
+      document.getElementById("modeTitle").innerText = "📤 Share This QR";
     });
   });
   setupPeer();
 }
 
 function startScan() {
-  qrEl.innerHTML = "";
+  switchPage("page3");
+  document.getElementById("modeTitle").innerText = "📷 Scan Peer QR";
+  readerDiv.innerHTML = "";
   const scanner = new Html5Qrcode("reader");
   Html5Qrcode.getCameras().then(cams => {
     if (!cams.length) return alert("No camera found");
     scanner.start(cams[0].id, { fps: 10, qrbox: 250 }, txt => {
       scanner.stop();
       readerDiv.innerHTML = "";
-      const offer = JSON.parse(dec(txt));
-      connectAnswer(offer);
+      try {
+        const offer = JSON.parse(dec(txt));
+        connectAnswer(offer);
+      } catch (e) {
+        alert("❌ Failed to decrypt QR – check password");
+        switchPage("page2");
+      }
     });
-  }).catch(e => alert("QR Scan error: " + e));
+  }).catch(e => alert("QR error: " + e));
 }
 
 async function connectAnswer(offer) {
-  try { key(); } catch (e) { alert(e); return; }
   stream = await getMedia();
   if (stream) meVid.srcObject = stream;
   peer = new SimplePeer({ initiator: false, trickle: false, stream: stream || undefined });
@@ -108,12 +148,13 @@ function setupPeer() {
     QRCode.toCanvas(s).then(canvas => {
       qrEl.innerHTML = "";
       qrEl.appendChild(canvas);
-      log("📱 Scan this QR on the other device");
+      document.getElementById("modeTitle").innerText = "📱 Show This QR Back";
     });
   });
   peer.on("connect", () => {
     msgEl.disabled = sendBtn.disabled = false;
     log("✅ Connected securely");
+    switchPage("page4");
   });
   peer.on("data", data => {
     const m = dec(data.toString());
