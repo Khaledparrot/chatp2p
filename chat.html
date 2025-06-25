@@ -8,6 +8,7 @@
     #chat { border: 1px solid #888; height: 200px; overflow-y: scroll; margin-bottom: 10px; padding: 5px; background: #222; }
     input, button, textarea { padding: 8px; margin: 5px 0; width: 100%; }
     canvas { max-width: 100%; }
+    #cam { display: none; }
   </style>
 </head>
 <body>
@@ -35,10 +36,10 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
 
 <script>
 let pc, dc, aesKey, password, qr, localMessages = [];
-
 const MAX_MESSAGES = 50;
 const localKey = 'secureChat';
 
@@ -84,8 +85,10 @@ function generateOffer() {
   dc.onmessage = e => handleMessage(e.data);
   pc.createOffer().then(offer => pc.setLocalDescription(offer)).then(() => {
     waitForICE(() => {
+      const text = JSON.stringify(pc.localDescription);
+      const compressed = LZString.compressToUTF16(text);
       const enc = new TextEncoder();
-      crypto.subtle.encrypt({name: 'AES-GCM', iv: enc.encode('1234567890123456')}, aesKey, enc.encode(JSON.stringify(pc.localDescription)))
+      crypto.subtle.encrypt({name: 'AES-GCM', iv: enc.encode('1234567890123456')}, aesKey, enc.encode(compressed))
         .then(encrypted => {
           const qrData = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
           showQR(qrData);
@@ -149,7 +152,9 @@ function connectWithAnswer(data) {
   const encrypted = Uint8Array.from(atob(data), c => c.charCodeAt(0));
   crypto.subtle.decrypt({name: 'AES-GCM', iv: enc.encode('1234567890123456')}, aesKey, encrypted)
     .then(decrypted => {
-      const offer = JSON.parse(new TextDecoder().decode(decrypted));
+      const compressed = new TextDecoder().decode(decrypted);
+      const text = LZString.decompressFromUTF16(compressed);
+      const offer = JSON.parse(text);
       pc = new RTCPeerConnection();
       pc.ondatachannel = e => {
         dc = e.channel;
