@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Secure P2P Chat</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: #fff; padding: 10px; }
+    #chat { border: 1px solid #888; height: 200px; overflow-y: scroll; margin-bottom: 10px; padding: 5px; background: #222; }
+    input, button, textarea { padding: 8px; margin: 5px 0; width: 100%; }
+    canvas { max-width: 100%; }
+  </style>
+</head>
+<body>
+
+<h2>🔐 Secure P2P Chat</h2>
+
+<div id="setup">
+  <input type="password" id="password" placeholder="Enter password (8+ chars)" />
+  <button onclick="start()">Start Chat</button>
+</div>
+
+<div id="qr-section" style="display:none;">
+  <button onclick="generateOffer()">📤 Generate Offer (QR)</button>
+  <button onclick="scanQRCode()">📷 Scan QR</button>
+  <div id="qr-display"></div>
+  <video id="cam" width="300" autoplay></video>
+</div>
+
+<div id="chat-section" style="display:none;">
+  <div id="chat"></div>
+  <textarea id="msg" placeholder="Type message..."></textarea>
+  <button onclick="send()">Send</button>
+  <button onclick="clearChat()">🗑 Clear Chat</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+
+<script>
+let pc, dc, aesKey, password, qr, localMessages = [];
+
+const MAX_MESSAGES = 50;
+const localKey = 'secureChat';
+
+function saveMessages() {
+  const enc = new TextEncoder();
+  const data = JSON.stringify(localMessages.slice(-MAX_MESSAGES));
+  crypto.subtle.encrypt({name: 'AES-GCM', iv: enc.encode('1234567890123456')}, aesKey, enc.encode(data)).then(encrypted => {
+    localStorage.setItem(localKey, btoa(String.fromCharCode(...new Uint8Array(encrypted))));
+  });
+}
+
+function loadMessages() {
+  const enc = new TextEncoder();
+  const stored = localStorage.getItem(localKey);
+  if (!stored) return;
+  try {
+    const encrypted = Uint8Array.from(atob(stored), c => c.charCodeAt(0));
+    crypto.subtle.decrypt({name: 'AES-GCM', iv: enc.encode('1234567890123456')}, aesKey, encrypted).then(decrypted => {
+      const dec = new TextDecoder().decode(decrypted);
+      localMessages = JSON.parse(dec);
+      localMessages.forEach(msg => appendMessage(msg, true));
+    }).catch(() => alert("Wrong password — cannot decrypt old messages."));
+  } catch (e) {
+    console.error("Load failed", e);
+  }
+}
+
+function start() {
+  password = document.getElementById("password").value;
+  if (password.length < 8) return alert("Password too short");
+  const enc = new TextEncoder().encode(password.padEnd(16));
+  crypto.subtle.importKey("raw", enc, "AES-GCM", false, ["encrypt", "decrypt"]).then(key => {
+    aesKey = key;
+    document.getElementById("setup").style.display = "none";
+    document.getElementById("qr-section").style.display = "block";
+    loadMessages();
+  });
+}
+
+function generateOffer() {
+  pc = new RTCPeerConnection();
+  dc = pc.createDataChannel("chat");
+  dc.onmessage = e => handleMessage(e.data);
+  pc.createOffer().then(offer => pc.setLocalDescription(offer)).then(() => {
+    waitForICE(() => {
+      const enc = new TextEncoder();
+      crypto.subtle.encrypt({name: 'AES-GCM', iv: enc.encode('1234567890123456')}, aesKey, enc.encode(JSON.stringify(pc.localDescription)))
+        .then(encrypted => {
+          const qrData = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+          showQR(qrData);
+        });
+    });
+  });
+  pc.onconnectionstatechange = () => {
+    if (pc.connectionState === "connected") {
+      document.getElementById("chat-section").style.display = "block";
+      document.getElementById("qr-section").style.display = "none";
+    }
+  };
+}
+
+function waitForICE(cb) {
+  if (pc.iceGatheringState === "complete") cb();
+  else pc.onicegatheringstatechange = () => {
+    if (pc.iceGatheringState === "complete") cb();
+  };
+}
+
+function showQR(data) {
+  document.getElementById("qr-display").innerHTML = "";
+  new QRCode(document.getElementById("qr-display"), {
+    text: data,
+    width: 256,
+    height: 256
+  });
+}
+
+function scanQRCode() {
+  const video = document.getElementById("cam");
+  document.getElementById("cam").style.display = "block";
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+    .then(stream => {
+      video.srcObject = stream;
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      const scan = () => {
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imgData.data, canvas.width, canvas.height);
+          if (code) {
+            stream.getTracks().forEach(track => track.stop());
+            connectWithAnswer(code.data);
+            return;
+          }
+        }
+        requestAnimationFrame(scan);
+      };
+      scan();
+    }).catch(err => alert("Camera error: " + err));
+}
+
+function connectWithAnswer(data) {
+  const enc = new TextEncoder();
+  const encrypted = Uint8Array.from(atob(data), c => c.charCodeAt(0));
+  crypto.subtle.decrypt({name: 'AES-GCM', iv: enc.encode('1234567890123456')}, aesKey, encrypted)
+    .then(decrypted => {
+      const offer = JSON.parse(new TextDecoder().decode(decrypted));
+      pc = new RTCPeerConnection();
+      pc.ondatachannel = e => {
+        dc = e.channel;
+        dc.onmessage = ev => handleMessage(ev.data);
+      };
+      pc.onconnectionstatechange = () => {
+        if (pc.connectionState === "connected") {
+          document.getElementById("chat-section").style.display = "block";
+          document.getElementById("qr-section").style.display = "none";
+        }
+      };
+      pc.setRemoteDescription(offer)
+        .then(() => pc.createAnswer())
+        .then(answer => pc.setLocalDescription(answer))
+        .then(() => waitForICE(() => {
+          dc.send(JSON.stringify(pc.localDescription));
+        }));
+    });
+}
+
+function handleMessage(raw) {
+  if (raw.startsWith("{") && raw.includes("type")) {
+    const desc = JSON.parse(raw);
+    pc.setRemoteDescription(desc);
+  } else {
+    appendMessage(raw);
+  }
+}
+
+function send() {
+  const msg = document.getElementById("msg").value.trim();
+  if (!msg || !dc || dc.readyState !== "open") return;
+  dc.send(msg);
+  appendMessage(msg, true);
+  document.getElementById("msg").value = "";
+}
+
+function appendMessage(msg, mine = false) {
+  const div = document.createElement("div");
+  div.textContent = (mine ? "🟢 You: " : "🔵 Them: ") + msg;
+  document.getElementById("chat").appendChild(div);
+  document.getElementById("chat").scrollTop = 9999;
+  localMessages.push((mine ? "[me] " : "[them] ") + msg);
+  if (localMessages.length > MAX_MESSAGES) localMessages.shift();
+  saveMessages();
+}
+
+function clearChat() {
+  if (confirm("Clear local encrypted messages?")) {
+    localMessages = [];
+    localStorage.removeItem(localKey);
+    document.getElementById("chat").innerHTML = "";
+  }
+}
+</script>
+</body>
+</html>
