@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fingerprint Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 2rem; }
+    #result { font-size: 1.5rem; margin-top: 2rem; }
+    button { font-size: 1.2rem; padding: 10px 20px; }
+    pre { background: #f0f0f0; text-align: left; padding: 10px; margin-top: 1rem; overflow-x: auto; }
+  </style>
+</head>
+<body>
+
+  <h1>🔐 Fingerprint Authentication Test</h1>
+  <p>This test uses WebAuthn and works on phones with fingerprint unlock.</p>
+
+  <button onclick="runFingerprint()">Test Fingerprint</button>
+
+  <div id="result"></div>
+  <pre id="details"></pre>
+
+  <script>
+    async function runFingerprint() {
+      const resultEl = document.getElementById('result');
+      const detailsEl = document.getElementById('details');
+      resultEl.textContent = '🔄 Waiting for fingerprint...';
+
+      try {
+        const publicKey = {
+          challenge: new Uint8Array(32), // Dummy challenge
+          timeout: 60000,
+          userVerification: 'required',
+        };
+
+        const credential = await navigator.credentials.get({ publicKey });
+
+        resultEl.textContent = '✅ Fingerprint correct!';
+        detailsEl.textContent = JSON.stringify(credential, null, 2);
+      } catch (err) {
+        resultEl.textContent = '❌ Fingerprint not correct or cancelled.';
+        detailsEl.textContent = err.toString();
+      }
+    }
+  </script>
+
+</body>
+</html>
