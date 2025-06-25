@@ -2,84 +2,122 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Secure QR-P2P Chat + Video</title>
+  <title>Secure Phone QR Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.jsdelivr.net/npm/simple-peer@9.11.1/simplepeer.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
-  <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
-    body { font-family: sans-serif; background: #121212; color: #eee; padding: 20px; }
-    input, button { width: 100%; padding: 10px; margin: 10px 0; font-size: 1em; }
-    #chat { border: 1px solid #444; padding: 10px; min-height: 120px; max-height: 300px; overflow-y: auto; font-family: monospace; background: #1a1a1a; }
-    video { width: 48%; margin: 5px 0; background: #000; }
-    #qr-display, #reader { margin: 10px 0; }
+    body { font-family: sans-serif; background: #000; color: #fff; padding: 10px; }
+    input, button { width: 100%; font-size: 1em; margin: 5px 0; padding: 10px; }
+    #chat { background: #111; padding: 10px; min-height: 100px; margin: 10px 0; overflow-y: auto; font-family: monospace; }
+    video { width: 48%; background: #222; margin: 5px 0; }
+    #qr, #reader { margin: 10px 0; }
   </style>
 </head>
 <body>
-  <h2>🔐 Secure QR-P2P Chat + Video</h2>
+  <h2>📱 Secure QR Chat (Phones Only)</h2>
 
-  <label>Password (≥8 chars):</label>
-  <input id="password" type="password" placeholder="Enter shared password" />
+  <label>🔑 Password (≥8 characters)</label>
+  <input id="pwd" type="password" placeholder="Shared password">
 
-  <button id="startBtn" onclick="start()">📡 Start / Refresh Offer</button>
+  <button onclick="startOffer()">🟢 Generate Offer QR</button>
+  <div id="qr"></div>
 
-  <div id="qr-display"></div>
-  <div id="reader" style="width:100%;"></div>
+  <button onclick="startScan()">📷 Scan QR to Connect</button>
+  <div id="reader" style="width:100%"></div>
 
-  <div id="chat">🔒 Waiting for connection...</div>
-  <input id="message" placeholder="Type a message..." disabled />
-  <button id="sendBtn" onclick="sendMessage()" disabled>Send</button>
-  <button onclick="clearChat()">🗑 Clear Chat</button>
+  <div id="chat">🕵️ Waiting for connection...</div>
+  <input id="msg" placeholder="Message" disabled>
+  <button onclick="sendMsg()" disabled>Send</button>
 
-  <hr>
-  <video id="localVideo" autoplay muted></video>
-  <video id="remoteVideo" autoplay></video>
-  <audio id="notify" src="https://notificationsounds.com/notification-sounds/light-528/download/mp3" preload="auto"></audio>
+  <video id="me" autoplay muted playsinline></video>
+  <video id="you" autoplay playsinline></video>
 
   <script>
-let peer, localStream, connected = false, chatHist = [], expiration = 30;
-const pwd = document.getElementById('password');
-const qrDisplay = document.getElementById('qr-display');
-const chatEl = document.getElementById('chat');
-const msgIn = document.getElementById('message'), sendBtn = document.getElementById('sendBtn');
-const localV = document.getElementById('localVideo'), remoteV = document.getElementById('remoteVideo');
-const reader = document.getElementById('reader'), notifier = document.getElementById('notify');
-function key(){ const p=pwd.value; if(p.length<8) throw 'Pwd too short'; return CryptoJS.SHA256(p).toString(); }
-function enc(t){ return CryptoJS.AES.encrypt(t,key()).toString(); }
-function dec(c){ try{return CryptoJS.AES.decrypt(c,key()).toString(CryptoJS.enc.Utf8)||'[BadPwd]';}catch{ return '[Err]'; } }
-function store(){ localStorage.setItem('qc', CryptoJS.AES.encrypt(JSON.stringify({c:chatHist,t:Date.now()}),key()).toString()); }
-function load(){ try{ const d=CryptoJS.AES.decrypt(localStorage.qc,key()).toString(CryptoJS.enc.Utf8);
-                    const o=JSON.parse(d); if((Date.now()-o.t)/60000<expiration){ chatHist=o.c; disp(); } else clearChat(); } catch{} }
-function disp(){ chatEl.innerHTML = chatHist.map(m=>`<div><b>${m.f}</b>: ${m.t}</div>`).join(''); chatEl.scrollTop=chatEl.scrollHeight; }
-function append(f,t){ chatHist.push({f,t}); disp(); store(); }
-function clearChat(){ chatHist=[]; localStorage.removeItem('qc'); disp(); }
-function start(){
-  try{ key(); }catch(e){alert(e);return;}
-  load(); navigator.mediaDevices.getUserMedia({video:1,audio:1}).then(s=>{
-    localStream=s; localV.srcObject=s;
-    peer=new SimplePeer({initiator:true,trickle:false,stream:s});
-    peer.on('signal',o=>{
-      const text=enc(JSON.stringify(o));
-      qrDisplay.innerHTML = ''; new QRCode(qrDisplay, {text, width:240, height:240});
+let peer, stream;
+function getKey() {
+  const pass = document.getElementById("pwd").value;
+  if (pass.length < 8) throw "Password too short";
+  return CryptoJS.SHA256(pass).toString();
+}
+function encrypt(text) {
+  return CryptoJS.AES.encrypt(text, getKey()).toString();
+}
+function decrypt(cipher) {
+  try {
+    return CryptoJS.AES.decrypt(cipher, getKey()).toString(CryptoJS.enc.Utf8);
+  } catch {
+    return "[Error: Decrypt]";
+  }
+}
+async function startOffer() {
+  try { getKey(); } catch(e) { alert(e); return; }
+  document.getElementById("reader").innerHTML = "";
+  stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  document.getElementById("me").srcObject = stream;
+  peer = new SimplePeer({ initiator: true, trickle: false, stream });
+  peer.on("signal", data => {
+    const enc = encrypt(JSON.stringify(data));
+    QRCode.toCanvas(document.createElement("canvas"), enc, { width: 300 }, (err, canvas) => {
+      if (!err) {
+        const qrDiv = document.getElementById("qr");
+        qrDiv.innerHTML = "";
+        qrDiv.appendChild(canvas);
+      }
     });
-    peer.on('connect',()=>{ connected=true; msgIn.disabled=sendBtn.disabled=false; append('🛡️ System','Connected securely'); })
-    .on('data',d=>{ const dc=dec(d.toString()); append('Peer',dc); notifier.play().catch(); })
-    .on('stream',st=>{ remoteV.srcObject=st; })
-    .on('error',e=>append('⚠️ Error',e.message));
-    html5QrcodeScanner = new Html5QrcodeReader('reader', {fps:10,qrbox:250});
-    html5QrcodeScanner.render(onScan,()=>{});
-  }).catch(e=>alert('Media err'));
+  });
+  setupEvents();
 }
-function onScan(txt){
-  try{
-    const dd=JSON.parse(dec(txt));
-    peer.signal(dd); html5QrcodeScanner.clear().catch();
-    qrDisplay.innerHTML='<b>Waiting…</b>';
-  }catch{}
+function startScan() {
+  document.getElementById("qr").innerHTML = "";
+  const qrScanner = new Html5Qrcode("reader");
+  qrScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
+    (txt) => {
+      qrScanner.stop();
+      const answer = JSON.parse(decrypt(txt));
+      if (!peer) {
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(s => {
+          stream = s;
+          document.getElementById("me").srcObject = s;
+          peer = new SimplePeer({ initiator: false, trickle: false, stream: s });
+          setupEvents();
+          peer.signal(answer);
+        });
+      } else {
+        peer.signal(answer);
+      }
+    },
+    (err) => console.warn("Scan error", err)
+  );
 }
-function sendMessage(){
-  const m=msgIn.value.trim(); if(!m||!connected)return;
-  peer.send(enc(m)); append('You',m); msgIn.value=''; }
-</script>
+function setupEvents() {
+  peer.on("connect", () => {
+    document.getElementById("msg").disabled = false;
+    document.querySelector("button[onclick='sendMsg()']").disabled = false;
+    log("✅ Connected securely");
+  });
+  peer.on("data", data => {
+    log("Peer: " + decrypt(data.toString()));
+  });
+  peer.on("stream", remote => {
+    document.getElementById("you").srcObject = remote;
+  });
+}
+function sendMsg() {
+  const msg = document.getElementById("msg").value.trim();
+  if (msg && peer) {
+    peer.send(encrypt(msg));
+    log("You: " + msg);
+    document.getElementById("msg").value = "";
+  }
+}
+function log(txt) {
+  const chat = document.getElementById("chat");
+  chat.innerHTML += `<div>${txt}</div>`;
+  chat.scrollTop = chat.scrollHeight;
+}
+  </script>
 </body>
 </html>
