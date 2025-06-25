@@ -2,8 +2,8 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Secure QR P2P Chat (Phone)</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Secure QR P2P Chat (with fallback)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.jsdelivr.net/npm/simple-peer@9.11.1/simplepeer.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
@@ -16,14 +16,14 @@
   </style>
 </head>
 <body>
-  <h2>Secure QR P2P Chat (Phone Only)</h2>
+  <h2>🔐 Secure QR P2P Chat</h2>
   <input id="pwd" type="password" placeholder="Shared password (≥8 chars)">
-  <button onclick="startOffer()">Generate Offer QR</button>
+  <button onclick="startOffer()">📤 Generate Offer QR</button>
   <div id="qr"></div>
-  <button onclick="startScan()">Scan Offer QR</button>
+  <button onclick="startScan()">📷 Scan Offer QR</button>
   <div id="reader" style="width:100%;height:300px"></div>
 
-  <div id="chat">🕵️ Waiting…</div>
+  <div id="chat">💬 Waiting for connection...</div>
   <input id="msg" disabled placeholder="Type message">
   <button id="sendBtn" disabled onclick="sendMsg()">Send</button>
 
@@ -48,71 +48,88 @@ function key() {
   return CryptoJS.SHA256(p).toString();
 }
 function enc(t){ return CryptoJS.AES.encrypt(t, key()).toString(); }
-function dec(c){ try{return CryptoJS.AES.decrypt(c, key()).toString(CryptoJS.enc.Utf8);}catch(e){return "[Decrypt err]"}}
+function dec(c){ try{return CryptoJS.AES.decrypt(c, key()).toString(CryptoJS.enc.Utf8);}catch(e){return "[Decrypt error]"} }
 function log(txt){ chatEl.innerHTML += `<div>${txt}</div>`; chatEl.scrollTop = chatEl.scrollHeight; }
-async function startOffer(){
-  try{key();}catch(e){alert(e); return;}
+
+async function getMedia() {
+  try {
+    return await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  } catch (e) {
+    log("⚠️ No camera/mic found – using chat only.");
+    return null;
+  }
+}
+
+async function startOffer() {
+  try { key(); } catch (e) { alert(e); return; }
   readerDiv.innerHTML = "";
   qrEl.innerHTML = "";
-  stream = await navigator.mediaDevices.getUserMedia({video:1,audio:1});
-  meVid.srcObject = stream;
-  peer = new SimplePeer({initiator:true,trickle:false,stream});
-  peer.on("signal", offer=>{
+
+  stream = await getMedia();
+  if (stream) meVid.srcObject = stream;
+
+  peer = new SimplePeer({ initiator: true, trickle: false, stream: stream || undefined });
+  peer.on("signal", offer => {
     const s = enc(JSON.stringify(offer));
-    QRCode.toCanvas(s).then(canvas=>{
+    QRCode.toCanvas(s).then(canvas => {
       qrEl.innerHTML = "";
       qrEl.appendChild(canvas);
     });
   });
   setupPeer();
 }
-function startScan(){
+
+function startScan() {
   qrEl.innerHTML = "";
   const scanner = new Html5Qrcode("reader");
-  Html5Qrcode.getCameras().then(cams=>{
-    if(!cams.length) return alert("No camera found");
-    scanner.start(cams[0].id,{fps:10,qrbox:250}, txt=>{
+  Html5Qrcode.getCameras().then(cams => {
+    if (!cams.length) return alert("No camera found");
+    scanner.start(cams[0].id, { fps: 10, qrbox: 250 }, txt => {
       scanner.stop();
-      readerDiv.innerHTML="";
+      readerDiv.innerHTML = "";
       const offer = JSON.parse(dec(txt));
       connectAnswer(offer);
-    }, err=>{});
-  }).catch(e=>alert("Scanner error"));
+    });
+  }).catch(e => alert("QR Scan error: " + e));
 }
-async function connectAnswer(offer){
-  try{key();}catch(e){alert(e);return;}
-  stream = await navigator.mediaDevices.getUserMedia({video:1,audio:1});
-  meVid.srcObject = stream;
-  peer = new SimplePeer({initiator:false,trickle:false,stream});
+
+async function connectAnswer(offer) {
+  try { key(); } catch (e) { alert(e); return; }
+  stream = await getMedia();
+  if (stream) meVid.srcObject = stream;
+  peer = new SimplePeer({ initiator: false, trickle: false, stream: stream || undefined });
   peer.signal(offer);
   setupPeer();
 }
-function setupPeer(){
-  peer.on("signal", ans=>{
+
+function setupPeer() {
+  peer.on("signal", ans => {
     const s = enc(JSON.stringify(ans));
-    QRCode.toCanvas(s).then(canvas=>{
-      qrEl.innerHTML=""; qrEl.appendChild(canvas);
-      log("📷 Scan this answer QR on the other phone to connect");
+    QRCode.toCanvas(s).then(canvas => {
+      qrEl.innerHTML = "";
+      qrEl.appendChild(canvas);
+      log("📱 Scan this QR on the other device");
     });
   });
-  peer.on("connect", ()=>{
+  peer.on("connect", () => {
     msgEl.disabled = sendBtn.disabled = false;
     log("✅ Connected securely");
   });
-  peer.on("data", data=>{
+  peer.on("data", data => {
     const m = dec(data.toString());
-    log("Peer: "+m);
-    notif.play().catch();
+    log("👤 Peer: " + m);
+    notif.play().catch(() => {});
   });
-  peer.on("stream", s=>{ youVid.srcObject = s; });
-  peer.on("error", err=>log("Error: "+ err.message));
+  peer.on("stream", s => { youVid.srcObject = s; });
+  peer.on("error", err => log("❌ Error: " + err.message));
 }
-function sendMsg(){
+
+function sendMsg() {
   const m = msgEl.value.trim();
-  if(!m||!peer) return;
+  if (!m || !peer) return;
   peer.send(enc(m));
-  log("You: "+m);
-  msgEl.value="";
+  log("🧍 You: " + m);
+  msgEl.value = "";
 }
 </script>
 </body>
