@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test WebAuthn (Empreinte)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 2rem; }
+    button { font-size: 1.1rem; padding: 10px 20px; margin: 10px; }
+    #result { margin-top: 20px; font-size: 1.2rem; }
+    pre { text-align: left; background: #f5f5f5; padding: 1em; margin-top: 1em; overflow-x: auto; }
+  </style>
+</head>
+<body>
+
+  <h1>🔐 Test Empreinte (WebAuthn)</h1>
+  <p>Appuie sur le bouton pour enregistrer une clé biométrique (empreinte).</p>
+
+  <button onclick="registerCredential()">📌 Enregistrer une empreinte</button>
+  <button onclick="authenticate()">🔓 Authentifier</button>
+
+  <div id="result"></div>
+  <pre id="details"></pre>
+
+  <script>
+    let credentialId = null;
+
+    async function registerCredential() {
+      const result = document.getElementById("result");
+      const details = document.getElementById("details");
+
+      const publicKey = {
+        challenge: new Uint8Array(32),
+        rp: { name: "khaled.github.io" },
+        user: {
+          id: new Uint8Array(16),
+          name: "user@khaled.github.io",
+          displayName: "Utilisateur Khaled"
+        },
+        pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+        timeout: 60000,
+        authenticatorSelection: { userVerification: "required" },
+      };
+
+      try {
+        const cred = await navigator.credentials.create({ publicKey });
+        credentialId = cred.rawId;
+        result.textContent = "✅ Empreinte enregistrée avec succès !";
+        details.textContent = JSON.stringify(cred, null, 2);
+      } catch (err) {
+        result.textContent = "❌ Erreur d'enregistrement.";
+        details.textContent = err.toString();
+      }
+    }
+
+    async function authenticate() {
+      const result = document.getElementById("result");
+      const details = document.getElementById("details");
+
+      const publicKey = {
+        challenge: new Uint8Array(32),
+        timeout: 60000,
+        userVerification: "required",
+        allowCredentials: credentialId ? [{
+          type: "public-key",
+          id: credentialId
+        }] : []
+      };
+
+      try {
+        const assertion = await navigator.credentials.get({ publicKey });
+        result.textContent = "✅ Authentification réussie !";
+        details.textContent = JSON.stringify(assertion, null, 2);
+      } catch (err) {
+        result.textContent = "❌ Échec de l'authentification.";
+        details.textContent = err.toString();
+      }
+    }
+  </script>
+
+</body>
+</html>
