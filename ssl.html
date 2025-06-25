@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Secure QR P2P Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/simple-peer@9.11.1/simplepeer.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+  <style>
+    body { background:#000; color:#fff; font-family:sans-serif; padding:10px; margin:0; }
+    .page { display: none; }
+    .show { display: block; }
+    input, button { width: 100%; margin: 10px 0; padding: 12px; font-size: 16px; }
+    #chat { background: #111; padding: 10px; height: 150px; overflow: auto; font-family: monospace }
+    video { width: 48%; margin: 5px 0; background: #222 }
+  </style>
+</head>
+<body>
+  <div id="page1" class="page show">
+    <h2>🔐 Enter Chat Password</h2>
+    <input id="pwd" type="password" placeholder="Password (min 8 chars)">
+    <button onclick="goToPage2()">Next</button>
+  </div>
+
+  <div id="page2" class="page">
+    <h2>🔗 Connect</h2>
+    <button onclick="startOffer()">📤 Generate Offer QR</button>
+    <button onclick="startScan()">📷 Scan Offer QR</button>
+  </div>
+
+  <div id="page3" class="page">
+    <h2 id="modeTitle">QR Code / Camera</h2>
+    <div id="qr"></div>
+    <div id="reader" style="width:100%;height:300px"></div>
+  </div>
+
+  <div id="page4" class="page">
+    <h2>💬 Chat</h2>
+    <div id="chat">Waiting for connection...</div>
+    <input id="msg" disabled placeholder="Type a message">
+    <button id="sendBtn" disabled onclick="sendMsg()">Send</button>
+    <video id="me" autoplay muted playsinline></video>
+    <video id="you" autoplay playsinline></video>
+    <audio id="notif" src="https://notificationsounds.com/notification-sounds/light-528/download/mp3" preload="auto"></audio>
+  </div>
+
+<script>
+let peer, stream, password;
+const pwdEl = document.getElementById("pwd");
+const qrEl = document.getElementById("qr");
+const readerDiv = document.getElementById("reader");
+const chatEl = document.getElementById("chat");
+const msgEl = document.getElementById("msg");
+const sendBtn = document.getElementById("sendBtn");
+const meVid = document.getElementById("me"), youVid = document.getElementById("you");
+const notif = document.getElementById("notif");
+
+function switchPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+}
+
+function goToPage2() {
+  if (pwdEl.value.length < 8) return alert("Password must be at least 8 characters");
+  password = pwdEl.value;
+  switchPage("page2");
+}
+
+function key() {
+  return CryptoJS.SHA256(password).toString();
+}
+function enc(t) { return CryptoJS.AES.encrypt(t, key()).toString(); }
+function dec(c) {
+  try {
+    return CryptoJS.AES.decrypt(c, key()).toString(CryptoJS.enc.Utf8);
+  } catch (e) {
+    alert("Error decrypting message.");
+    return "[Decrypt error]";
+  }
+}
+function log(txt) {
+  chatEl.innerHTML += `<div>${txt}</div>`;
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+async function getMedia() {
+  try {
+    return await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  } catch (e) {
+    alert("Camera/Microphone access failed: " + e.message);
+    return null;
+  }
+}
+
+async function startOffer() {
+  stream = await getMedia();
+  if (stream) meVid.srcObject = stream;
+  try {
+    peer = new SimplePeer({ initiator: true, trickle: false, stream: stream || undefined });
+    peer.on("signal", offer => {
+      const s = enc(JSON.stringify(offer));
+      QRCode.toCanvas(s).then(canvas => {
+        qrEl.innerHTML = "";
+        qrEl.appendChild(canvas);
+        switchPage("page3");
+        document.getElementById("modeTitle").innerText = "📤 Share This QR";
+      }).catch(err => alert("QR generation failed: " + err.message));
+    });
+    setupPeer();
+  } catch (e) {
+    alert("Peer creation failed: " + e.message);
+  }
+}
+
+function startScan() {
+  switchPage("page3");
+  document.getElementById("modeTitle").innerText = "📷 Scan Peer QR";
+  readerDiv.innerHTML = "";
+  const scanner = new Html5Qrcode("reader");
+  Html5Qrcode.getCameras().then(cams => {
+    if (!cams.length) return alert("No camera found");
+    scanner.start(cams[0].id, { fps: 10, qrbox: 250 }, txt => {
+      scanner.stop();
+      readerDiv.innerHTML = "";
+      try {
+        const offer = JSON.parse(dec(txt));
+        connectAnswer(offer);
+      } catch (e) {
+        alert("❌ Failed to decrypt QR – check password");
+        switchPage("page2");
+      }
+    }, err => {
+      console.error("QR Scan Error", err);
+    });
+  }).catch(e => alert("QR camera init failed: " + e.message));
+}
+
+async function connectAnswer(offer) {
+  stream = await getMedia();
+  if (stream) meVid.srcObject = stream;
+  peer = new SimplePeer({ initiator: false, trickle: false, stream: stream || undefined });
+  peer.signal(offer);
+  setupPeer();
+}
+
+function setupPeer() {
+  peer.on("signal", ans => {
+    const s = enc(JSON.stringify(ans));
+    QRCode.toCanvas(s).then(canvas => {
+      qrEl.innerHTML = "";
+      qrEl.appendChild(canvas);
+      document.getElementById("modeTitle").innerText = "📱 Show This QR Back";
+    }).catch(err => alert("QR generation failed: " + err.message));
+  });
+  peer.on("connect", () => {
+    msgEl.disabled = sendBtn.disabled = false;
+    log("✅ Connected securely");
+    switchPage("page4");
+  });
+  peer.on("data", data => {
+    const m = dec(data.toString());
+    log("👤 Peer: " + m);
+    notif.play().catch(() => {});
+  });
+  peer.on("stream", s => { youVid.srcObject = s; });
+  peer.on("error", err => alert("Connection error: " + err.message));
+}
+
+function sendMsg() {
+  const m = msgEl.value.trim();
+  if (!m || !peer) return;
+  peer.send(enc(m));
+  log("🧍 You: " + m);
+  msgEl.value = "";
+}
+</script>
+</body>
+</html>
