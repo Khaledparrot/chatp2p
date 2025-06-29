@@ -6,11 +6,9 @@
   <style>
     * { box-sizing: border-box; }
     html, body {
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       font-family: sans-serif;
-      height: 100%;
-      background: #f0f0f0;
+      height: 100%; background: #f0f0f0;
     }
     .hidden { display: none; }
     .view {
@@ -43,23 +41,25 @@
       overflow-y: auto;
       padding: 10px;
       background: #eaeaea;
+      display: flex;
+      flex-direction: column;
     }
     #bottomBar {
       display: flex;
-      padding: 8px;
+      padding: 10px;
       background: #fff;
       border-top: 1px solid #ccc;
     }
     #msg {
       flex: 1;
       font-size: 18px;
-      padding: 12px;
+      padding: 14px;
       border-radius: 12px;
       border: 1px solid #ccc;
     }
     #sendBtn {
       margin-left: 8px;
-      padding: 10px;
+      padding: 10px 14px;
       font-size: 14px;
       border-radius: 8px;
       background: #28a745;
@@ -67,22 +67,22 @@
     }
     .you, .peer {
       max-width: 80%;
-      padding: 10px;
-      margin: 6px 0;
+      padding: 12px;
+      margin: 6px;
       border-radius: 12px;
-      clear: both;
       display: inline-block;
+      word-wrap: break-word;
     }
     .you {
-      background: #d0e7ff;
-      color: #004080;
-      float: right;
+      background: #cce5ff;
+      color: #004085;
+      align-self: flex-end;
       text-align: right;
     }
     .peer {
-      background: #d1ffd6;
-      color: #026602;
-      float: left;
+      background: #d4edda;
+      color: #155724;
+      align-self: flex-start;
       text-align: left;
     }
     #chatUI {
@@ -140,13 +140,14 @@
     <button id="clearBtn" onclick="clearAll()">🧹 Clear All</button>
     <div id="chatBox"></div>
     <div id="bottomBar">
-      <input id="msg" placeholder="Type a message..." />
+      <textarea id="msg" rows="2" placeholder="Type a message..."></textarea>
       <button id="sendBtn" onclick="sendMessage()">Send</button>
     </div>
   </div>
 
   <script>
     let pc, channel;
+    let connected = false;
     const saved = JSON.parse(localStorage.getItem('p2p-data') || '{}');
     const username = getOrAskName();
 
@@ -170,18 +171,20 @@
       navigator.clipboard.writeText(el.value).then(() => alert("Copied!"));
     }
 
-    function appendMessage(msg, from = 'Peer') {
+    function appendMessage(msg, from) {
       const chatBox = document.getElementById("chatBox");
       const bubble = document.createElement("div");
-      bubble.className = from === username ? 'you' : 'peer';
+      bubble.className = (from === username) ? 'you' : 'peer';
       bubble.innerHTML = `<strong>${from}:</strong><br>${msg}`;
       chatBox.appendChild(bubble);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     function setupChannel() {
-      channel.onmessage = e => appendMessage(e.data);
+      channel.onmessage = e => appendMessage(e.data, 'Peer');
       channel.onopen = () => {
+        if (connected) return;
+        connected = true;
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById("chatUI").classList.remove("hidden");
         appendMessage("✅ Connected", "System");
@@ -201,7 +204,6 @@
       pc = new RTCPeerConnection();
       channel = pc.createDataChannel("chat");
       setupChannel();
-
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
       await waitForICE(pc);
@@ -269,6 +271,11 @@
       await pc.setRemoteDescription(JSON.parse(saved.offer));
       await pc.setLocalDescription(JSON.parse(saved.answer));
     }
+
+    // Auto-show chat if already connected
+    if (saved.offer && saved.answer) {
+      autoReconnect();
+    }
   </script>
 </body>
-</html>
+  </html
