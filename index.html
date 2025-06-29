@@ -23,96 +23,133 @@
       padding: 5px;
       margin-top: 10px;
       background: #f9f9f9;
+      display: none;
+    }
+    .step {
+      display: none;
+    }
+    .active {
+      display: block;
     }
   </style>
 </head>
 <body>
   <h2>🔗 P2P Chat (No Server)</h2>
 
-  <button onclick="createOffer()">1. Create Offer</button>
-  <button onclick="copyToClipboard('offer')">Copy Offer</button>
-  <textarea id="offer" placeholder="Offer will appear here" rows="5" readonly></textarea>
+  <!-- Step 0: Mode Selection -->
+  <div id="step0" class="step active">
+    <p>Do you want to create a connection or join one?</p>
+    <button onclick="startOffer()">🔵 Create Connection</button>
+    <button onclick="startAnswer()">🟢 Join Connection</button>
+  </div>
 
-  <button onclick="setRemoteAnswer()">2. Paste Answer & Connect</button>
-  <textarea id="answer" placeholder="Paste answer here" rows="5"></textarea>
+  <!-- Step 1: Create Offer -->
+  <div id="step1" class="step">
+    <p>Send this offer to your peer:</p>
+    <textarea id="offer" rows="5" readonly></textarea>
+    <button onclick="copyToClipboard('offer')">Copy Offer</button>
+    <button onclick="showStep(2)">Next ➡️</button>
+  </div>
 
-  <hr>
+  <!-- Step 2: Paste Answer -->
+  <div id="step2" class="step">
+    <p>Paste the answer you received:</p>
+    <textarea id="answer" rows="5"></textarea>
+    <button onclick="setRemoteAnswer()">Connect</button>
+  </div>
 
-  <button onclick="setRemoteOffer()">3. Paste Offer</button>
-  <textarea id="remoteOffer" placeholder="Paste offer here" rows="5"></textarea>
+  <!-- Step 3: Paste Offer -->
+  <div id="step3" class="step">
+    <p>Paste the offer you received:</p>
+    <textarea id="remoteOffer" rows="5"></textarea>
+    <button onclick="acceptOffer()">Next ➡️</button>
+  </div>
 
-  <button onclick="createAnswer()">4. Create Answer</button>
-  <button onclick="copyToClipboard('localAnswer')">Copy Answer</button>
-  <textarea id="localAnswer" placeholder="Your answer here" rows="5" readonly></textarea>
+  <!-- Step 4: Create Answer -->
+  <div id="step4" class="step">
+    <p>Send this answer back:</p>
+    <textarea id="localAnswer" rows="5" readonly></textarea>
+    <button onclick="copyToClipboard('localAnswer')">Copy Answer</button>
+  </div>
 
-  <hr>
-
-  <div id="chat"></div>
-  <input id="msg" placeholder="Type a message..." />
-  <button onclick="sendMessage()">Send</button>
+  <!-- Chat UI -->
+  <div id="chat">
+    <h4>Chat</h4>
+    <div id="chatMessages"></div>
+    <input id="msg" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
 
   <script>
     let pc = new RTCPeerConnection();
     let channel;
-    const chatBox = document.getElementById('chat');
 
-    function appendMessage(msg, from = 'Peer') {
-      chatBox.innerHTML += `<div><strong>${from}:</strong> ${msg}</div>`;
-      chatBox.scrollTop = chatBox.scrollHeight;
+    function showStep(n) {
+      document.querySelectorAll('.step').forEach(d => d.classList.remove('active'));
+      document.getElementById('step' + n).classList.add('active');
     }
 
     function copyToClipboard(id) {
       const el = document.getElementById(id);
       el.select();
       el.setSelectionRange(0, 99999);
-      navigator.clipboard.writeText(el.value).then(() => {
-        alert('Copied!');
-      });
+      navigator.clipboard.writeText(el.value).then(() => alert("Copied!"));
     }
 
     function setupChannel() {
       channel.onmessage = e => appendMessage(e.data);
-      channel.onopen = () => appendMessage('Connection established', 'System');
-      channel.onclose = () => appendMessage('Connection closed', 'System');
+      channel.onopen = () => {
+        appendMessage("Connection established", "System");
+        document.getElementById("chat").style.display = "block";
+      };
+      channel.onclose = () => appendMessage("Connection closed", "System");
     }
 
-    async function createOffer() {
-      channel = pc.createDataChannel('chat');
+    function appendMessage(msg, from = 'Peer') {
+      const box = document.getElementById('chatMessages');
+      box.innerHTML += `<div><strong>${from}:</strong> ${msg}</div>`;
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function startOffer() {
+      showStep(1);
+      channel = pc.createDataChannel("chat");
       setupChannel();
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
-      document.getElementById('offer').value = JSON.stringify(offer);
+      document.getElementById("offer").value = JSON.stringify(offer);
     }
 
     async function setRemoteAnswer() {
-      const answer = document.getElementById('answer').value;
-      if (!answer) return alert('Please paste the answer first.');
+      const answer = document.getElementById("answer").value;
+      if (!answer) return alert("Paste an answer first");
       await pc.setRemoteDescription(JSON.parse(answer));
     }
 
-    async function setRemoteOffer() {
-      const offer = document.getElementById('remoteOffer').value;
-      if (!offer) return alert('Please paste the offer first.');
-      await pc.setRemoteDescription(JSON.parse(offer));
-
+    async function startAnswer() {
+      showStep(3);
       pc.ondatachannel = e => {
         channel = e.channel;
         setupChannel();
       };
     }
 
-    async function createAnswer() {
+    async function acceptOffer() {
+      const offer = document.getElementById("remoteOffer").value;
+      if (!offer) return alert("Paste the offer first");
+      await pc.setRemoteDescription(JSON.parse(offer));
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
-      document.getElementById('localAnswer').value = JSON.stringify(answer);
+      document.getElementById("localAnswer").value = JSON.stringify(answer);
+      showStep(4);
     }
 
     function sendMessage() {
-      const msg = document.getElementById('msg').value.trim();
-      if (!msg || !channel || channel.readyState !== 'open') return;
+      const msg = document.getElementById("msg").value.trim();
+      if (!msg || !channel || channel.readyState !== "open") return;
       channel.send(msg);
-      appendMessage(msg, 'You');
-      document.getElementById('msg').value = '';
+      appendMessage(msg, "You");
+      document.getElementById("msg").value = '';
     }
   </script>
 </body>
