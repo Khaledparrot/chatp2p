@@ -1,37 +1,76 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>P2P Chat - No Server</title>
+  <title>P2P Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <style>
-    body {
-      font-family: sans-serif;
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
       margin: 0;
       padding: 0;
+      font-family: sans-serif;
+      height: 100%;
+      background: #f0f0f0;
     }
-    .step, #chatUI {
+    .hidden {
       display: none;
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
     }
-    .active { display: block; }
-    textarea, input {
-      width: 100%;
-      margin-top: 5px;
-      padding: 8px;
-      font-size: 16px;
+    .view {
+      display: none;
+      padding: 16px;
+      height: 100%;
+      overflow: hidden;
+    }
+    .active {
+      display: block;
     }
     button {
-      margin: 5px 0;
-      padding: 8px 16px;
+      padding: 12px;
       font-size: 16px;
+      width: 100%;
+      margin: 8px 0;
+      border: none;
+      border-radius: 8px;
+      background: #007bff;
+      color: white;
+    }
+    textarea, input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
     #chatBox {
-      border-top: 1px solid #ccc;
-      height: 70vh;
+      flex: 1;
       overflow-y: auto;
       padding: 10px;
-      background: #f4f4f4;
+      background: white;
+    }
+    #bottomBar {
+      display: flex;
+      padding: 10px;
+      background: #fff;
+      border-top: 1px solid #ccc;
+    }
+    #msg {
+      flex: 1;
+      font-size: 16px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    #sendBtn {
+      margin-left: 8px;
+      padding: 10px 16px;
+      background: #28a745;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      border: none;
     }
     .you {
       text-align: right;
@@ -41,109 +80,102 @@
       text-align: left;
       color: green;
     }
-    #bottomBar {
+    #chatUI {
       display: flex;
-      padding: 10px;
-      gap: 5px;
-      border-top: 1px solid #ccc;
-    }
-    #msg {
-      flex: 1;
-      font-size: 16px;
+      flex-direction: column;
+      height: 100%;
     }
     #clearBtn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
+      background: red;
+      color: white;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
 
-  <button id="clearBtn" onclick="clearAll()">🧹 Clear All</button>
-
-  <div id="step0" class="step active">
-    <h2>P2P Chat</h2>
-    <p>Choose mode:</p>
+  <div id="home" class="view active">
+    <h2>🔗 P2P Chat</h2>
     <button onclick="startOffer()">🔵 Create Connection</button>
     <button onclick="startAnswer()">🟢 Join Connection</button>
+    <button onclick="autoReconnect()">🔁 Connect (Saved)</button>
+    <button id="clearBtn" onclick="clearAll()">🧹 Clear All</button>
   </div>
 
-  <div id="step1" class="step">
-    <p>Send this offer to your peer:</p>
+  <div id="step1" class="view">
+    <p>Send this offer:</p>
     <textarea id="offer" rows="5" readonly></textarea>
-    <button onclick="copyToClipboard('offer')">Copy Offer</button>
-    <button onclick="showStep(2)">Next ➡️</button>
+    <button onclick="copyToClipboard('offer')">📋 Copy</button>
+    <button onclick="show('step2')">Next ➡️</button>
   </div>
 
-  <div id="step2" class="step">
-    <p>Paste the answer from peer:</p>
+  <div id="step2" class="view">
+    <p>Paste answer:</p>
     <textarea id="answer" rows="5"></textarea>
     <button onclick="setRemoteAnswer()">Connect</button>
   </div>
 
-  <div id="step3" class="step">
-    <p>Paste the offer you received:</p>
+  <div id="step3" class="view">
+    <p>Paste offer:</p>
     <textarea id="remoteOffer" rows="5"></textarea>
     <button onclick="acceptOffer()">Next ➡️</button>
   </div>
 
-  <div id="step4" class="step">
+  <div id="step4" class="view">
     <p>Send this answer back:</p>
     <textarea id="localAnswer" rows="5" readonly></textarea>
-    <button onclick="copyToClipboard('localAnswer')">Copy Answer</button>
+    <button onclick="copyToClipboard('localAnswer')">📋 Copy</button>
   </div>
 
-  <div id="chatUI">
+  <div id="chatUI" class="hidden">
     <div id="chatBox"></div>
     <div id="bottomBar">
-      <input id="msg" placeholder="Type a message..." />
-      <button onclick="sendMessage()">Send</button>
+      <input id="msg" placeholder="Message..." />
+      <button id="sendBtn" onclick="sendMessage()">Send</button>
     </div>
   </div>
 
   <script>
     let pc, channel;
-    const username = getOrAskName();
     const saved = JSON.parse(localStorage.getItem('p2p-data') || '{}');
+    const username = getOrAskName();
 
     function getOrAskName() {
       let name = localStorage.getItem("p2p-name");
       if (!name) {
         name = prompt("Enter your name:");
-        localStorage.setItem("p2p-name", name || "Me");
+        localStorage.setItem("p2p-name", name || "You");
       }
       return name;
     }
 
-    function showStep(n) {
-      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-      document.getElementById('step' + n).classList.add('active');
+    function show(id) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
     }
 
     function copyToClipboard(id) {
       const el = document.getElementById(id);
-      el.select(); el.setSelectionRange(0, 99999);
+      el.select();
       navigator.clipboard.writeText(el.value).then(() => alert("Copied!"));
     }
 
-    function appendMessage(msg, from = 'peer') {
-      const box = document.getElementById('chatBox');
-      const div = document.createElement('div');
-      div.className = from === 'you' ? 'you' : 'peer';
-      div.innerHTML = `<strong>${from === 'you' ? username : 'Peer'}:</strong> ${msg}`;
-      box.appendChild(div);
-      box.scrollTop = box.scrollHeight;
+    function appendMessage(msg, from = 'Peer') {
+      const chatBox = document.getElementById("chatBox");
+      const div = document.createElement("div");
+      div.className = from === username ? 'you' : 'peer';
+      div.innerHTML = `<strong>${from}:</strong> ${msg}`;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     function setupChannel() {
       channel.onmessage = e => appendMessage(e.data);
       channel.onopen = () => {
-        document.querySelectorAll('.step').forEach(s => s.style.display = 'none');
-        document.getElementById('chatUI').style.display = 'block';
-        appendMessage("✅ Connected", "system");
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById("chatUI").classList.remove("hidden");
+        appendMessage("✅ Connected", "System");
       };
-      channel.onclose = () => appendMessage("❌ Disconnected", "system");
     }
 
     async function waitForICE(pc) {
@@ -163,16 +195,14 @@
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
       await waitForICE(pc);
-
       const offerData = JSON.stringify(pc.localDescription);
       document.getElementById("offer").value = offerData;
       localStorage.setItem("p2p-data", JSON.stringify({ offer: offerData }));
-      showStep(1);
+      show("step1");
     }
 
     async function setRemoteAnswer() {
       const answer = document.getElementById("answer").value;
-      if (!answer) return alert("Paste the answer first");
       await pc.setRemoteDescription(JSON.parse(answer));
       const data = JSON.parse(localStorage.getItem("p2p-data") || '{}');
       data.answer = answer;
@@ -185,40 +215,42 @@
         channel = e.channel;
         setupChannel();
       };
-      showStep(3);
+      show("step3");
     }
 
     async function acceptOffer() {
       const offer = document.getElementById("remoteOffer").value;
-      if (!offer) return alert("Paste the offer first");
       await pc.setRemoteDescription(JSON.parse(offer));
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
       await waitForICE(pc);
-
       const answerData = JSON.stringify(pc.localDescription);
       document.getElementById("localAnswer").value = answerData;
       localStorage.setItem("p2p-data", JSON.stringify({ offer, answer: answerData }));
-      showStep(4);
+      show("step4");
     }
 
     function sendMessage() {
       const msg = document.getElementById("msg").value.trim();
-      if (!msg || !channel || channel.readyState !== "open") return;
-      channel.send(msg);
-      appendMessage(msg, "you");
-      document.getElementById("msg").value = '';
+      if (msg && channel && channel.readyState === "open") {
+        channel.send(msg);
+        appendMessage(msg, username);
+        document.getElementById("msg").value = '';
+      }
     }
 
     function clearAll() {
-      if (confirm("Clear all saved data?")) {
+      if (confirm("Clear all data and reload?")) {
         localStorage.clear();
         location.reload();
       }
     }
 
     async function autoReconnect() {
-      if (!saved.offer || !saved.answer) return;
+      if (!saved.offer || !saved.answer) {
+        alert("No saved connection found.");
+        return;
+      }
       pc = new RTCPeerConnection();
       pc.ondatachannel = e => {
         channel = e.channel;
@@ -227,8 +259,6 @@
       await pc.setRemoteDescription(JSON.parse(saved.offer));
       await pc.setLocalDescription(JSON.parse(saved.answer));
     }
-
-    autoReconnect();
   </script>
 </body>
 </html>
