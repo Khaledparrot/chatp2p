@@ -1,157 +1,319 @@
 <!DOCTYPE html><html>
 <head>
-  <title>P2P Voice Chat</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>P2P Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <style>
     * { box-sizing: border-box; }
-    body, html {
-      margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-      background: #f0f0f0;
-      height: 100%;
+    html, body {
+      margin: 0; padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      height: 100%; background: #f9f9f9;
     }
-    .screen { display: none; padding: 16px; height: 100%; }
-    .active { display: block; }
-    #chatBox {
-      height: 70vh;
-      overflow-y: auto;
-      background: #eaeaea;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-    }
-    .bubble {
-      max-width: 80%;
-      padding: 10px;
-      margin: 6px;
+    button {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      margin: 8px 0;
+      border: none;
       border-radius: 10px;
-      word-wrap: break-word;
+      background: #007bff;
+      color: white;
     }
-    .you { align-self: flex-end; background: #cce5ff; }
-    .peer { align-self: flex-start; background: #d4edda; }
-    #msgBar { display: flex; gap: 8px; margin-top: 10px; }
-    textarea { flex: 1; padding: 10px; font-size: 16px; border-radius: 8px; }
-    button { padding: 10px; font-size: 16px; border-radius: 8px; }
+    textarea, input, select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .screen {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+      padding: 16px;
+    }
+    .active { display: flex; }#chatBox {
+  flex: 1;
+  overflow-y: auto;
+  background: #eaeaea;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+#inputBar {
+  display: flex;
+  padding: 10px;
+  background: #fff;
+  border-top: 1px solid #ccc;
+}
+
+#msg {
+  flex: 1;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+#sendBtn {
+  margin-left: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  border-radius: 8px;
+  background: #28a745;
+  color: white;
+}
+
+.you, .peer {
+  max-width: 80%;
+  padding: 10px;
+  margin: 6px;
+  border-radius: 12px;
+  word-wrap: break-word;
+}
+
+.you {
+  align-self: flex-end;
+  background: #cce5ff;
+  color: #004085;
+  text-align: right;
+}
+
+.peer {
+  align-self: flex-start;
+  background: #d4edda;
+  color: #155724;
+  text-align: left;
+}
+
+#clearBtn {
+  background: #dc3545;
+  color: white;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  align-self: flex-end;
+  margin-bottom: 4px;
+}
+
+h2 { text-align: center; }
+
   </style>
 </head>
-<body><div id="login" class="screen active">
-  <h2>Enter Username</h2>
-  <input id="usernameInput" placeholder="Your name" />
-  <button onclick="saveUsername()">Continue</button>
-</div><div id="chat" class="screen">
-  <h3>Welcome, <span id="myName"></span></h3>
-  <div id="chatBox"></div>
-  <div id="msgBar">
-    <textarea id="msg" rows="2" placeholder="Type..."></textarea>
-    <button onclick="sendMessage()">Send</button>
-  </div>
-  <div>
-    <label>Voice Filter:
+<body>  <!-- Login Screen -->  <div id="loginScreen" class="screen active">
+    <h2>🔗 P2P Chat</h2>
+    <button onclick="startOffer()">Create Connection</button>
+    <button onclick="startAnswer()">Join Connection</button>
+    <button onclick="autoReconnect()">Connect (Saved)</button>
+  </div>  <!-- Offer / Answer Step Screens -->  <div id="stepScreen" class="screen">
+    <textarea id="stepText" rows="6" readonly></textarea>
+    <button id="copyBtn" onclick="copyToClipboard()">📋 Copy</button>
+    <textarea id="inputText" rows="6" placeholder="Paste here..."></textarea>
+    <button id="nextBtn" onclick="handleNext()">Next ➡️</button>
+  </div>  <!-- Chat Screen -->  <div id="chatScreen" class="screen">
+    <button id="clearBtn" onclick="clearAll()">🧹 Clear Saved</button>
+    <div id="chatBox"></div>
+    <div>
+      <label>Voice Filter:</label>
       <select id="voiceFilter">
         <option value="normal">Normal</option>
-        <option value="pitchUp">Pitch Up</option>
-        <option value="pitchDown">Pitch Down</option>
-        <option value="robot">Robot</option>
+        <option value="pitchup">Pitch Up</option>
+        <option value="pitchdown">Pitch Down</option>
       </select>
-    </label>
-    <button onclick="startRecording()">🎙️ Record Voice</button>
-  </div>
-</div><script>
-let username = localStorage.getItem("username");
-const chatBox = document.getElementById("chatBox");
-let pc, channel;
+    </div>
+    <div id="inputBar">
+      <textarea id="msg" rows="2" placeholder="Type a message..."></textarea>
+      <button id="sendBtn" onclick="sendMessage()">Send</button>
+      <button onclick="startRecording()">🎙️</button>
+    </div>
+  </div>  <script>
+    let pc, channel;
+    let step = 0;
+    let mode = "";
+    const saved = JSON.parse(localStorage.getItem("p2p-data") || "{}");
+    const username = getUsername();
 
-if (username) {
-  document.getElementById("myName").textContent = username;
-  switchScreen("chat");
-  setupConnection();
-}
-
-function saveUsername() {
-  username = document.getElementById("usernameInput").value.trim();
-  if (!username) return alert("Please enter a name");
-  localStorage.setItem("username", username);
-  document.getElementById("myName").textContent = username;
-  switchScreen("chat");
-  setupConnection();
-}
-
-function switchScreen(id) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-}
-
-function appendMessage(text, from) {
-  const div = document.createElement("div");
-  div.className = `bubble ${from === username ? 'you' : 'peer'}`;
-  div.innerHTML = `<strong>${from}:</strong><br>${text}`;
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-function appendAudio(blob, from) {
-  const div = document.createElement("div");
-  div.className = `bubble ${from === username ? 'you' : 'peer'}`;
-  const audio = document.createElement("audio");
-  audio.controls = true;
-  audio.src = URL.createObjectURL(blob);
-  div.innerHTML = `<strong>${from}:</strong><br>`;
-  div.appendChild(audio);
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-function sendMessage() {
-  const msg = document.getElementById("msg").value;
-  if (msg && channel && channel.readyState === "open") {
-    const data = JSON.stringify({ type: 'text', from: username, msg });
-    channel.send(data);
-    appendMessage(msg, username);
-    document.getElementById("msg").value = "";
-  }
-}
-
-async function startRecording() {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  const filter = document.getElementById("voiceFilter").value;
-
-  const audioCtx = new AudioContext();
-  const source = audioCtx.createMediaStreamSource(stream);
-  let processor = audioCtx.createScriptProcessor(2048, 1, 1);
-  const dest = audioCtx.createMediaStreamDestination();
-
-  // Pitch/robot filters placeholder (actual effects can be added with WebAudio)
-  source.connect(dest); // Replace with filter chains
-
-  const mediaRecorder = new MediaRecorder(dest.stream);
-  let chunks = [];
-
-  mediaRecorder.ondataavailable = e => chunks.push(e.data);
-  mediaRecorder.onstop = () => {
-    const blob = new Blob(chunks, { type: 'audio/webm' });
-    channel.send(blob);
-    appendAudio(blob, username);
-  };
-  mediaRecorder.start();
-
-  setTimeout(() => mediaRecorder.stop(), 3000); // auto stop after 3s
-}
-
-function setupConnection() {
-  pc = new RTCPeerConnection();
-  channel = pc.createDataChannel("chat");
-  channel.onmessage = e => {
-    if (typeof e.data === "string") {
-      const obj = JSON.parse(e.data);
-      appendMessage(obj.msg, obj.from);
-    } else {
-      const blob = new Blob([e.data], { type: 'audio/webm' });
-      appendAudio(blob, "Peer");
+    function getUsername() {
+      let name = localStorage.getItem("p2p-name");
+      if (!name) {
+        name = prompt("Enter your name:");
+        localStorage.setItem("p2p-name", name || "You");
+      }
+      return name;
     }
-  };
-  channel.onopen = () => appendMessage("✅ Connected", "System");
-  // Add ICE signaling logic here or manual input steps if no server
-}
-</script></body>
+
+    function switchTo(screenId) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      document.getElementById(screenId).classList.add("active");
+    }
+
+    function copyToClipboard() {
+      const el = document.getElementById("stepText");
+      el.select();
+      navigator.clipboard.writeText(el.value).then(() => alert("Copied!"));
+    }
+
+    function appendMessage(msg, from) {
+      const box = document.getElementById("chatBox");
+      const div = document.createElement("div");
+      div.className = from === username ? "you" : "peer";
+      div.innerHTML = `<strong>${from}:</strong><br>${msg}`;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function appendAudio(blob, from) {
+      const box = document.getElementById("chatBox");
+      const div = document.createElement("div");
+      div.className = from === username ? "you" : "peer";
+      const audio = document.createElement("audio");
+      audio.controls = true;
+      audio.src = URL.createObjectURL(blob);
+      div.innerHTML = `<strong>${from}:</strong><br>`;
+      div.appendChild(audio);
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function setupChannel() {
+      channel.onmessage = e => {
+        if (typeof e.data === "string") {
+          appendMessage(e.data, "Peer");
+        } else {
+          const blob = new Blob([e.data], { type: 'audio/webm' });
+          appendAudio(blob, "Peer");
+        }
+      };
+      channel.onopen = () => {
+        switchTo("chatScreen");
+        appendMessage("✅ Connected", "System");
+      };
+    }
+
+    async function waitICE() {
+      if (pc.iceGatheringState === "complete") return;
+      return new Promise(resolve => {
+        pc.onicegatheringstatechange = () => {
+          if (pc.iceGatheringState === "complete") resolve();
+        };
+      });
+    }
+
+    async function startOffer() {
+      pc = new RTCPeerConnection();
+      channel = pc.createDataChannel("chat");
+      setupChannel();
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      await waitICE();
+      localStorage.setItem("p2p-data", JSON.stringify({ offer: JSON.stringify(pc.localDescription) }));
+      document.getElementById("stepText").value = JSON.stringify(pc.localDescription);
+      step = 1;
+      mode = "offer";
+      switchTo("stepScreen");
+    }
+
+    async function handleNext() {
+      const input = document.getElementById("inputText").value.trim();
+      if (!input) return alert("Please paste something.");
+
+      if (mode === "offer" && step === 1) {
+        await pc.setRemoteDescription(JSON.parse(input));
+        const data = JSON.parse(localStorage.getItem("p2p-data"));
+        data.answer = input;
+        localStorage.setItem("p2p-data", JSON.stringify(data));
+        switchTo("chatScreen");
+      }
+
+      if (mode === "answer" && step === 1) {
+        await pc.setRemoteDescription(JSON.parse(input));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        await waitICE();
+        const answerStr = JSON.stringify(pc.localDescription);
+        localStorage.setItem("p2p-data", JSON.stringify({ offer: input, answer: answerStr }));
+        document.getElementById("stepText").value = answerStr;
+        document.getElementById("inputText").value = "";
+        step = 2;
+      }
+    }
+
+    async function startAnswer() {
+      pc = new RTCPeerConnection();
+      pc.ondatachannel = e => {
+        channel = e.channel;
+        setupChannel();
+      };
+      mode = "answer";
+      step = 1;
+      document.getElementById("stepText").value = "";
+      document.getElementById("inputText").value = "";
+      switchTo("stepScreen");
+    }
+
+    async function sendMessage() {
+      const msg = document.getElementById("msg").value.trim();
+      if (msg && channel && channel.readyState === "open") {
+        channel.send(msg);
+        appendMessage(msg, username);
+        document.getElementById("msg").value = "";
+      }
+    }
+
+    async function startRecording() {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const context = new AudioContext();
+      const source = context.createMediaStreamSource(stream);
+
+      const filterType = document.getElementById("voiceFilter").value;
+      let destination = context.createMediaStreamDestination();
+
+      if (filterType === "pitchup" || filterType === "pitchdown") {
+        const pitch = context.createBiquadFilter();
+        pitch.type = "allpass";
+        pitch.frequency.value = 1000;
+        source.connect(pitch);
+        pitch.connect(destination);
+      } else {
+        source.connect(destination);
+      }
+
+      const recorder = new MediaRecorder(destination.stream);
+      const chunks = [];
+      recorder.ondataavailable = e => chunks.push(e.data);
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'audio/webm' });
+        if (channel && channel.readyState === "open") {
+          channel.send(blob);
+          appendAudio(blob, username);
+        }
+      };
+      recorder.start();
+      setTimeout(() => recorder.stop(), 3000);
+    }
+
+    function clearAll() {
+      if (confirm("Clear saved connection and reload?")) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+
+    async function autoReconnect() {
+      if (!saved.offer || !saved.answer) return alert("Nothing saved to connect.");
+      pc = new RTCPeerConnection();
+      pc.ondatachannel = e => {
+        channel = e.channel;
+        setupChannel();
+      };
+      await pc.setRemoteDescription(JSON.parse(saved.offer));
+      await pc.setLocalDescription(JSON.parse(saved.answer));
+    }
+
+    if (saved.offer && saved.answer) {
+      autoReconnect();
+    }
+  </script></body>
 </html>
