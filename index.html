@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html>
 <head>
   <title>P2P Chat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -11,10 +10,8 @@
       height: 100%; background: #f9f9f9;
     }
     button {
-      width: 100%;
       padding: 14px;
       font-size: 16px;
-      margin: 8px 0;
       border: none;
       border-radius: 10px;
       background: #007bff;
@@ -34,130 +31,112 @@
       height: 100%;
       padding: 16px;
     }
-    .active { display: flex; }
+    .active { display: flex; }#chatBox {
+  flex: 1;
+  overflow-y: auto;
+  background: #eaeaea;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
 
-    #chatBox {
-      flex: 1;
-      overflow-y: auto;
-      background: #eaeaea;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-    }
+#inputBar {
+  display: flex;
+  padding: 10px;
+  background: #fff;
+  border-top: 1px solid #ccc;
+  gap: 6px;
+}
 
-    #inputBar {
-      display: flex;
-      flex-wrap: wrap;
-      padding: 10px;
-      background: #fff;
-      border-top: 1px solid #ccc;
-    }
+#msg {
+  flex: 1;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
 
-    #msg {
-      flex: 1 1 100%;
-      padding: 14px;
-      font-size: 16px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      margin-bottom: 8px;
-    }
+#sendBtn {
+  padding: 10px 14px;
+  font-size: 14px;
+  border-radius: 8px;
+  background: #28a745;
+  color: white;
+}
 
-    #sendBtn, .voiceBtn {
-      width: 32%;
-      margin-right: 2%;
-      padding: 10px 14px;
-      font-size: 14px;
-      border-radius: 8px;
-      background: #28a745;
-      color: white;
-    }
+.micBtn {
+  background: #ff5722;
+  color: white;
+  padding: 12px;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
 
-    .you, .peer {
-      max-width: 80%;
-      padding: 10px;
-      margin: 6px;
-      border-radius: 12px;
-      word-wrap: break-word;
-    }
+.you, .peer {
+  max-width: 80%;
+  padding: 10px;
+  margin: 6px;
+  border-radius: 12px;
+  word-wrap: break-word;
+}
 
-    .you {
-      align-self: flex-end;
-      background: #cce5ff;
-      color: #004085;
-      text-align: right;
-    }
+.you {
+  align-self: flex-end;
+  background: #cce5ff;
+  color: #004085;
+  text-align: right;
+}
 
-    .peer {
-      align-self: flex-start;
-      background: #d4edda;
-      color: #155724;
-      text-align: left;
-    }
+.peer {
+  align-self: flex-start;
+  background: #d4edda;
+  color: #155724;
+  text-align: left;
+}
 
-    #clearBtn {
-      background: #dc3545;
-      color: white;
-      font-size: 13px;
-      padding: 6px 10px;
-      border-radius: 6px;
-      align-self: flex-end;
-      margin-bottom: 4px;
-    }
+#clearBtn {
+  background: #dc3545;
+  color: white;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  align-self: flex-end;
+  margin-bottom: 4px;
+}
 
-    h2 { text-align: center; }
+h2 { text-align: center; }
+
   </style>
 </head>
-<body>
-
-  <!-- Login Screen -->
-  <div id="loginScreen" class="screen active">
+<body>  <div id="loginScreen" class="screen active">
     <h2>🔗 P2P Chat</h2>
     <button onclick="startOffer()">Create Connection</button>
     <button onclick="startAnswer()">Join Connection</button>
     <button onclick="autoReconnect()">Connect (Saved)</button>
-  </div>
-
-  <!-- Offer / Answer Step Screens -->
-  <div id="stepScreen" class="screen">
+  </div>  <div id="stepScreen" class="screen">
     <textarea id="stepText" rows="6" readonly></textarea>
     <button onclick="navigator.clipboard.writeText(document.getElementById('stepText').value)">📋 Copy</button>
     <textarea id="inputText" rows="6" placeholder="Paste here..."></textarea>
     <button onclick="handleNext()">Next ➡️</button>
-  </div>
-
-  <!-- Chat Screen -->
-  <div id="chatScreen" class="screen">
+  </div>  <div id="chatScreen" class="screen">
     <button id="clearBtn" onclick="clearAll()">🧹 Clear Saved</button>
-    <div id="chatBox"></div>
+    <div id="chatBox"></div><div id="inputBar">
+  <textarea id="msg" rows="2" placeholder="Type a message..."></textarea>
+  <button id="sendBtn" onclick="sendMessage()">Send</button>
+  <button class="micBtn" id="micBtn" title="Hold to record">🎤</button>
+</div>
 
-    <label>🎛 Voice Filter:</label>
-    <select id="voiceFilter">
-      <option value="normal">Normal</option>
-      <option value="pitchup">Pitch Up</option>
-      <option value="pitchdown">Pitch Down</option>
-      <option value="robot">Robot</option>
-      <option value="echo">Echo</option>
-    </select>
-
-    <label>🎙 Duration (sec):</label>
-    <input id="durationInput" type="number" value="3" min="1" max="30">
-
-    <label>🎧 Preview:</label>
-    <audio id="previewAudio" controls></audio>
-
-    <div id="inputBar">
-      <textarea id="msg" rows="2" placeholder="Type a message..."></textarea>
-      <button id="sendBtn" onclick="sendMessage()">Send</button>
-      <button class="voiceBtn" onclick="startRecording(true)">🎙️ Preview</button>
-      <button class="voiceBtn" onclick="startRecording(false)">📤 Send Voice</button>
-    </div>
-  </div>
-
-  <script>
+  </div>  <script>
     let pc, channel;
     let step = 0, mode = "";
     const saved = JSON.parse(localStorage.getItem("p2p-data") || "{}");
     const username = getUsername();
+    let mediaRecorder, audioChunks = [];
 
     function getUsername() {
       let name = localStorage.getItem("p2p-name");
@@ -298,64 +277,41 @@
       }
     }
 
-    async function startRecording(isPreview = false) {
+    document.getElementById("micBtn").addEventListener("mousedown", startVoiceRecord);
+    document.getElementById("micBtn").addEventListener("mouseup", stopVoiceRecord);
+    document.getElementById("micBtn").addEventListener("touchstart", startVoiceRecord);
+    document.getElementById("micBtn").addEventListener("touchend", stopVoiceRecord);
+
+    async function startVoiceRecord() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const audioCtx = new AudioContext();
-        const source = audioCtx.createMediaStreamSource(stream);
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
 
-        const filterType = document.getElementById("voiceFilter").value;
-        const duration = parseInt(document.getElementById("durationInput").value || "3") * 1000;
-        const dest = audioCtx.createMediaStreamDestination();
-
-        let node = source;
-        if (filterType === "pitchup" || filterType === "pitchdown") {
-          const biquad = audioCtx.createBiquadFilter();
-          biquad.type = "allpass";
-          biquad.frequency.value = filterType === "pitchup" ? 1600 : 400;
-          node.connect(biquad);
-          node = biquad;
-        } else if (filterType === "robot") {
-          const wave = audioCtx.createWaveShaper();
-          wave.curve = new Float32Array([0, 1]);
-          node.connect(wave);
-          node = wave;
-        } else if (filterType === "echo") {
-          const delay = audioCtx.createDelay();
-          delay.delayTime.value = 0.25;
-          node.connect(delay);
-          delay.connect(dest);
-        }
-
-        node.connect(dest);
-        const recorder = new MediaRecorder(dest.stream);
-        const chunks = [];
-
-        recorder.ondataavailable = e => {
-          if (e.data.size > 0) chunks.push(e.data);
+        mediaRecorder.ondataavailable = e => {
+          if (e.data.size > 0) audioChunks.push(e.data);
         };
 
-        recorder.onstop = () => {
-          const blob = new Blob(chunks, { type: 'audio/webm' });
-          if (isPreview) {
-            document.getElementById("previewAudio").src = URL.createObjectURL(blob);
-          } else if (channel && channel.readyState === "open") {
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(audioChunks, { type: 'audio/webm' });
+          if (channel && channel.readyState === "open") {
             channel.send(blob);
             appendAudio(blob, username);
-          } else {
-            alert("🔌 Connection not ready.");
           }
         };
 
-        recorder.start();
-        setTimeout(() => recorder.stop(), duration);
+        mediaRecorder.start();
       } catch (err) {
         alert("Microphone error: " + err.message);
       }
     }
 
-    // Auto reconnect on load
+    function stopVoiceRecord() {
+      if (mediaRecorder && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+      }
+    }
+
     if (saved.offer && saved.answer) autoReconnect();
-  </script>
-</body>
+  </script></body>
 </html>
