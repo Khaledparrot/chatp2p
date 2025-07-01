@@ -1,4 +1,5 @@
-<!DOCTYPE html><html>
+<!DOCTYPE html>
+<html>
 <head>
   <title>P2P Chat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -33,116 +34,128 @@
       height: 100%;
       padding: 16px;
     }
-    .active { display: flex; }#chatBox {
-  flex: 1;
-  overflow-y: auto;
-  background: #eaeaea;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-}
+    .active { display: flex; }
 
-#inputBar {
-  display: flex;
-  padding: 10px;
-  background: #fff;
-  border-top: 1px solid #ccc;
-}
+    #chatBox {
+      flex: 1;
+      overflow-y: auto;
+      background: #eaeaea;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+    }
 
-#msg {
-  flex: 1;
-  padding: 14px;
-  font-size: 16px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-}
+    #inputBar {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 10px;
+      background: #fff;
+      border-top: 1px solid #ccc;
+    }
 
-#sendBtn {
-  margin-left: 8px;
-  padding: 10px 14px;
-  font-size: 14px;
-  border-radius: 8px;
-  background: #28a745;
-  color: white;
-}
+    #msg {
+      flex: 1 1 100%;
+      padding: 14px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      margin-bottom: 8px;
+    }
 
-.you, .peer {
-  max-width: 80%;
-  padding: 10px;
-  margin: 6px;
-  border-radius: 12px;
-  word-wrap: break-word;
-}
+    #sendBtn, .voiceBtn {
+      width: 32%;
+      margin-right: 2%;
+      padding: 10px 14px;
+      font-size: 14px;
+      border-radius: 8px;
+      background: #28a745;
+      color: white;
+    }
 
-.you {
-  align-self: flex-end;
-  background: #cce5ff;
-  color: #004085;
-  text-align: right;
-}
+    .you, .peer {
+      max-width: 80%;
+      padding: 10px;
+      margin: 6px;
+      border-radius: 12px;
+      word-wrap: break-word;
+    }
 
-.peer {
-  align-self: flex-start;
-  background: #d4edda;
-  color: #155724;
-  text-align: left;
-}
+    .you {
+      align-self: flex-end;
+      background: #cce5ff;
+      color: #004085;
+      text-align: right;
+    }
 
-#clearBtn {
-  background: #dc3545;
-  color: white;
-  font-size: 13px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  align-self: flex-end;
-  margin-bottom: 4px;
-}
+    .peer {
+      align-self: flex-start;
+      background: #d4edda;
+      color: #155724;
+      text-align: left;
+    }
 
-h2 { text-align: center; }
+    #clearBtn {
+      background: #dc3545;
+      color: white;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      align-self: flex-end;
+      margin-bottom: 4px;
+    }
 
+    h2 { text-align: center; }
   </style>
 </head>
-<body>  <!-- Login Screen -->  <div id="loginScreen" class="screen active">
+<body>
+
+  <!-- Login Screen -->
+  <div id="loginScreen" class="screen active">
     <h2>🔗 P2P Chat</h2>
     <button onclick="startOffer()">Create Connection</button>
     <button onclick="startAnswer()">Join Connection</button>
     <button onclick="autoReconnect()">Connect (Saved)</button>
-  </div>  <!-- Offer / Answer Step Screens -->  <div id="stepScreen" class="screen">
+  </div>
+
+  <!-- Offer / Answer Step Screens -->
+  <div id="stepScreen" class="screen">
     <textarea id="stepText" rows="6" readonly></textarea>
-    <button id="copyBtn" onclick="copyToClipboard()">📋 Copy</button>
+    <button onclick="navigator.clipboard.writeText(document.getElementById('stepText').value)">📋 Copy</button>
     <textarea id="inputText" rows="6" placeholder="Paste here..."></textarea>
-    <button id="nextBtn" onclick="handleNext()">Next ➡️</button>
-  </div>  <!-- Chat Screen -->  <div id="chatScreen" class="screen">
+    <button onclick="handleNext()">Next ➡️</button>
+  </div>
+
+  <!-- Chat Screen -->
+  <div id="chatScreen" class="screen">
     <button id="clearBtn" onclick="clearAll()">🧹 Clear Saved</button>
     <div id="chatBox"></div>
-    <div>
-      <label>🎛 Voice Filter:</label>
-      <select id="voiceFilter">
-        <option value="normal">Normal</option>
-        <option value="pitchup">Pitch Up</option>
-        <option value="pitchdown">Pitch Down</option>
-        <option value="robot">Robot</option>
-        <option value="echo">Echo</option>
-      </select>
-    </div>
-    <div>
-      <label>🎙 Duration (sec):</label>
-      <input id="durationInput" type="number" value="3" min="1" max="30">
-    </div>
-    <div>
-      <label>🎧 Preview:</label>
-      <audio id="previewAudio" controls></audio>
-    </div>
+
+    <label>🎛 Voice Filter:</label>
+    <select id="voiceFilter">
+      <option value="normal">Normal</option>
+      <option value="pitchup">Pitch Up</option>
+      <option value="pitchdown">Pitch Down</option>
+      <option value="robot">Robot</option>
+      <option value="echo">Echo</option>
+    </select>
+
+    <label>🎙 Duration (sec):</label>
+    <input id="durationInput" type="number" value="3" min="1" max="30">
+
+    <label>🎧 Preview:</label>
+    <audio id="previewAudio" controls></audio>
+
     <div id="inputBar">
       <textarea id="msg" rows="2" placeholder="Type a message..."></textarea>
       <button id="sendBtn" onclick="sendMessage()">Send</button>
-      <button onclick="startRecording(true)">🎙️ Preview</button>
-      <button onclick="startRecording(false)">📤 Send Voice</button>
+      <button class="voiceBtn" onclick="startRecording(true)">🎙️ Preview</button>
+      <button class="voiceBtn" onclick="startRecording(false)">📤 Send Voice</button>
     </div>
-  </div>  <script>
+  </div>
+
+  <script>
     let pc, channel;
-    let step = 0;
-    let mode = "";
+    let step = 0, mode = "";
     const saved = JSON.parse(localStorage.getItem("p2p-data") || "{}");
     const username = getUsername();
 
@@ -158,12 +171,6 @@ h2 { text-align: center; }
     function switchTo(screenId) {
       document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
       document.getElementById(screenId).classList.add("active");
-    }
-
-    function copyToClipboard() {
-      const el = document.getElementById("stepText");
-      el.select();
-      navigator.clipboard.writeText(el.value).then(() => alert("Copied!"));
     }
 
     function appendMessage(msg, from) {
@@ -226,9 +233,22 @@ h2 { text-align: center; }
       switchTo("stepScreen");
     }
 
+    async function startAnswer() {
+      pc = new RTCPeerConnection();
+      pc.ondatachannel = e => {
+        channel = e.channel;
+        setupChannel();
+      };
+      mode = "answer";
+      step = 1;
+      document.getElementById("stepText").value = "";
+      document.getElementById("inputText").value = "";
+      switchTo("stepScreen");
+    }
+
     async function handleNext() {
       const input = document.getElementById("inputText").value.trim();
-      if (!input) return alert("Please paste something.");
+      if (!input) return alert("Paste something!");
 
       if (mode === "offer" && step === 1) {
         await pc.setRemoteDescription(JSON.parse(input));
@@ -251,82 +271,8 @@ h2 { text-align: center; }
       }
     }
 
-    async function startAnswer() {
-      pc = new RTCPeerConnection();
-      pc.ondatachannel = e => {
-        channel = e.channel;
-        setupChannel();
-      };
-      mode = "answer";
-      step = 1;
-      document.getElementById("stepText").value = "";
-      document.getElementById("inputText").value = "";
-      switchTo("stepScreen");
-    }
-
-    async function sendMessage() {
-      const msg = document.getElementById("msg").value.trim();
-      if (msg && channel && channel.readyState === "open") {
-        channel.send(msg);
-        appendMessage(msg, username);
-        document.getElementById("msg").value = "";
-      }
-    }
-
-    async function startRecording(isPreview = false) {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const audioCtx = new AudioContext();
-      const source = audioCtx.createMediaStreamSource(stream);
-
-      const filterType = document.getElementById("voiceFilter").value;
-      const duration = parseInt(document.getElementById("durationInput").value || "3") * 1000;
-      const dest = audioCtx.createMediaStreamDestination();
-
-      let node = source;
-      if (filterType === "pitchup" || filterType === "pitchdown") {
-        const biquad = audioCtx.createBiquadFilter();
-        biquad.type = "allpass";
-        biquad.frequency.value = filterType === "pitchup" ? 1600 : 400;
-        node.connect(biquad);
-        node = biquad;
-      } else if (filterType === "robot") {
-        const wave = audioCtx.createWaveShaper();
-        wave.curve = new Float32Array([0, 1]);
-        node.connect(wave);
-        node = wave;
-      } else if (filterType === "echo") {
-        const delay = audioCtx.createDelay();
-        delay.delayTime.value = 0.2;
-        node.connect(delay);
-        delay.connect(dest);
-      }
-
-      node.connect(dest);
-      const recorder = new MediaRecorder(dest.stream);
-      const chunks = [];
-      recorder.ondataavailable = e => chunks.push(e.data);
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'audio/webm' });
-        if (isPreview) {
-          document.getElementById("previewAudio").src = URL.createObjectURL(blob);
-        } else if (channel && channel.readyState === "open") {
-          channel.send(blob);
-          appendAudio(blob, username);
-        }
-      };
-      recorder.start();
-      setTimeout(() => recorder.stop(), duration);
-    }
-
-    function clearAll() {
-      if (confirm("Clear saved connection and reload?")) {
-        localStorage.clear();
-        location.reload();
-      }
-    }
-
     async function autoReconnect() {
-      if (!saved.offer || !saved.answer) return alert("Nothing saved to connect.");
+      if (!saved.offer || !saved.answer) return alert("Nothing saved.");
       pc = new RTCPeerConnection();
       pc.ondatachannel = e => {
         channel = e.channel;
@@ -336,8 +282,80 @@ h2 { text-align: center; }
       await pc.setLocalDescription(JSON.parse(saved.answer));
     }
 
-    if (saved.offer && saved.answer) {
-      autoReconnect();
+    function sendMessage() {
+      const msg = document.getElementById("msg").value.trim();
+      if (msg && channel && channel.readyState === "open") {
+        channel.send(msg);
+        appendMessage(msg, username);
+        document.getElementById("msg").value = "";
+      }
     }
-  </script></body>
+
+    function clearAll() {
+      if (confirm("Clear all data and reload?")) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+
+    async function startRecording(isPreview = false) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const audioCtx = new AudioContext();
+        const source = audioCtx.createMediaStreamSource(stream);
+
+        const filterType = document.getElementById("voiceFilter").value;
+        const duration = parseInt(document.getElementById("durationInput").value || "3") * 1000;
+        const dest = audioCtx.createMediaStreamDestination();
+
+        let node = source;
+        if (filterType === "pitchup" || filterType === "pitchdown") {
+          const biquad = audioCtx.createBiquadFilter();
+          biquad.type = "allpass";
+          biquad.frequency.value = filterType === "pitchup" ? 1600 : 400;
+          node.connect(biquad);
+          node = biquad;
+        } else if (filterType === "robot") {
+          const wave = audioCtx.createWaveShaper();
+          wave.curve = new Float32Array([0, 1]);
+          node.connect(wave);
+          node = wave;
+        } else if (filterType === "echo") {
+          const delay = audioCtx.createDelay();
+          delay.delayTime.value = 0.25;
+          node.connect(delay);
+          delay.connect(dest);
+        }
+
+        node.connect(dest);
+        const recorder = new MediaRecorder(dest.stream);
+        const chunks = [];
+
+        recorder.ondataavailable = e => {
+          if (e.data.size > 0) chunks.push(e.data);
+        };
+
+        recorder.onstop = () => {
+          const blob = new Blob(chunks, { type: 'audio/webm' });
+          if (isPreview) {
+            document.getElementById("previewAudio").src = URL.createObjectURL(blob);
+          } else if (channel && channel.readyState === "open") {
+            channel.send(blob);
+            appendAudio(blob, username);
+          } else {
+            alert("🔌 Connection not ready.");
+          }
+        };
+
+        recorder.start();
+        setTimeout(() => recorder.stop(), duration);
+      } catch (err) {
+        alert("Microphone error: " + err.message);
+      }
+    }
+
+    // Auto reconnect on load
+    if (saved.offer && saved.answer) autoReconnect();
+  </script>
+</body>
 </html>
