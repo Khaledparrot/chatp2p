@@ -116,17 +116,28 @@ h2 { text-align: center; }
     <button id="clearBtn" onclick="clearAll()">🧹 Clear Saved</button>
     <div id="chatBox"></div>
     <div>
-      <label>Voice Filter:</label>
+      <label>🎛 Voice Filter:</label>
       <select id="voiceFilter">
         <option value="normal">Normal</option>
         <option value="pitchup">Pitch Up</option>
         <option value="pitchdown">Pitch Down</option>
+        <option value="robot">Robot</option>
+        <option value="echo">Echo</option>
       </select>
+    </div>
+    <div>
+      <label>🎙 Duration (sec):</label>
+      <input id="durationInput" type="number" value="3" min="1" max="30">
+    </div>
+    <div>
+      <label>🎧 Preview:</label>
+      <audio id="previewAudio" controls></audio>
     </div>
     <div id="inputBar">
       <textarea id="msg" rows="2" placeholder="Type a message..."></textarea>
       <button id="sendBtn" onclick="sendMessage()">Send</button>
-      <button onclick="startRecording()">🎙️</button>
+      <button onclick="startRecording(true)">🎙️ Preview</button>
+      <button onclick="startRecording(false)">📤 Send Voice</button>
     </div>
   </div>  <script>
     let pc, channel;
@@ -262,36 +273,49 @@ h2 { text-align: center; }
       }
     }
 
-    async function startRecording() {
+    async function startRecording(isPreview = false) {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const context = new AudioContext();
-      const source = context.createMediaStreamSource(stream);
+      const audioCtx = new AudioContext();
+      const source = audioCtx.createMediaStreamSource(stream);
 
       const filterType = document.getElementById("voiceFilter").value;
-      let destination = context.createMediaStreamDestination();
+      const duration = parseInt(document.getElementById("durationInput").value || "3") * 1000;
+      const dest = audioCtx.createMediaStreamDestination();
 
+      let node = source;
       if (filterType === "pitchup" || filterType === "pitchdown") {
-        const pitch = context.createBiquadFilter();
-        pitch.type = "allpass";
-        pitch.frequency.value = 1000;
-        source.connect(pitch);
-        pitch.connect(destination);
-      } else {
-        source.connect(destination);
+        const biquad = audioCtx.createBiquadFilter();
+        biquad.type = "allpass";
+        biquad.frequency.value = filterType === "pitchup" ? 1600 : 400;
+        node.connect(biquad);
+        node = biquad;
+      } else if (filterType === "robot") {
+        const wave = audioCtx.createWaveShaper();
+        wave.curve = new Float32Array([0, 1]);
+        node.connect(wave);
+        node = wave;
+      } else if (filterType === "echo") {
+        const delay = audioCtx.createDelay();
+        delay.delayTime.value = 0.2;
+        node.connect(delay);
+        delay.connect(dest);
       }
 
-      const recorder = new MediaRecorder(destination.stream);
+      node.connect(dest);
+      const recorder = new MediaRecorder(dest.stream);
       const chunks = [];
       recorder.ondataavailable = e => chunks.push(e.data);
       recorder.onstop = () => {
         const blob = new Blob(chunks, { type: 'audio/webm' });
-        if (channel && channel.readyState === "open") {
+        if (isPreview) {
+          document.getElementById("previewAudio").src = URL.createObjectURL(blob);
+        } else if (channel && channel.readyState === "open") {
           channel.send(blob);
           appendAudio(blob, username);
         }
       };
       recorder.start();
-      setTimeout(() => recorder.stop(), 3000);
+      setTimeout(() => recorder.stop(), duration);
     }
 
     function clearAll() {
