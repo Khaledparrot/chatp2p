@@ -51,7 +51,7 @@ def is_captcha_limit_reached(page):
     }''')
 
 def return_to_login(page):
-    print("🔄 Going back to login page...")
+    print("Youghal login page...")
     page.goto("https://algeria.blsspainglobal.com/DZA/account/login", wait_until="domcontentloaded")
     human_wait(2, 4)
     try:
@@ -61,10 +61,10 @@ def return_to_login(page):
         if login_input:
             login_input.fill("user268923@gmail.com")
             page.click('button[type="submit"]')
-            print("✅ Re-submitted login.")
+            print("✅ login.")
             human_wait(2, 4)
     except Exception as e:
-        print("❌ Error while logging in again:", e)
+        print("Ghachou yellan di logging again:", e)
 
 with sync_playwright() as p:
     browser = p.chromium.launch_persistent_context("user_data", headless=False)
@@ -75,14 +75,14 @@ with sync_playwright() as p:
     while True:
         try:
             if is_captcha_limit_reached(page):
-                print("🚫 Captcha limit reached. Restarting...")
+                print("Captcha limit reached.")
                 return_to_login(page)
                 continue
 
             current_url = page.url
 
             if "account/login" in current_url:
-                print("🔐 Login page detected.")
+                print("Login detected..")
                 try:
                     login_input = page.evaluate_handle('''() => {
                         return Array.from(document.querySelectorAll('input[type="text"]')).find(el => el.offsetParent !== null);
@@ -90,11 +90,11 @@ with sync_playwright() as p:
                     if login_input:
                         login_input.fill("user268923@gmail.com")
                         page.click('button[type="submit"]')
-                        print("✅ Submitted login.")
+                        print("ikchem login.")
                         human_wait(2, 4)
                         continue
                 except Exception as e:
-                    print("❌ Login failed:", e)
+                    print("walou failed:", e)
                     continue
 
             visible_password_handle = page.evaluate_handle('''() => {
@@ -113,7 +113,7 @@ with sync_playwright() as p:
             password_input = visible_password_handle.as_element()
             if password_input:
                 password_input.fill("Khaled@1616")
-                print("🔑 Password filled.")
+                print("thegheltedh")
                 human_wait(1, 2)
 
             target_number = page.evaluate('''() => {
@@ -134,11 +134,11 @@ with sync_playwright() as p:
             }''')
 
             if not target_number:
-                print("⏳ No captcha.")
+                print("No captcha number")
                 time.sleep(3)
                 continue
 
-            print(f"🎯 Captcha target: {target_number}")
+            print(f"Captcha target number: {target_number}")
 
             visible_imgs_handle = page.evaluate_handle('''() => {
                 return Array.from(document.querySelectorAll('img.captcha-img')).filter(img => {
@@ -163,7 +163,7 @@ with sync_playwright() as p:
                     visible_imgs.append(el)
 
             if not visible_imgs:
-                print("⚠️ No visible captcha images.")
+                print("No visible captcha images.")
                 time.sleep(3)
                 continue
 
@@ -179,13 +179,13 @@ with sync_playwright() as p:
                             try:
                                 img.click()
                                 matched += 1
-                                print(f"✅ Clicked image {idx}")
+                                print(f"Clicked image {idx}")
                             except Exception as e:
-                                print(f"❌ Click error: {e}")
+                                print(f"Click error: {e}")
                     else:
                         print(f"🔴 Image {idx}: No valid result.")
 
-            print(f"🔢 Total clicked: {matched}")
+            print(f"Total clicked: {matched}/9")
             human_wait(1, 2)
 
             try:
