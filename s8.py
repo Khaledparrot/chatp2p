@@ -1,0 +1,472 @@
+import os
+import time
+import random
+import base64
+from io import BytesIO
+from PIL import Image, ImageEnhance, ImageOps, ImageFilter
+import pytesseract
+from playwright.sync_api import sync_playwright
+
+# === Configuration ===
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+LOGIN_URL = "https://algeria.blsspainglobal.com/DZA/account/login"
+USERNAME = "user268923@gmail.com"
+PASSWORD = "Khaled@1616"
+
+# === Utility Functions ===
+def human_wait(min_sec=1, max_sec=3):
+    time.sleep(random.uniform(min_sec, max_sec))
+
+def base64_to_image(base64_str):
+    if ',' in base64_str:
+        base64_str = base64_str.split(',')[1]
+    return Image.open(BytesIO(base64.b64decode(base64_str)))
+
+def preprocess_variants(img):
+    img = img.convert("L")
+    yield img
+    yield ImageEnhance.Contrast(img).enhance(2)
+    yield ImageOps.invert(img).filter(ImageFilter.SHARPEN)
+    yield img.resize((img.width * 2, img.height * 2), Image.Resampling.LANCZOS)
+    yield img.point(lambda x: 0 if x < 140 else 255)
+
+def extract_digits_with_confidence(img):
+    config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789'
+    best_text = ""
+    best_conf = 0
+    for variant in preprocess_variants(img):
+        data = pytesseract.image_to_data(variant, config=config, output_type=pytesseract.Output.DICT)
+        for text, conf in zip(data['text'], data['conf']):
+            text = text.strip()
+            if text.isdigit() and len(text) == 3:
+                try:
+                    conf = int(conf)
+                    if conf > best_conf:
+                        best_conf = conf
+                        best_text = text
+                except:
+                    continue
+    return (best_text if best_conf >= 10 else None), best_conf
+
+# === Page State Checks ===
+def is_captcha_limit_reached(page):
+    return page.evaluate("() => document.body.innerText.includes('maximum number of allowed captcha submissions')")
+
+def is_login_page(page):
+    return "account/login" in page.url
+
+def is_password_required(page):
+    handle = page.evaluate_handle('''() => {
+        return Array.from(document.querySelectorAll('input[type="password"]')).find(el => {
+            const rect = el.getBoundingClientRect();
+            const style = window.getComputedStyle(el);
+            return (
+                rect.width > 0 &&
+                rect.height > 0 &&
+                style.display !== 'none' &&
+                style.visibility !== 'hidden' &&
+                parseFloat(style.opacity) !== 0
+            );
+        });
+    }''')
+    return handle.as_element()
+
+def get_captcha_target(page):
+    return page.evaluate('''() => {
+        const visible = Array.from(document.querySelectorAll('div.box-label')).find(div => {
+            const rect = div.getBoundingClientRect();
+            const style = window.getComputedStyle(div);
+            if (
+                rect.width === 0 ||
+                rect.height === 0 ||
+                style.display === 'none' ||
+                style.visibility === 'hidden' ||
+                parseFloat(style.opacity) === 0
+            ) return false;
+            const elAtPoint = document.elementFromPoint(rect.left + 1, rect.top + 1);
+            return elAtPoint === div || div.contains(elAtPoint);
+        });
+        return visible ? visible.textContent.match(/\d{3}/)?.[0] : null;
+    }''')
+
+def get_visible_captcha_images(page):
+    handle = page.evaluate_handle('''() => {
+        return Array.from(document.querySelectorAll('img.captcha-img')).filter(img => {
+            const rect = img.getBoundingClientRect();
+            const style = window.getComputedStyle(img);
+            if (
+                rect.width === 0 ||
+                rect.height === 0 ||
+                style.display === 'none' ||
+                style.visibility === 'hidden' ||
+                parseFloat(style.opacity) === 0
+            ) return false;
+            const elAtPoint = document.elementFromPoint(rect.left + 1, rect.top + 1);
+            return elAtPoint === img || img.contains(elAtPoint);
+        });
+    }''')
+    return [prop.as_element() for prop in handle.get_properties().values() if prop.as_element()]
+
+# === CAPTCHA Handler ===
+def check_and_solve_captcha(page):
+    target_number = get_captcha_target(page)
+    if target_number:
+        print("CAPTCHA detected before action. Qahba ...")
+        solve_captcha(page)
+        time.sleep(5)
+
+def handle_too_many_requests(page):
+    """Check for 'Too Many Requests' error and reload if present."""
+    if page.locator("h1:has-text('Too Many Requests')").is_visible() or page.locator("h1:has-text('Application Temporarily Unavailable')").is_visible():
+        print("Detected 'Too Many Requests'. Reloading page...")
+        page.reload(wait_until="domcontentloaded")
+        human_wait(2, 4)
+
+def solve_captcha(page):
+    target_number = get_captcha_target(page)
+    if not target_number:
+        print("Captcha number not found.")
+        time.sleep(3)
+        return False
+
+    print(f"Captcha number: {target_number}")
+    images = get_visible_captcha_images(page)
+
+    if not images:
+        print("Wlah l captcha .")
+        time.sleep(3)
+        return False
+
+    matched = 0
+    for idx, img in enumerate(images, start=1):
+        src = img.get_attribute("src")
+        if src and src.startswith("data:image"):
+            pil_img = base64_to_image(src)
+            result, conf = extract_digits_with_confidence(pil_img)
+            if result:
+                print(f"Image {idx}: {result} (Conf: {conf}%)")
+                if result == target_number:
+                    try:
+                        img.click()
+                        matched += 1
+                        print(f"Clicked image {idx}")
+                    except Exception as e:
+                        print(f"Click error: {e}")
+            else:
+                print(f"Image {idx}: Walou.")
+
+    print(f"click Total: {matched}/9")
+    human_wait(1, 2)
+
+    try:
+        page.click('#btnVerify')
+        print(" Submitted captcha.")
+    except Exception as e:
+        print(" Submit click error:", e)
+    return True
+
+# === Page Actions ===
+def return_to_login(page):
+    handle_too_many_requests(page)
+    print(" Returning to login page...")
+    page.goto(LOGIN_URL, wait_until="domcontentloaded")
+    human_wait(2, 4)
+    try:
+        fill_login(page)
+    except Exception as e:
+        print(" Error during login retry:", e)
+
+def fill_login(page):
+    handle_too_many_requests(page)
+    check_and_solve_captcha(page)
+    print(" Logging in...")
+    login_input = page.evaluate_handle('''() => {
+        return Array.from(document.querySelectorAll('input[type="text"]')).find(el => el.offsetParent !== null);
+    }''').as_element()
+    if login_input:
+        login_input.fill(USERNAME)
+        page.click('button[type="submit"]')
+        print("Login submitted.")
+        human_wait(2, 4)
+
+def fill_password(page):
+    handle_too_many_requests(page)
+    check_and_solve_captcha(page)
+    password_input = is_password_required(page)
+    if password_input:
+        password_input.fill(PASSWORD)
+        print(" Password filled.")
+        human_wait(1, 2)
+
+def click_book_now(page):
+    handle_too_many_requests(page)
+    check_and_solve_captcha(page)
+    try:
+        button = page.query_selector('a[href="/DZA/appointment/newappointment"]')
+        if button:
+            button.click()
+            print(" Clicked 'Book Now'.")
+            human_wait(2, 3)
+    except Exception as e:
+        print(" Book Now click failed:", e)
+
+def handle_form_submission(page):
+    handle_too_many_requests(page)
+    check_and_solve_captcha(page)
+    if "Book New Appointment - Visa Type Selection" in page.content():
+        print(" Running auto JS...")
+
+        js_code = """
+        // INSERTED JavaScript for dropdown and modal interaction
+        """ + """function isVisible(el) {
+  return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+}
+
+function findDropdownAfterLabel(labelText) {
+  const labels = Array.from(document.querySelectorAll('label.form-label')).filter(isVisible);
+  const targetLabel = labels.find(label => label.textContent.trim().toLowerCase().includes(labelText.toLowerCase()));
+  if (!targetLabel) return null;
+
+  const labelY = targetLabel.getBoundingClientRect().top;
+  const spans = Array.from(document.querySelectorAll('span.k-input[role="option"]')).filter(isVisible);
+  return spans.find(span => span.getBoundingClientRect().top > labelY) || null;
+}
+
+function waitAndClickSuggestion(desiredText = null, retries = 10) {
+  const candidates = Array.from(document.querySelectorAll('ul[role="listbox"] li.k-item[role="option"]')).filter(isVisible);
+
+  if (candidates.length > 0) {
+    let match = candidates[0];
+    if (desiredText) {
+      const found = candidates.find(el => el.textContent.trim().toLowerCase() === desiredText.toLowerCase());
+      if (found) match = found;
+    }
+    match.click();
+    console.log(` Clicked option: "${match.textContent.trim()}"`);
+    return;
+  }
+
+  if (retries > 0) {
+    setTimeout(() => waitAndClickSuggestion(desiredText, retries - 1), 200);
+  } else {
+    console.warn(" No visible dropdown option found to click after retries.");
+  }
+}
+
+function typeIntoActiveInput(text, callback) {
+  const input = document.activeElement;
+  if (!input || !(input.tagName === 'INPUT' || input.tagName === 'TEXTAREA')) {
+    console.warn("No input active after clicking dropdown.");
+    return;
+  }
+
+  input.value = '';
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+
+  let i = 0;
+  function typeNextChar() {
+    if (i >= text.length) {
+      setTimeout(() => {
+        waitAndClickSuggestion(text);
+        setTimeout(() => {
+          document.body.dispatchEvent(new MouseEvent('click', {
+            bubbles: true,
+            clientX: 5,
+            clientY: 5
+          }));
+
+          console.log(` Finished typing "${text}" and closed dropdown.`);
+          if (callback) setTimeout(callback, 300);
+        }, 400);
+      }, 300);
+      return;
+    }
+
+    const char = text[i];
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: char, bubbles: true }));
+    input.value += char;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    i++;
+
+    setTimeout(typeNextChar, 50);
+  }
+
+  typeNextChar();
+}
+
+function selectDropdownOption(dropdownSpan, valueToType, callback) {
+  if (!dropdownSpan) {
+    console.warn(" Dropdown not found for: " + valueToType);
+    if (callback) callback();
+    return;
+  }
+
+  dropdownSpan.click();
+  setTimeout(() => {
+    typeIntoActiveInput(valueToType, callback);
+  }, 300);
+}
+
+//  Handles Premium Confirmation Modal (title based)
+function waitAndClickPremiumAccept(maxTries = 15) {
+  let tries = 0;
+  const check = () => {
+    const modal = Array.from(document.querySelectorAll('.modal-content'))
+      .find(modal => modal.innerText.includes('Premium Confirmation'));
+    if (modal && isVisible(modal)) {
+      const acceptBtn = modal.querySelector('button.btn.btn-success');
+      if (acceptBtn && isVisible(acceptBtn)) {
+        acceptBtn.click();
+        console.log(" Clicked Premium Accept button");
+        return;
+      }
+    }
+    if (++tries < maxTries) {
+      setTimeout(check, 300);
+    } else {
+      console.warn(" Premium Accept button not found.");
+    }
+  };
+  check();
+}
+
+//  Handles Visa Confirmation Modal (by Reject button attribute)
+function waitAndClickVisaAccept(maxTries = 15) {
+  let tries = 0;
+  const check = () => {
+    const visaModal = Array.from(document.querySelectorAll('.modal-footer')).find(footer => {
+      const reject = footer.querySelector('button.btn.btn-danger[onclick*="OnVisaReject"]');
+      const accept = footer.querySelector('button.btn.btn-success');
+      return reject && accept && isVisible(footer);
+    });
+    if (visaModal) {
+      const acceptBtn = visaModal.querySelector('button.btn.btn-success');
+      acceptBtn.click();
+      console.log(" Clicked Visa Accept button");
+      return;
+    }
+    if (++tries < maxTries) {
+      setTimeout(check, 300);
+    } else {
+      console.warn(" Visa Accept button not found.");
+    }
+  };
+  check();
+}
+
+//  Handles Generic OK Modal
+function waitAndClickOkModal(maxTries = 15) {
+  let tries = 0;
+  const check = () => {
+    const okBtn = Array.from(document.querySelectorAll('button.btn.btn-primary'))
+      .find(btn => isVisible(btn) && btn.textContent.trim().toLowerCase() === 'ok');
+    if (okBtn) {
+      okBtn.click();
+      console.log(" Clicked OK button after Visa Sub Type");
+      return;
+    }
+    if (++tries < maxTries) {
+      setTimeout(check, 300);
+    } else {
+      console.warn(" OK button not found after Visa Sub Type.");
+    }
+  };
+  check();
+}
+
+function waitUntilVisibleThenClick(selector, maxTries = 10) {
+  let tries = 0;
+  const tryClick = () => {
+    const btn = document.querySelector(selector);
+    if (btn && isVisible(btn)) {
+      btn.click();
+      console.log(" Clicked modal button:", btn.textContent.trim());
+    } else if (tries < maxTries) {
+      tries++;
+      setTimeout(tryClick, 200);
+    } else {
+      console.warn(" Modal button not found:", selector);
+    }
+  };
+  tryClick();
+}
+
+function finalSubmitClick(delayMs = 5000) {
+  setTimeout(() => {
+    const btn = document.querySelector('#btnSubmit');
+    if (btn && isVisible(btn)) {
+      btn.click();
+      console.log(" Clicked final Submit button!");
+    } else {
+      console.warn(" Submit button not found.");
+    }
+  }, delayMs);
+}
+
+// === Start Automation Flow ===
+
+const locationDropdown = findDropdownAfterLabel("Location");
+selectDropdownOption(locationDropdown, "Algiers", () => {
+
+  const visaTypeDropdown = findDropdownAfterLabel("Visa Type");
+  selectDropdownOption(visaTypeDropdown, "First application / première demande", () => {
+
+    waitAndClickVisaAccept(); //  New Visa Confirmation handler
+
+    const categoryDropdown = findDropdownAfterLabel("Category");
+    selectDropdownOption(categoryDropdown, "Premium", () => {
+
+      waitAndClickPremiumAccept(); //  Premium modal Accept
+
+      const visaSubTypeDropdown = findDropdownAfterLabel("Visa Sub Type");
+      selectDropdownOption(visaSubTypeDropdown, "ALG 1", () => {
+
+        waitAndClickOkModal(); //  OK after Visa Sub Type
+        finalSubmitClick(5000); //  Final Submit click after delay
+
+      });
+    });
+  });
+});
+"""
+        # check_and_solve_captcha(page)
+        page.evaluate(js_code)
+        time.sleep(12)
+        if page.locator("text=Currently, no slots are available").is_visible():
+            print("No slots. Retrying...")
+            btn = page.query_selector("a.btn.btn-primary[href='/DZA/appointment/newappointment']")
+            if btn:
+                btn.click()
+        else:
+            print("submitted successfully email sending....")
+
+# === Main Script ===
+with sync_playwright() as p:
+    browser = p.chromium.launch_persistent_context("user_data", headless=False)
+    page = browser.new_page()
+    page.goto(LOGIN_URL, wait_until="domcontentloaded")
+    human_wait(2, 4)
+
+    while True:
+        try:
+            if is_captcha_limit_reached(page):
+                print(" Captcha limit a nemi.")
+                return_to_login(page)
+                continue
+
+            if is_login_page(page):
+                fill_login(page)
+                continue
+
+            fill_password(page)
+            click_book_now(page)
+            handle_form_submission(page)
+
+        except KeyboardInterrupt:
+            print(" Stopped manually.")
+            break
+        except Exception as e:
+            print(" Error in loop:", e)
+            time.sleep(5)
+
+    print("✅ Script finished.")
