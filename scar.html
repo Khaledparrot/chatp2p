@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TrustFund Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #f1f3f6; }
+    header { background: #004aad; color: white; padding: 15px; text-align: center; font-size: 1.2em; }
+    nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; border-top: 1px solid #ccc; }
+    nav button { flex: 1; padding: 10px; border: none; background: none; font-size: 0.9em; color: #444; }
+    nav button.active { color: #004aad; font-weight: bold; }
+    .page { display: none; padding: 20px; }
+    .page.active { display: block; }
+    .card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 0 5px #ccc; }
+    .btn { background: #004aad; color: white; border: none; padding: 10px; border-radius: 5px; width: 100%; margin-top: 10px; }
+    .badge { background: green; color: white; padding: 5px 10px; border-radius: 20px; font-size: 0.8em; }
+    .input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; }
+    .task { margin: 10px 0; padding: 10px; background: #e8f5e9; border-left: 4px solid green; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+<header id="header-title">Dashboard</header>
+
+<!-- Dashboard -->
+<div id="page-dashboard" class="page active">
+  <div class="card">
+    <h2>Balance</h2>
+    <p style="font-size: 1.5em;">$5,240.00</p>
+    <p>ROI: <strong>+12.5%</strong> (Monthly)</p>
+  </div>
+  <div class="card">
+    <h2>Latest Profits</h2>
+    <ul>
+      <li>+ $120.20 — AutoBot Pro</li>
+      <li>+ $55.90 — Referral Bonus</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Tasks -->
+<div id="page-tasks" class="page">
+  <div class="card">
+    <h2>Trusted Tasks</h2>
+    <div class="task">✅ Upload National ID (KYC)</div>
+    <div class="task">✅ Connect to Binance Wallet</div>
+    <div class="task">🕒 Share referral link with 5 users</div>
+    <div class="task">🕒 Complete quiz on Investment Ethics</div>
+    <button class="btn">Complete a Task</button>
+  </div>
+</div>
+
+<!-- Wallet -->
+<div id="page-wallet" class="page">
+  <div class="card">
+    <h2>Wallet</h2>
+    <p>Balance: <strong>$5,240.00</strong></p>
+    <input class="input" placeholder="Enter amount to withdraw">
+    <button class="btn">Request Withdrawal</button>
+    <small style="color: gray;">* Minimum $50. Manual review in 48h</small>
+  </div>
+</div>
+
+<!-- Profile -->
+<div id="page-profile" class="page">
+  <div class="card">
+    <h2>My Profile</h2>
+    <p>Name: <strong>Amir Tech</strong></p>
+    <p>Email: <strong>amir@cryptofunds.io</strong></p>
+    <p>Status: <span class="badge">KYC Verified</span></p>
+    <button class="btn">Edit Profile</button>
+  </div>
+</div>
+
+<!-- Support -->
+<div id="page-support" class="page">
+  <div class="card">
+    <h2>Support</h2>
+    <p>Need help? Contact our verified agents.</p>
+    <button class="btn">Chat on Telegram</button>
+    <button class="btn" style="background: #888;">Open FAQ</button>
+  </div>
+</div>
+
+<!-- Navigation -->
+<nav>
+  <button onclick="showPage('dashboard')" class="active">🏠 Dashboard</button>
+  <button onclick="showPage('tasks')">✅ Tasks</button>
+  <button onclick="showPage('wallet')">💼 Wallet</button>
+  <button onclick="showPage('profile')">👤 Profile</button>
+  <button onclick="showPage('support')">💬 Support</button>
+</nav>
+
+<script>
+  function showPage(id) {
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(p => p.classList.remove('active'));
+
+    document.getElementById('page-' + id).classList.add('active');
+    document.getElementById('header-title').innerText = capitalize(id);
+
+    const navBtns = document.querySelectorAll('nav button');
+    navBtns.forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+
+  function capitalize(s) {
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+</script>
+
+</body>
+</html>
