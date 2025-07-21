@@ -1,1 +1,159 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TrustFund Pro | Secure Crypto Investments</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #f4f6fa; color: #333; }
+    header { background: #003366; color: white; padding: 20px; text-align: center; }
+    nav { background: #002244; color: white; display: flex; justify-content: space-between; padding: 10px 20px; position: sticky; top: 0; z-index: 999; }
+    nav select { background: white; color: black; padding: 5px; border-radius: 4px; }
+    main { max-width: 1100px; margin: auto; padding: 20px; }
+    .section { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    h2 { margin-top: 0; }
+    .label { font-weight: bold; color: #004080; }
+    .input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; }
+    .btn { background: #004080; color: white; padding: 10px 15px; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer; width: 100%; }
+    footer { background: #001c33; color: white; text-align: center; padding: 20px; font-size: 0.9em; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+    .badge { background: green; color: white; font-size: 0.8em; padding: 3px 8px; border-radius: 10px; display: inline-block; margin-left: 10px; }
+    .disclaimer { font-size: 0.8em; color: #777; margin-top: 10px; }
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; }
+    .modal-content { background: white; padding: 20px; border-radius: 10px; max-width: 500px; width: 90%; }
+    .modal-content h3 { margin-top: 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>TrustFund Pro</h1>
+    <p>Secured by Blockchain • Audited • Regulated • Insured</p>
+  </header>
+
+  <nav>
+    <div><strong>Investor Menu</strong></div>
+    <select onchange="navigate(this.value)">
+      <option value="dashboard">Dashboard</option>
+      <option value="invest">Invest</option>
+      <option value="tasks">Verify</option>
+      <option value="wallet">Wallet</option>
+      <option value="analytics">Analytics</option>
+      <option value="faq">FAQ</option>
+      <option value="about">About</option>
+    </select>
+  </nav>
+
+  <main>
+    <section id="dashboard" class="section">
+      <h2>Investor Dashboard</h2>
+      <p><span class="label">Total Portfolio:</span> $27,860.00</p>
+      <p><span class="label">Pending ROI:</span> $1,205.32</p>
+      <p><span class="label">Membership Level:</span> Gold Elite <span class="badge">Verified</span></p>
+    </section>
+
+    <section id="invest" class="section" style="display:none;">
+      <h2>Secure Investment Packages</h2>
+      <div class="grid">
+        <div>
+          <h4>Starter Plan</h4>
+          <p>ROI: 5%/mo | Lock-in: 30 Days | Min: $100</p>
+          <button class="btn">View Details</button>
+        </div>
+        <div>
+          <h4>Growth Plan</h4>
+          <p>ROI: 9%/mo | Lock-in: 90 Days | Min: $1,000</p>
+          <button class="btn">View Details</button>
+        </div>
+        <div>
+          <h4>Premium Vault</h4>
+          <p>ROI: 13%/mo | Lock-in: 180 Days | Min: $5,000</p>
+          <button class="btn">Apply for Access</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="tasks" class="section" style="display:none;">
+      <h2>Account Verification & Trust Tasks</h2>
+      <ul>
+        <li>✔ KYC: Government ID upload (manual verification)</li>
+        <li>✔ Address verification (utility bill or bank statement)</li>
+        <li>⏳ Advanced risk compliance survey</li>
+        <li>⏳ Record video with unique code for identity audit</li>
+      </ul>
+      <p class="disclaimer">Full access is granted once all tasks are completed.</p>
+      <button class="btn" onclick="showModal()">Submit Documents</button>
+    </section>
+
+    <section id="wallet" class="section" style="display:none;">
+      <h2>Wallet Dashboard</h2>
+      <label class="label">Available Balance</label>
+      <p>$3,200.00</p>
+      <label class="label">Withdraw Funds</label>
+      <input class="input" type="number" placeholder="Amount (USD)">
+      <label class="label">Destination</label>
+      <select class="input">
+        <option>Binance Wallet</option>
+        <option>TRC20 Wallet</option>
+        <option>SEPA Transfer</option>
+      </select>
+      <button class="btn">Initiate Withdrawal</button>
+    </section>
+
+    <section id="analytics" class="section" style="display:none;">
+      <h2>Investment Performance</h2>
+      <p>Your account ROI over the past 6 months shows consistent growth.</p>
+      <ul>
+        <li>March: +5.2%</li>
+        <li>April: +6.0%</li>
+        <li>May: +7.8%</li>
+        <li>June: +8.5%</li>
+        <li>July: +9.2%</li>
+      </ul>
+      <button class="btn">Download Monthly Report</button>
+    </section>
+
+    <section id="faq" class="section" style="display:none;">
+      <h2>Frequently Asked Questions</h2>
+      <p><strong>Q:</strong> Is my investment insured?<br><strong>A:</strong> Yes, TrustFund Pro covers up to $5M through CryptoInsure™.</p>
+      <p><strong>Q:</strong> How long are funds locked?<br><strong>A:</strong> Depends on the selected plan: 30–180 days.</p>
+      <p><strong>Q:</strong> Can I cancel early?<br><strong>A:</strong> Yes, with a 12% early release penalty fee.</p>
+    </section>
+
+    <section id="about" class="section" style="display:none;">
+      <h2>About TrustFund Pro</h2>
+      <p>Founded in 2021, TrustFund Pro is a licensed digital asset management firm headquartered in Zurich. We manage over $180M in crypto portfolios and operate under regulatory frameworks in the EU and Switzerland.</p>
+      <p>🔹 Partners: CertiK, Chainalysis, Binance, Ledger</p>
+      <p>🔹 Audits: CyberSec Labs Q1 + Q3 <a href="#">(View Report)</a></p>
+      <p>🔹 Regulation ID: ZH-CYPT-784421</p>
+      <p>🔹 Insurance: CryptoInsure™ - Coverage up to $5,000,000</p>
+    </section>
+  </main>
+
+  <div id="modal" class="modal" onclick="hideModal()">
+    <div class="modal-content">
+      <h3>Upload Verification Documents</h3>
+      <input type="file" class="input" multiple>
+      <textarea class="input" rows="3" placeholder="Comment or instructions (optional)"></textarea>
+      <button class="btn" onclick="hideModal()">Submit Now</button>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 TrustFund Pro. All Rights Reserved. | GDPR Compliant | ISO 27001 Certified | Registered in Switzerland
+  </footer>
+
+  <script>
+    function navigate(page) {
+      document.querySelectorAll('main > section').forEach(s => s.style.display = 'none');
+      document.getElementById(page).style.display = 'block';
+    }
+    function showModal() {
+      document.getElementById('modal').style.display = 'flex';
+    }
+    function hideModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
