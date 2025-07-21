@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TrustFund Pro | Secure Crypto Investments</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #f4f6fa; color: #333; }
+    header { background: #003366; color: white; padding: 20px; text-align: center; }
+    nav { background: #002244; color: white; display: flex; justify-content: space-between; padding: 10px 20px; position: sticky; top: 0; z-index: 999; }
+    nav select { background: white; color: black; padding: 5px; border-radius: 4px; }
+    main { max-width: 900px; margin: auto; padding: 20px; }
+    .section { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    h2 { margin-top: 0; }
+    .label { font-weight: bold; color: #004080; }
+    .input, select { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; }
+    .btn { background: #004080; color: white; padding: 10px 15px; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer; width: 100%; }
+    footer { background: #001c33; color: white; text-align: center; padding: 20px; font-size: 0.9em; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .badge { background: green; color: white; font-size: 0.8em; padding: 3px 8px; border-radius: 10px; display: inline-block; margin-left: 10px; }
+    .disclaimer { font-size: 0.8em; color: #777; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>TrustFund Pro</h1>
+    <p>Secured by Blockchain. Audited by Third Parties. Insured up to $5M.</p>
+  </header>
+
+  <nav>
+    <div><strong>Welcome, Investor</strong></div>
+    <select onchange="navigate(this.value)">
+      <option value="dashboard">Dashboard</option>
+      <option value="invest">Investment Plans</option>
+      <option value="tasks">Verification Tasks</option>
+      <option value="wallet">Wallet</option>
+      <option value="about">About Company</option>
+    </select>
+  </nav>
+
+  <main>
+    <section id="dashboard" class="section">
+      <h2>Account Overview</h2>
+      <p><span class="label">Total Balance:</span> $12,530.00</p>
+      <p><span class="label">Monthly ROI:</span> +8.5%</p>
+      <p><span class="label">Last Withdrawal:</span> $2,000 on July 12, 2025</p>
+    </section>
+
+    <section id="invest" class="section" style="display:none;">
+      <h2>Available Investment Plans</h2>
+      <div class="grid">
+        <div>
+          <p><strong>Starter Plan</strong><br> ROI: 5%/month<br> Min: $100</p>
+          <button class="btn">Invest Now</button>
+        </div>
+        <div>
+          <p><strong>Pro Plan</strong><br> ROI: 10%/month<br> Min: $1,000</p>
+          <button class="btn">Invest Now</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="tasks" class="section" style="display:none;">
+      <h2>Verification & Trust Tasks</h2>
+      <ul>
+        <li>✔ Upload Valid ID (Manual Review within 24h)</li>
+        <li>✔ Complete Blockchain Compliance Quiz</li>
+        <li>⏳ Connect External Wallet (MetaMask, Binance)</li>
+        <li>⏳ Invite 3 Friends with Minimum $100 Investment</li>
+      </ul>
+      <button class="btn">Submit Verification Documents</button>
+    </section>
+
+    <section id="wallet" class="section" style="display:none;">
+      <h2>Wallet & Transactions</h2>
+      <label class="label">Withdraw Amount (USD)</label>
+      <input class="input" type="number" placeholder="Enter amount">
+      <label class="label">Payment Method</label>
+      <select class="input">
+        <option>USDT (TRC20)</option>
+        <option>Binance Pay</option>
+        <option>Bank Wire Transfer</option>
+      </select>
+      <button class="btn">Request Withdrawal</button>
+      <p class="disclaimer">* Withdrawals are processed in 48h after KYC check.</p>
+    </section>
+
+    <section id="about" class="section" style="display:none;">
+      <h2>About Our Company</h2>
+      <p>Founded in 2021, TrustFund Pro is a privately regulated crypto asset management firm with over $180M in assets under management. We provide retail and institutional investors with safe, high-yield crypto strategies through our audited smart contract ecosystem.</p>
+      <p>Partners: Chainalysis, CertiK, Ledger, Binance</p>
+      <p>Headquarters: Zurich, Switzerland</p>
+      <p>License ID: ZH-CYPT-784421 <span class="badge">Verified</span></p>
+      <p>Audits: Completed Q1 & Q3 by CyberSec Labs Ltd. (<a href="#">View Audit PDF</a>)</p>
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2025 TrustFund Pro. All Rights Reserved.<br>
+    Certified Secure • Insured by CryptoInsure™ • GDPR Compliant
+  </footer>
+
+  <script>
+    function navigate(page) {
+      document.querySelectorAll('main > section').forEach(sec => sec.style.display = 'none');
+      document.getElementById(page).style.display = 'block';
+    }
+  </script>
+</body>
+</html>
