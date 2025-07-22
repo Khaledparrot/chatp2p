@@ -1,304 +1,230 @@
-<!-- TRUSTFUND PRO - FULL FAKE INVESTMENT DEMO APP (FOR EDUCATION ONLY) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TrustFund Pro</title>
+  <title>TrustFund Pro App</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
-      --bg: #0d0d0d;
-      --accent: #00c2ff;
-      --text: #f0f0f0;
+      --bg: #0e0e0e;
+      --accent: #00bfff;
+      --text: #ffffff;
       --muted: #888;
       --card: #1a1a1a;
       --border: #333;
     }
-
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      padding-top: 60px;
-      padding-bottom: 60px;
-    }
-
-    header, footer {
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+    header {
       position: fixed;
+      top: 0;
       width: 100%;
       background: var(--card);
       z-index: 1000;
+      padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 20px;
     }
-
-    header {
-      top: 0;
-    }
-
-    footer {
-      bottom: 0;
-      justify-content: center;
-      font-size: 0.85em;
-      color: var(--muted);
-    }
-
-    h1 {
-      font-size: 1.2rem;
+    header h1 {
+      font-size: 1.1rem;
       color: var(--accent);
-      margin: 0;
     }
-
-    .dropdown {
-      position: relative;
-    }
-
-    .dropdown-toggle {
-      width: 36px;
-      height: 36px;
+    .menu-btn {
+      background: none;
       border: none;
-      background: var(--card);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .dropdown-menu {
-      display: none;
-      position: absolute;
-      top: 45px;
-      left: 0;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      z-index: 2000;
-    }
-
-    .dropdown-menu button {
-      background: transparent;
-      border: 1px solid var(--accent);
-      border-radius: 6px;
-      width: 38px;
-      height: 38px;
+      font-size: 1.5rem;
       color: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
       cursor: pointer;
     }
-
-    .dropdown-menu button:hover {
-      background: var(--accent);
-      color: #000;
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: -260px;
+      width: 240px;
+      height: 100%;
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      z-index: 1500;
+      padding-top: 60px;
+      transition: left 0.3s ease;
     }
-
+    .drawer.open { left: 0; }
+    .drawer button {
+      width: 100%;
+      text-align: left;
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1rem;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .drawer button:hover { background: var(--border); }
     main {
+      margin-top: 60px;
       padding: 20px;
+      transition: margin-left 0.3s ease;
     }
-
     .section {
       display: none;
-      animation: fadeIn 0.4s ease;
-      background: var(--card);
-      padding: 20px;
-      border-radius: 10px;
-      margin-bottom: 40px;
+      animation: fadeIn 0.3s ease;
     }
-
-    .section.active {
-      display: block;
-    }
-
+    .section.active { display: block; }
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
-    h2 {
-      margin-top: 0;
-      color: var(--accent);
-    }
-
+    h2 { color: var(--accent); margin-bottom: 10px; }
     .card {
-      background: #15191f;
+      background: var(--card);
       padding: 15px;
       border-radius: 10px;
-      margin: 10px 0;
+      margin-bottom: 15px;
     }
-
     canvas {
       background: #000;
       border-radius: 8px;
-      margin: 20px 0;
+      margin: 10px 0;
     }
-
-    input[type='text'], textarea {
+    footer {
+      position: fixed;
+      bottom: 0;
       width: 100%;
-      padding: 8px;
-      border: none;
-      border-radius: 5px;
-      margin-bottom: 10px;
+      text-align: center;
+      background: var(--card);
+      color: var(--muted);
+      padding: 10px;
+      font-size: 0.85rem;
     }
-
     button.main {
       background: var(--accent);
-      color: #000;
+      color: black;
+      padding: 10px;
       border: none;
-      padding: 10px 15px;
       border-radius: 6px;
       cursor: pointer;
+      margin-top: 10px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
   <header>
     <h1>TrustFund Pro</h1>
-    <div class="dropdown">
-      <button class="dropdown-toggle" onclick="toggleMenu()"><i class="bi bi-grid"></i></button>
-      <div class="dropdown-menu" id="menu">
-        <button onclick="showSection('dashboard')" title="Dashboard"><i class="bi bi-house"></i></button>
-        <button onclick="showSection('market')" title="Market"><i class="bi bi-graph-up"></i></button>
-        <button onclick="showSection('invest')" title="Invest"><i class="bi bi-cash"></i></button>
-        <button onclick="showSection('analytics')" title="Analytics"><i class="bi bi-bar-chart-line"></i></button>
-        <button onclick="showSection('wallet')" title="Wallet"><i class="bi bi-wallet2"></i></button>
-        <button onclick="showSection('referral')" title="Referrals"><i class="bi bi-link-45deg"></i></button>
-        <button onclick="showSection('faq')" title="FAQ"><i class="bi bi-question-circle"></i></button>
-        <button onclick="showSection('careers')" title="Careers"><i class="bi bi-briefcase"></i></button>
-        <button onclick="showSection('kyc')" title="KYC"><i class="bi bi-person-check"></i></button>
-        <button onclick="showSection('security')" title="Security"><i class="bi bi-shield-lock"></i></button>
-        <button onclick="showSection('about')" title="About"><i class="bi bi-info-circle"></i></button>
-        <button onclick="showSection('contact')" title="Contact"><i class="bi bi-envelope"></i></button>
-      </div>
-    </div>
+    <button class="menu-btn" onclick="toggleDrawer()"><i class="bi bi-list"></i></button>
   </header>
 
-  <main>
+  <div class="drawer" id="drawer">
+    <button onclick="showSection('dashboard')">Dashboard</button>
+    <button onclick="showSection('market')">Live Market</button>
+    <button onclick="showSection('invest')">Invest</button>
+    <button onclick="showSection('analytics')">Analytics</button>
+    <button onclick="showSection('wallet')">Wallet</button>
+    <button onclick="showSection('referral')">Referrals</button>
+    <button onclick="showSection('faq')">FAQ</button>
+    <button onclick="showSection('careers')">Careers</button>
+    <button onclick="showSection('kyc')">KYC</button>
+    <button onclick="showSection('security')">Security</button>
+    <button onclick="showSection('about')">About</button>
+    <button onclick="showSection('contact')">Contact</button>
+  </div>
+
+  <main id="main">
     <section id="dashboard" class="section active">
       <h2>Dashboard</h2>
-      <div class="card">Total Balance: $25,800</div>
-      <div class="card">Recent Activity: Withdrawal $800 - July 20</div>
-      <canvas id="chart1" width="300" height="120"></canvas>
+      <div class="card">Balance: $25,800</div>
+      <div class="card">Last Login: Jul 22</div>
+      <canvas id="chart1" width="300" height="100"></canvas>
     </section>
-
     <section id="market" class="section">
       <h2>Live Market</h2>
       <div class="card">BTC/USD: $67,000</div>
       <div class="card">ETH/USD: $3,300</div>
-      <div class="card">BNB/USD: $540</div>
     </section>
-
     <section id="invest" class="section">
       <h2>Investment Plans</h2>
       <div class="card">Starter - $100, 5% monthly</div>
       <div class="card">Pro - $1,000, 8% monthly</div>
       <div class="card">Elite - $10,000, 12% monthly</div>
     </section>
-
     <section id="analytics" class="section">
-      <h2>Performance Analytics</h2>
-      <canvas id="chart2" width="300" height="120"></canvas>
+      <h2>Analytics</h2>
+      <canvas id="chart2" width="300" height="100"></canvas>
     </section>
-
     <section id="wallet" class="section">
       <h2>Wallet</h2>
       <div class="card">Available: $2,600</div>
       <div class="card">Pending: $400</div>
     </section>
-
     <section id="referral" class="section">
       <h2>Referral Program</h2>
-      <div class="card">Your link: trustfund.pro/invite/abc123</div>
-      <div class="card">Referrals: 23 — Earnings: $340</div>
+      <div class="card">Your Link: trustfund.pro/invite/abc123</div>
+      <div class="card">Referrals: 23</div>
     </section>
-
     <section id="faq" class="section">
-      <h2>FAQ</h2>
-      <div class="card">Q: How to withdraw? <br>A: Go to Wallet > Withdraw.</div>
-      <div class="card">Q: Is there a mobile app? <br>A: Yes. Available on Android & iOS.</div>
+      <h2>FAQs</h2>
+      <div class="card">How to withdraw? Go to Wallet > Withdraw</div>
     </section>
-
     <section id="careers" class="section">
       <h2>Careers</h2>
-      <div class="card">Frontend Developer (Remote)</div>
-      <div class="card">Compliance Officer (Zurich)</div>
+      <div class="card">Frontend Dev – Remote</div>
     </section>
-
     <section id="kyc" class="section">
-      <h2>KYC Verification</h2>
-      <div class="card">Upload ID Document and a Selfie</div>
-      <input type="file" /><br />
-      <input type="file" /><br />
+      <h2>KYC</h2>
+      <input type="file" /> <br />
+      <input type="file" /> <br />
       <button class="main">Submit</button>
     </section>
-
     <section id="security" class="section">
-      <h2>Platform Security</h2>
-      <div class="card">AES-256 encryption, cold storage, biometric login supported</div>
+      <h2>Security</h2>
+      <div class="card">AES-256, cold wallets, biometric login</div>
     </section>
-
     <section id="about" class="section">
-      <h2>About Us</h2>
-      <p class="card">TrustFund Pro is a fintech platform based in Switzerland, operating since 2021 with over 10,000 global users.</p>
+      <h2>About</h2>
+      <div class="card">Founded in 2021. Serving 10,000+ users globally.</div>
     </section>
-
     <section id="contact" class="section">
-      <h2>Contact Us</h2>
-      <div class="card">Email: support@trustfundpro.com</div>
+      <h2>Contact</h2>
+      <input type="text" placeholder="Your email" />
       <textarea placeholder="Your message..."></textarea>
-      <button class="main">Send Message</button>
+      <button class="main">Send</button>
     </section>
   </main>
 
-  <footer>&copy; 2025 TrustFund Pro. All rights reserved.</footer>
+  <footer>&copy; 2025 TrustFund Pro</footer>
 
   <script>
-    function toggleMenu() {
-      const menu = document.getElementById(\"menu\");
-      menu.style.display = menu.style.display === \"grid\" ? \"none\" : \"grid\";
+    function toggleDrawer() {
+      document.getElementById('drawer').classList.toggle('open');
     }
-
     function showSection(id) {
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
-      document.getElementById(\"menu\").style.display = \"none\";
+      toggleDrawer();
     }
-
-    window.addEventListener(\"load\", () => {
-      const ctx1 = document.getElementById(\"chart1\").getContext(\"2d\");
-      new Chart(ctx1, {
-        type: \"line\",
+    window.addEventListener("load", () => {
+      new Chart(document.getElementById("chart1").getContext("2d"), {
+        type: "line",
         data: {
-          labels: [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\"],
-          datasets: [{
-            label: \"Account Value ($)\",
-            data: [800, 1200, 1900, 2800, 4000, 5800],
-            borderColor: \"#00c2ff\",
-            fill: false
-          }]
+          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+          datasets: [{ label: "Growth", data: [800, 1200, 1900, 2800, 4000, 5800], borderColor: "#00c2ff", fill: false }]
         }
       });
-
-      const ctx2 = document.getElementById(\"chart2\").getContext(\"2d\");
-      new Chart(ctx2, {
-        type: \"bar\",
+      new Chart(document.getElementById("chart2").getContext("2d"), {
+        type: "bar",
         data: {
-          labels: [\"Q1\", \"Q2\", \"Q3\", \"Q4\"],
-          datasets: [{
-            label: \"Quarterly Return %\",
-            data: [5, 7, 8, 10],
-            backgroundColor: \"#00c2ff\"
-          }]
+          labels: ["Q1", "Q2", "Q3", "Q4"],
+          datasets: [{ label: "Returns", data: [5, 7, 8, 10], backgroundColor: "#00c2ff" }]
         }
       });
     });
