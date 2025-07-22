@@ -344,5 +344,14 @@ function typeEffect() {
 
     typeEffect();
   </script>
+
+  <script>
+  fetch('sections.html')
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('imported-sections').innerHTML = html;
+    })
+    .catch(error => console.error('Erreur lors du chargement des sections:', error));
+</script>
 </body>
 </html>
