@@ -12,19 +12,50 @@
     <div class="nav-left">
       <img src="assets/logo.svg" alt="NovaTrust Logo" class="nav-logo">
       <nav class="nav-menu">
-        <a href="#features">Fonctionnalités</a>
-        <a href="#plans">Plans</a>
-        <a href="#team">Équipe</a>
-        <a href="#faq">FAQ</a>
+        <div class="nav-item">
+          <a href="#features">Fonctionnalités</a>
+          <div class="dropdown">
+            <a href="#features1">Avantage 1</a>
+            <a href="#features2">Avantage 2</a>
+          </div>
+        </div>
+        <div class="nav-item">
+          <a href="#plans">Plans</a>
+          <div class="dropdown">
+            <a href="#plan1">Court terme</a>
+            <a href="#plan2">Long terme</a>
+          </div>
+        </div>
+        <div class="nav-item">
+          <a href="#team">Équipe</a>
+          <div class="dropdown">
+            <a href="#ceo">Fondateur</a>
+            <a href="#teamlist">Membres</a>
+          </div>
+        </div>
+        <div class="nav-item">
+          <a href="#faq">FAQ</a>
+          <div class="dropdown">
+            <a href="#support">Support</a>
+            <a href="#questions">Questions fréquentes</a>
+          </div>
+        </div>
       </nav>
     </div>
     <div class="nav-right">
-      <button class="icon-btn" id="toggleDarkMode" title="Mode Sombre">🌓</button>
-      <select id="languageSwitcher" class="lang-select" title="Changer de langue">
-        <option value="fr">FR</option>
-        <option value="en">EN</option>
-        <option value="ar">AR</option>
-      </select>
+      <button class="icon-btn" id="toggleDarkMode" title="Mode Sombre">
+        <img src="assets/darkmode.svg" alt="Dark Mode" style="width: 20px; height: 20px;">
+      </button>
+      <div class="lang-dropdown">
+        <button class="icon-btn" id="languageBtn" title="Changer de langue">
+          <img src="assets/lang.svg" alt="Langue" style="width: 20px; height: 20px;">
+        </button>
+        <div class="lang-options">
+          <a href="#" data-lang="fr">Français</a>
+          <a href="#" data-lang="en">English</a>
+          <a href="#" data-lang="ar">العربية</a>
+        </div>
+      </div>
       <a href="login.html" class="btn nav-btn">Se connecter</a>
       <a href="register.html" class="btn primary">S'inscrire</a>
     </div>
@@ -98,10 +129,23 @@
       document.body.classList.toggle('dark-mode');
     });
 
-    // Language switcher logic (example placeholder)
-    document.getElementById('languageSwitcher').addEventListener('change', (e) => {
-      alert('Langue changée vers: ' + e.target.value + ' (fonctionnalité à implémenter)');
+    // Language menu toggle
+    const langBtn = document.getElementById('languageBtn');
+    const langOptions = document.querySelector('.lang-options');
+    langBtn.addEventListener('mouseenter', () => {
+      langOptions.style.display = 'block';
     });
+    langBtn.addEventListener('mouseleave', () => {
+      langOptions.style.display = 'none';
+    });
+    langOptions.addEventListener('mouseenter', () => {
+      langOptions.style.display = 'block';
+    });
+    langOptions.addEventListener('mouseleave', () => {
+      langOptions.style.display = 'none';
+    });
+
+    // Hover nav items dropdowns handled by CSS
   </script>
 </body>
 </html>
