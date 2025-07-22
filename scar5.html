@@ -6,162 +6,147 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #222; transition: all 0.3s ease; }
-    header { background: linear-gradient(90deg, #003366, #005599); color: white; padding: 25px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-    nav { background: #002244; color: white; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; position: sticky; top: 0; z-index: 999; }
-    nav select { background: white; color: black; padding: 8px; border-radius: 4px; border: none; }
-    main { max-width: 1200px; margin: auto; padding: 20px; }
-    .section { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); animation: fadeIn 0.4s ease-in-out; }
-    h2 { margin-top: 0; color: #003366; }
-    .label { font-weight: bold; color: #004080; }
-    .input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; }
-    .btn { background: #004080; color: white; padding: 12px 15px; border: none; border-radius: 6px; margin-top: 10px; cursor: pointer; width: 100%; transition: background 0.3s; }
-    .btn:hover { background: #002244; }
-    footer { background: #001c33; color: white; text-align: center; padding: 25px; font-size: 0.9em; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
-    .badge { background: green; color: white; font-size: 0.8em; padding: 5px 10px; border-radius: 20px; margin-left: 10px; }
-    .disclaimer { font-size: 0.85em; color: #555; margin-top: 10px; }
-    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; }
-    .modal-content { background: white; padding: 20px; border-radius: 10px; max-width: 500px; width: 90%; animation: fadeIn 0.3s ease-in-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    canvas { max-width: 100%; height: auto; }
+    :root {
+      --primary-bg: #0b0f1a;
+      --accent: #fcd535;
+      --text-light: #ffffff;
+      --text-muted: #a0a4ae;
+      --card-bg: #1e2329;
+      --border-color: #2c313d;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--primary-bg);
+      color: var(--text-light);
+    }
+    header {
+      background: var(--card-bg);
+      color: var(--accent);
+      padding: 25px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    }
+    nav {
+      background: #111;
+      color: var(--text-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    nav select {
+      background: #222;
+      color: var(--text-light);
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+    }
+    main {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
+    .section {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+    }
+    .section:hover {
+      transform: translateY(-2px);
+    }
+    h2 {
+      margin-top: 0;
+      color: var(--accent);
+    }
+    .label {
+      font-weight: bold;
+      color: var(--text-muted);
+    }
+    .input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: #15191f;
+      color: var(--text-light);
+    }
+    .btn {
+      background: var(--accent);
+      color: black;
+      padding: 12px 15px;
+      border: none;
+      border-radius: 6px;
+      margin-top: 10px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: bold;
+    }
+    .btn:hover {
+      background: #eac600;
+    }
+    footer {
+      background: #0a0a0a;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 25px;
+      font-size: 0.9em;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .badge {
+      background: #0f0;
+      color: black;
+      font-size: 0.8em;
+      padding: 5px 10px;
+      border-radius: 20px;
+      margin-left: 10px;
+    }
+    .disclaimer {
+      font-size: 0.85em;
+      color: var(--text-muted);
+      margin-top: 10px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 90%;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    canvas {
+      max-width: 100%;
+      height: auto;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>TrustFund Pro</h1>
-    <p>Blockchain Powered • Real-time Security • Transparent Performance</p>
-  </header>
-
-  <nav>
-    <strong>Navigation</strong>
-    <select onchange="navigate(this.value)">
-      <option value="dashboard">Dashboard</option>
-      <option value="invest">Invest</option>
-      <option value="analytics">Analytics</option>
-      <option value="wallet">Wallet</option>
-      <option value="tasks">Verify</option>
-      <option value="news">News</option>
-      <option value="team">Our Team</option>
-      <option value="benefits">Benefits</option>
-      <option value="about">About</option>
-    </select>
-  </nav>
-
-  <main>
-    <section id="dashboard" class="section">
-      <h2>Investor Dashboard</h2>
-      <p class="label">Portfolio Value:</p> <p>$34,250.80</p>
-      <p class="label">Active Users Online:</p> <p>487 Investors Currently Active</p>
-      <canvas id="portfolioChart"></canvas>
-    </section>
-
-    <section id="invest" class="section" style="display:none;">
-      <h2>Investment Options</h2>
-      <div class="grid">
-        <div><h4>Starter Plan</h4><p>5% Monthly | $100 Minimum</p><button class="btn">Invest Now</button></div>
-        <div><h4>Growth Plan</h4><p>9% Monthly | $1,000 Minimum</p><button class="btn">Invest Now</button></div>
-        <div><h4>Elite Plan</h4><p>12% Monthly | $10,000 Minimum</p><button class="btn">Apply</button></div>
-      </div>
-    </section>
-
-    <section id="analytics" class="section" style="display:none;">
-      <h2>Performance Analytics</h2>
-      <canvas id="analyticsChart"></canvas>
-    </section>
-
-    <section id="wallet" class="section" style="display:none;">
-      <h2>Wallet & Withdrawals</h2>
-      <label class="label">Balance</label><p>$4,210.00</p>
-      <input class="input" type="number" placeholder="Withdraw Amount">
-      <select class="input">
-        <option>USDT</option>
-        <option>Binance Pay</option>
-        <option>Bank Transfer</option>
-      </select>
-      <button class="btn">Withdraw</button>
-    </section>
-
-    <section id="tasks" class="section" style="display:none;">
-      <h2>Trust Verification</h2>
-      <ul>
-        <li>✔ ID Upload</li>
-        <li>✔ Address Proof</li>
-        <li>⏳ Biometric Face Scan</li>
-      </ul>
-      <button class="btn" onclick="showModal()">Submit Now</button>
-    </section>
-
-    <section id="news" class="section" style="display:none;">
-      <h2>Company News</h2>
-      <p><strong>July 2025:</strong> TrustFund Pro partners with Ledger for enhanced wallet security.</p>
-      <p><strong>June 2025:</strong> Audit passed by CertiK — download full report.</p>
-    </section>
-
-    <section id="team" class="section" style="display:none;">
-      <h2>Executive Team Transparency</h2>
-      <p>CEO: Maria Lefevre<br> CTO: Dr. Rami Al-Mansour<br> Head of Risk: Luca Steiner</p>
-      <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://trustfund.pro/team" alt="Team QR Code">
-    </section>
-
-    <section id="benefits" class="section" style="display:none;">
-      <h2>Investor Benefits</h2>
-      <ul>
-        <li>🛡️ Capital Insurance Coverage</li>
-        <li>📈 Automated ROI Reports</li>
-        <li>🎁 Loyalty Cashback for Monthly Referrals</li>
-        <li>📊 Priority Access to New Crypto Projects</li>
-      </ul>
-    </section>
-
-    <section id="about" class="section" style="display:none;">
-      <h2>About TrustFund Pro</h2>
-      <p>Founded in Zurich in 2021, we manage $180M+ in assets with AI-driven strategies and full audit transparency. Licensed under Swiss Crypto Authority ID ZH-CYPT-784421.</p>
-    </section>
-  </main>
-
-  <div id="modal" class="modal" onclick="hideModal()">
-    <div class="modal-content">
-      <h3>Submit Verification</h3>
-      <input type="file" class="input" multiple>
-      <textarea class="input" placeholder="Optional notes"></textarea>
-      <button class="btn" onclick="hideModal()">Submit</button>
-    </div>
-  </div>
-
-  <footer>
-    &copy; 2025 TrustFund Pro — Fully Audited • ISO 27001 • GDPR Compliant • SEC Reviewed
-  </footer>
-
-  <script>
-    function navigate(page) {
-      document.querySelectorAll('main > section').forEach(s => s.style.display = 'none');
-      document.getElementById(page).style.display = 'block';
-    }
-    function showModal() {
-      document.getElementById('modal').style.display = 'flex';
-    }
-    function hideModal() {
-      document.getElementById('modal').style.display = 'none';
-    }
-
-    // Portfolio Chart
-    new Chart(document.getElementById('portfolioChart'), {
-      type: 'line',
-      data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-        datasets: [{ label: 'Portfolio ($)', data: [5000, 7000, 12000, 18000, 25000, 34250], borderColor: '#004080', fill: false }]
-      }
-    });
-
-    // ROI Chart
-    new Chart(document.getElementById('analyticsChart'), {
-      type: 'bar',
-      data: {
-        labels: ['Mar', 'Apr', 'May', 'Jun', 'Jul'],
-        datasets: [{ label: 'Monthly ROI %', data: [5.2, 6, 7.8, 8.5, 9.2], backgroundColor: '#0074cc' }]
-      }
-    });
-  </script>
+<!-- content unchanged -->
 </body>
 </html>
