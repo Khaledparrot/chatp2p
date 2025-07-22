@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NovaTrust - Investissements Sécurisés</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    /* Existing styles... (unchanged) */
+
+    /* --- New Section: Real-time Users --- */
+    .user-count {
+      background: #fff;
+      text-align: center;
+      padding: 4rem 2rem;
+      font-size: 3rem;
+      font-weight: bold;
+      color: #2d3e50;
+    }
+    .dark-mode .user-count {
+      background: #1e1e1e;
+      color: #fcd535;
+    }
+
+    /* --- New Section: Company Info with Animated BG --- */
+    .company-info {
+      background-image: url('https://images.unsplash.com/photo-1551836022-d5d88e9218df');
+      background-size: cover;
+      background-position: center;
+      color: #fff;
+      padding: 6rem 5%;
+      position: relative;
+      animation: bgScroll 20s linear infinite;
+    }
+
+    @keyframes bgScroll {
+      0% { background-position-y: 0; }
+      100% { background-position-y: 100%; }
+    }
+
+    .company-info h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .company-info p {
+      max-width: 800px;
+      margin: auto;
+      font-size: 1.2rem;
+    }
+
+    /* --- New Section: Investment Analysis --- */
+    .analysis {
+      padding: 4rem 5%;
+      background: #f9f9f9;
+      text-align: center;
+    }
+
+    .dark-mode .analysis {
+      background: #1b1b1b;
+    }
+
+    .analysis h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    canvas {
+      max-width: 800px;
+      margin: auto;
+    }
+
+    /* --- New Section: Leadership Profiles --- */
+    .leadership {
+      padding: 4rem 5%;
+      background: #fff;
+    }
+
+    .dark-mode .leadership {
+      background: #1e1e1e;
+    }
+
+    .leadership h2 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .leader-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+    }
+
+    .leader-card {
+      background: #f4f4f4;
+      border-radius: 10px;
+      padding: 1.5rem;
+      width: 280px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .dark-mode .leader-card {
+      background: #2b2b2b;
+      color: #e0e0e0;
+    }
+
+    .leader-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .leader-card img {
+      width: 100px;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+    }
+
+    .leader-card h3 {
+      margin-bottom: 0.5rem;
+    }
+
+    .leader-card p {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .dark-mode .leader-card p {
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <!-- Existing content... -->
+
+  <!-- New Section: Real-Time Users -->
+  <section class="user-count" id="userCountSection">
+    <div>Utilisateurs Actuels: <span id="userCount">8,241</span></div>
+  </section>
+
+  <!-- New Section: Company Info -->
+  <section class="company-info">
+    <h2>À propos de NovaTrust</h2>
+    <p>NovaTrust est une plateforme d’investissement de confiance, spécialisée dans les solutions de sécurité financière, avec des milliers d’utilisateurs dans le monde. Nous nous engageons à la transparence, la croissance durable, et l'innovation technologique.</p>
+  </section>
+
+  <!-- New Section: Investment Analysis -->
+  <section class="analysis" id="analysis">
+    <h2>Analyse des Investissements</h2>
+    <canvas id="investmentChart" width="400" height="200"></canvas>
+  </section>
+
+  <!-- New Section: Leadership Profiles -->
+  <section class="leadership" id="team">
+    <h2>Notre Équipe Dirigeante</h2>
+    <div class="leader-grid">
+      <div class="leader-card">
+        <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="CEO">
+        <h3>Jean Dupont</h3>
+        <p>PDG - Vision stratégique et développement global</p>
+      </div>
+      <div class="leader-card">
+        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="CFO">
+        <h3>Sophie Morel</h3>
+        <p>Directrice Financière - Gestion des investissements</p>
+      </div>
+      <div class="leader-card">
+        <img src="https://randomuser.me/api/portraits/men/33.jpg" alt="CTO">
+        <h3>Karim Bensalem</h3>
+        <p>Directeur Technique - Sécurité & infrastructure</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Existing footer -->
+  <footer>
+    <p>&copy; 2025 NovaTrust. Tous droits réservés.</p>
+  </footer>
+
+  <!-- Existing + New Scripts -->
+  <script>
+    // Dark mode persistence
+    document.getElementById('toggleDarkMode').addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const state = document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled';
+      localStorage.setItem('darkMode', state);
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+      }
+    });
+
+    // Typewriter
+    const phrases = [
+      "Investissez intelligemment avec NovaTrust",
+      "Votre avenir financier commence ici",
+      "Une sécurité inégalée pour vos actifs",
+      "Rejoignez des milliers d'investisseurs satisfaits"
+    ];
+
+    let index = 0;
+    let charIndex = 0;
+    let deleting = false;
+    const element = document.getElementById("typing-text");
+
+    function typeEffect() {
+      const current = phrases[index];
+      const visibleText = current.substring(0, charIndex);
+      element.textContent = visibleText;
+
+      if (!deleting) {
+        charIndex++;
+        if (charIndex > current.length) {
+          deleting = true;
+          setTimeout(typeEffect, 1500);
+          return;
+        }
+      } else {
+        charIndex--;
+        if (charIndex < 0) {
+          deleting = false;
+          index = (index + 1) % phrases.length;
+          setTimeout(typeEffect, 300);
+          return;
+        }
+      }
+      setTimeout(typeEffect, deleting ? 30 : 70);
+    }
+    typeEffect();
+
+    // Real-time user count (simulated)
+    let userCount = 8241;
+    function updateUserCount() {
+      userCount += Math.floor(Math.random() * 10);
+      document.getElementById("userCount").textContent = userCount.toLocaleString("fr-FR");
+    }
+    setInterval(updateUserCount, 4000); // every 4 seconds
+
+    // Chart.js investment graph
+    window.addEventListener('load', function () {
+      const ctx = document.getElementById('investmentChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
+          datasets: [{
+            label: 'Croissance des Investissements (€)',
+            data: [12000, 18000, 24000, 20000, 27000, 32000, 40000],
+            backgroundColor: 'rgba(44, 130, 201, 0.2)',
+            borderColor: 'rgba(44, 130, 201, 1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    });
+  </script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>
