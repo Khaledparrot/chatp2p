@@ -5,15 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard - NovaTrust</title>
   <link rel="stylesheet" href="style.css" />
+  <script defer src="script.js"></script>
 </head>
 <body>
   <div class="dashboard">
-    <h2>Welcome, <span id="usernameDisplay"></span></h2>
-    <p>Balance: <strong>$12,500</strong></p>
-    <canvas id="investmentChart" width="400" height="200"></canvas>
-    <a href="logout.html" class="btn">Logout</a>
+    <h2>Hello, <span id="usernameDisplay">User</span></h2>
+    <div class="balance-box">
+      <p>Total Balance</p>
+      <h3>$12,500.00</h3>
+    </div>
+    <canvas id="growthChart" height="120"></canvas>
+    <a class="btn" href="home.html" onclick="logout()">Back Home</a>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="data.js"></script>
 </body>
 </html>
