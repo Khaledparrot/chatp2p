@@ -143,11 +143,21 @@
       font-size: 2.5rem;
       margin-bottom: 1rem;
     }
-.hero p span {
-  display: inline;
-  white-space: nowrap;
-  font-size: 1.2rem;
-}
+
+    .hero p {
+      min-height: 2rem; /* or more depending on your font size */
+    }
+    
+    #typing-text::after {
+      content: "\00a0"; /* non-breaking space to prevent collapse */
+      visibility: hidden;
+    }
+    
+    .hero p span {
+      display: inline;
+      white-space: nowrap;
+      font-size: 1.2rem;
+    }
 
     .features {
       padding: 4rem 5%;
