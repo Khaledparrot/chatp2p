@@ -143,16 +143,15 @@
       font-size: 2.5rem;
       margin-bottom: 1rem;
     }
-    .hero p {
-      min-height: 2rem;
-    }
     .hero p span {
       display: inline-block;
+      min-width: 32ch; /* or adjust based on longest phrase */
       white-space: nowrap;
       border-right: 2px solid rgba(255,255,255,0.6);
       font-size: 1.2rem;
       animation: blink 1s infinite;
     }
+
     @keyframes blink {
       50% { border-color: transparent; }
     }
@@ -206,7 +205,80 @@
   </style>
 </head>
 <body>
-  <!-- existing content unchanged -->
+  <header class="navbar">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Nova_company_logo.png" alt="NovaTrust" class="nav-logo">
+    <nav class="nav-menu">
+      <div class="nav-item">
+        <a href="#">Accueil</a>
+        <div class="dropdown">
+          <a href="#features">Fonctionnalités</a>
+          <a href="#download">Télécharger</a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <a href="#">Investir</a>
+        <div class="dropdown">
+          <a href="#plans">Plans</a>
+          <a href="#returns">Rendement</a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <a href="#">À propos</a>
+        <div class="dropdown">
+          <a href="#team">Notre Équipe</a>
+          <a href="#values">Valeurs</a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <a href="#">Contact</a>
+        <div class="dropdown">
+          <a href="#support">Support</a>
+          <a href="#faq">FAQ</a>
+        </div>
+      </div>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <button class="icon-btn" id="toggleDarkMode" title="Mode sombre"><i class="fas fa-moon"></i></button>
+      <div class="lang-dropdown">
+        <button class="icon-btn" title="Langue"><i class="fas fa-globe"></i></button>
+        <div class="lang-options">
+          <a href="#" data-lang="fr">Français</a>
+          <a href="#" data-lang="en">English</a>
+          <a href="#" data-lang="ar">العربية</a>
+        </div>
+      </div>
+      <a class="btn" href="#login">Connexion</a>
+      <a class="btn" href="#register">Inscription</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>NovaTrust</h1>
+    <p><span id="typing-text"></span></p>
+  </section>
+
+  <section class="features" id="features">
+    <h2>Nos Services</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>Haute sécurité</h3>
+        <p>Protégez vos investissements grâce à notre système chiffré 256-bit.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Rendements garantis</h3>
+        <p>Des profits stables avec des plans flexibles à court et long terme.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Support 24/7</h3>
+        <p>Notre équipe est disponible à toute heure pour vous assister.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 NovaTrust. Tous droits réservés.</p>
+  </footer>
+
   <script>
     document.getElementById('toggleDarkMode').addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
@@ -220,6 +292,7 @@
       }
     });
 
+    // Animated typewriter with rotation
     const phrases = [
       "Investissez intelligemment avec NovaTrust",
       "Votre avenir financier commence ici",
@@ -233,29 +306,29 @@
     const element = document.getElementById("typing-text");
 
     function typeEffect() {
-      const current = phrases[index];
+  const current = phrases[index];
+  const visibleText = current.substring(0, charIndex);
+  const padded = visibleText.padEnd(current.length, ' ');
+  element.textContent = padded + "|";
 
-      if (!deleting) {
-        element.textContent = current.substring(0, charIndex) + "|";
-        charIndex++;
-        if (charIndex > current.length) {
-          deleting = true;
-          setTimeout(typeEffect, 1500);
-          return;
-        }
-      } else {
-        element.textContent = current.substring(0, charIndex) + "|";
-        charIndex--;
-        if (charIndex < 0) {
-          deleting = false;
-          index = (index + 1) % phrases.length;
-          setTimeout(typeEffect, 300);
-          return;
-        }
-      }
-      setTimeout(typeEffect, deleting ? 30 : 70);
+  if (!deleting) {
+    charIndex++;
+    if (charIndex > current.length) {
+      deleting = true;
+      setTimeout(typeEffect, 1500);
+      return;
     }
-
+  } else {
+    charIndex--;
+    if (charIndex < 0) {
+      deleting = false;
+      index = (index + 1) % phrases.length;
+      setTimeout(typeEffect, 300);
+      return;
+    }
+  }
+  setTimeout(typeEffect, deleting ? 30 : 70);
+}
     typeEffect();
   </script>
 </body>
