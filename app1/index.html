@@ -1,235 +1,255 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NovaTrust - Investir en Confiance</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NovaTrust - Investissements Sécurisés</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {margin: 0; padding: 0; box-sizing: border-box;}
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #0b0f1a;
-      color: #eaecef;
-      transition: background 0.3s, color 0.3s;
+      background-color: #f4f5f9;
+      color: #333;
+      transition: background-color 0.3s, color 0.3s;
     }
-    body.dark-mode { background-color: #1c1f2a; color: #eaecef; }
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
     .navbar {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 1rem 5%; background-color: #12161d; position: sticky; top: 0; z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 5%;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
-    .nav-logo { height: 40px; }
-    .nav-menu { display: flex; gap: 2rem; }
-    .nav-item { position: relative; }
+    .dark-mode .navbar {
+      background: #1e1e1e;
+    }
+    .nav-logo {
+      height: 40px;
+    }
+    .nav-menu {
+      display: flex;
+      gap: 2rem;
+    }
+    .nav-item {
+      position: relative;
+    }
     .nav-item a {
-      color: #ccc; font-weight: 500; padding: 0.5rem; display: inline-block;
+      color: inherit;
+      font-weight: 500;
+      text-decoration: none;
     }
-    .nav-item:hover > a { color: #fff; }
     .dropdown {
-      position: absolute; top: 100%; left: 0; background: #1d2331;
-      padding: 0.5rem 0; display: none; min-width: 160px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); border-radius: 6px; z-index: 100;
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #fff;
+      padding: 0.5rem;
+      border-radius: 6px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
     }
-    .nav-item:hover .dropdown { display: block; animation: fadeIn 0.3s ease; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .dark-mode .dropdown {
+      background: #2a2a2a;
+    }
+    .nav-item:hover .dropdown {
+      display: block;
     }
     .dropdown a {
-      display: block; padding: 0.5rem 1rem; color: #ddd; font-size: 0.9rem;
+      display: block;
+      padding: 0.5rem 1rem;
+      color: #333;
+      text-decoration: none;
+      white-space: nowrap;
     }
-    .dropdown a:hover {
-      background: #2b3245; color: #fff;
+    .dark-mode .dropdown a {
+      color: #e0e0e0;
     }
     .icon-btn {
-      background: none; border: none; padding: 0.5rem; cursor: pointer;
-      color: #fcd535; font-size: 1.1rem;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      margin: 0 0.5rem;
+      color: #666;
     }
-    .lang-dropdown { position: relative; margin: 0 1rem; }
-    .lang-options {
-      position: absolute; top: 100%; right: 0; background: #1d2331; display: none;
-      border-radius: 6px; overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    .dark-mode .icon-btn {
+      color: #fcd535;
     }
-    .lang-dropdown:hover .lang-options { display: block; }
-    .lang-options a {
-      display: block; padding: 0.6rem 1rem; color: #ddd; font-size: 0.9rem;
-    }
-    .lang-options a:hover { background: #2c3548; color: #fff; }
     .btn {
-      padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: bold;
-      background: #384054; border: none; color: #fff; transition: background 0.3s;
+      padding: 0.5rem 1.2rem;
+      border-radius: 8px;
+      background: #0077ff;
+      color: white;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
     }
-    .btn:hover { background: #4a5470; }
-    .btn.primary { background: #fcd535; color: #181a20; }
-    .btn.primary:hover { background: #ffe770; }
+    .btn:hover {
+      background: #005dd0;
+    }
+    .btn.primary {
+      background: #fcd535;
+      color: #181a20;
+    }
+    .btn.primary:hover {
+      background: #ffe770;
+    }
+    .lang-dropdown {
+      position: relative;
+    }
+    .lang-options {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+    .dark-mode .lang-options {
+      background: #2a2a2a;
+    }
+    .lang-dropdown:hover .lang-options {
+      display: block;
+    }
+    .lang-options a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: #333;
+      text-decoration: none;
+    }
+    .dark-mode .lang-options a {
+      color: #e0e0e0;
+    }
     .hero {
-      background: linear-gradient(145deg, #141a26, #0b0f1a); padding: 4rem 5%; text-align: center;
+      padding: 4rem 5%;
+      text-align: center;
+      background: linear-gradient(to right, #0077ff, #00c2ff);
+      color: #fff;
     }
-    .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; line-height: 1.3; }
-    .hero p { margin-bottom: 2rem; color: #aaa; font-size: 1.1rem; }
     .features {
-      padding: 3rem 5%; background-color: #0f141f; text-align: center;
+      padding: 3rem 5%;
+      background: #f9f9f9;
+    }
+    .dark-mode .features {
+      background: #1b1b1b;
     }
     .feature-grid {
-      display: grid; gap: 2rem;
+      display: grid;
+      gap: 2rem;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     }
     .feature-card {
-      background-color: #1a1f2b; padding: 2rem; border-radius: 10px;
-      transition: transform 0.3s, box-shadow 0.3s;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease;
+    }
+    .dark-mode .feature-card {
+      background: #2b2b2b;
+      color: #e0e0e0;
     }
     .feature-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }
-    .feature-card i {
-      font-size: 2rem; margin-bottom: 1rem; color: #fcd535;
+    footer {
+      padding: 2rem 5%;
+      background: #121212;
+      color: #888;
+      text-align: center;
     }
-    .download-section {
-      padding: 3rem 5%; text-align: center; background-color: #12161d;
-    }
-    .app-btn {
-      padding: 0.7rem 1.5rem; margin: 1rem; border-radius: 6px;
-      background: #2b3245; color: #fff; border: none; cursor: pointer;
-    }
-    .app-btn:hover { background: #3b4259; }
-    .footer {
-      background-color: #0a0e17; padding: 2rem 5%; text-align: center;
-    }
-    .footer-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 2rem;
-    }
-    .footer-grid h3 { margin-bottom: 0.5rem; font-size: 1rem; }
-    .footer-grid a {
-      display: block; color: #888; margin-bottom: 0.3rem; font-size: 0.9rem;
-    }
-    .footer-grid a:hover { color: #fff; }
-    footer p {
-      margin-top: 2rem; font-size: 0.85rem; color: #555;
+    .dark-mode footer {
+      background: #000;
     }
     @media (max-width: 768px) {
-      .nav-menu { flex-direction: column; display: none; }
-      .nav-menu.active { display: flex; }
+      .nav-menu {
+        display: none;
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
   <header class="navbar">
-    <div class="nav-left">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Nova_company_logo.png" alt="NovaTrust Logo" class="nav-logo">
-      <nav class="nav-menu">
-        <div class="nav-item">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Nova_company_logo.png" alt="NovaTrust" class="nav-logo">
+    <nav class="nav-menu">
+      <div class="nav-item">
+        <a href="#">Accueil</a>
+        <div class="dropdown">
           <a href="#features">Fonctionnalités</a>
-          <div class="dropdown">
-            <a href="#features1">Avantage 1</a>
-            <a href="#features2">Avantage 2</a>
-          </div>
+          <a href="#download">Télécharger</a>
         </div>
-        <div class="nav-item">
+      </div>
+      <div class="nav-item">
+        <a href="#">Investir</a>
+        <div class="dropdown">
           <a href="#plans">Plans</a>
-          <div class="dropdown">
-            <a href="#plan1">Court terme</a>
-            <a href="#plan2">Long terme</a>
-          </div>
+          <a href="#returns">Rendement</a>
         </div>
-      </nav>
-    </div>
-    <div class="nav-right">
-      <button class="icon-btn" id="toggleDarkMode" title="Mode Sombre">
-        <i class="fas fa-moon"></i>
-      </button>
+      </div>
+    </nav>
+    <div style="display: flex; align-items: center;">
+      <button class="icon-btn" id="toggleDarkMode"><i class="fas fa-moon"></i></button>
       <div class="lang-dropdown">
-        <button class="icon-btn" id="languageBtn" title="Changer de langue">
-          <i class="fas fa-globe"></i>
-        </button>
+        <button class="icon-btn"><i class="fas fa-globe"></i></button>
         <div class="lang-options">
           <a href="#" data-lang="fr">Français</a>
           <a href="#" data-lang="en">English</a>
           <a href="#" data-lang="ar">العربية</a>
         </div>
       </div>
-      <a href="#login" class="btn nav-btn">Connexion</a>
-      <a href="#register" class="btn primary">S'inscrire</a>
+      <a class="btn" href="#login">Connexion</a>
+      <a class="btn primary" href="#register">Inscription</a>
     </div>
   </header>
 
   <section class="hero">
-    <h1>Investissez Intelligemment avec NovaTrust</h1>
-    <p>Une plateforme sécurisée et fluide pour vos placements financiers</p>
-    <a href="#register" class="btn primary">Commencer maintenant</a>
+    <h1>NovaTrust</h1>
+    <p>Votre plateforme d'investissement numérique sécurisée</p>
   </section>
 
   <section class="features" id="features">
-    <h2>Nos Avantages</h2>
+    <h2>Nos Services</h2>
     <div class="feature-grid">
       <div class="feature-card">
-        <i class="fas fa-shield-alt"></i>
-        <h3>Sécurité Maximale</h3>
-        <p>Vos données et fonds sont protégés 24/7</p>
+        <h3>Haute sécurité</h3>
+        <p>Protégez vos investissements grâce à notre système chiffré 256-bit.</p>
       </div>
       <div class="feature-card">
-        <i class="fas fa-chart-line"></i>
-        <h3>Plans Rentables</h3>
-        <p>Des rendements stables et durables</p>
+        <h3>Rendements garantis</h3>
+        <p>Des profits stables avec des plans flexibles à court et long terme.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Support 24/7</h3>
+        <p>Notre équipe est disponible à toute heure pour vous assister.</p>
       </div>
     </div>
   </section>
 
-  <section class="download-section">
-    <h2>Disponible sur Mobile</h2>
-    <p>Téléchargez notre application pour gérer vos placements n'importe où</p>
-    <div class="store-buttons">
-      <button class="app-btn"><i class="fab fa-apple"></i> App Store</button>
-      <button class="app-btn"><i class="fab fa-google-play"></i> Google Play</button>
-    </div>
-  </section>
-
-  <footer class="footer">
-    <div class="footer-grid">
-      <div>
-        <h3>Produit</h3>
-        <a href="#">Plateforme</a>
-        <a href="#">API</a>
-        <a href="#">Mobile</a>
-      </div>
-      <div>
-        <h3>Aide</h3>
-        <a href="#">Centre d'assistance</a>
-        <a href="#">Nous contacter</a>
-        <a href="#">FAQ</a>
-      </div>
-    </div>
-    <p>© 2025 NovaTrust. Tous droits réservés.</p>
+  <footer>
+    <p>&copy; 2025 NovaTrust. Tous droits réservés.</p>
   </footer>
 
   <script>
+    document.getElementById('toggleDarkMode').addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const state = document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled';
+      localStorage.setItem('darkMode', state);
+    });
     window.addEventListener('DOMContentLoaded', () => {
       if (localStorage.getItem('darkMode') === 'enabled') {
         document.body.classList.add('dark-mode');
       }
-    });
-    document.getElementById('toggleDarkMode')?.addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
-      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
-    });
-    const langBtn = document.getElementById('languageBtn');
-    const langOptions = document.querySelector('.lang-options');
-    if (langBtn && langOptions) {
-      langBtn.addEventListener('click', () => {
-        langOptions.style.display = langOptions.style.display === 'block' ? 'none' : 'block';
-      });
-      document.addEventListener('click', (e) => {
-        if (!langBtn.contains(e.target) && !langOptions.contains(e.target)) {
-          langOptions.style.display = 'none';
-        }
-      });
-    }
-    document.querySelectorAll('.lang-options a').forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        alert('Langue changée vers : ' + link.dataset.lang);
-      });
     });
   </script>
 </body>
