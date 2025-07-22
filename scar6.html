@@ -23,6 +23,8 @@
       font-family: 'Segoe UI', sans-serif;
       background: var(--primary-bg);
       color: var(--text-light);
+      padding-top: 60px;
+      padding-bottom: 60px;
     }
     header {
       background: var(--card-bg);
@@ -31,6 +33,10 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
     }
     header img {
       height: 32px;
@@ -38,14 +44,8 @@
     header h1 {
       font-size: 1.2em;
       margin: 0;
-      animation: typing 3s steps(30, end) 1;
       white-space: nowrap;
       overflow: hidden;
-      border-right: 2px solid var(--accent);
-    }
-    @keyframes typing {
-      from { width: 0 }
-      to { width: 100% }
     }
     .dropdown {
       position: relative;
@@ -56,43 +56,48 @@
       padding: 10px;
       border-radius: 6px;
       cursor: pointer;
-      width: 50px;
-      height: 50px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .dropdown-toggle i {
-      font-size: 24px;
+      font-size: 20px;
       color: var(--accent);
     }
     .dropdown-menu {
       display: none;
       position: absolute;
-      top: 60px;
+      top: 50px;
       left: 0;
       background: #15191f;
       border: 1px solid var(--border-color);
       border-radius: 6px;
-      padding: 10px;
+      padding: 5px;
       z-index: 999;
-      width: 200px;
+      width: auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
     }
     .dropdown-menu button {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 18px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      width: 100%;
-      background: transparent;
-      border: none;
-      color: var(--text-light);
-      padding: 8px;
-      border-radius: 4px;
-      cursor: pointer;
+      justify-content: center;
+      height: 50px;
+      width: 50px;
     }
     .dropdown-menu button:hover {
       background: var(--accent);
-      color: black;
-    }
-    .dropdown:hover .dropdown-menu {
-      display: block;
+      color: #000;
     }
     #search-bar {
       width: 100%;
@@ -102,12 +107,6 @@
       max-width: 400px;
       border-radius: 5px;
       border: none;
-    }
-    #progress {
-      width: 0%;
-      height: 4px;
-      background: var(--accent);
-      transition: width 0.3s ease;
     }
     .loader {
       border: 4px solid #333;
@@ -129,23 +128,28 @@
       display: none;
       background: var(--card-bg);
       border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
+      padding: 30px;
+      margin-bottom: 40px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .section.active {
       display: block;
     }
     h2 {
       color: var(--accent);
-      font-size: 1.4em;
+      font-size: 1.6em;
       margin-top: 0;
     }
     .card {
       background: #15191f;
-      padding: 15px;
+      padding: 20px;
       border-radius: 10px;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
       box-shadow: inset 0 0 5px #000;
     }
     .card p {
@@ -160,31 +164,37 @@
       text-align: center;
       padding: 20px;
       font-size: 0.9em;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
     }
   </style>
 </head>
-<body onload="document.querySelector('.loader').style.display='none'">
+<body>
   <header>
     <img src="https://cdn-icons-png.flaticon.com/512/3022/3022557.png" alt="Logo">
     <h1>TrustFund Pro</h1>
     <div class="dropdown">
-      <button class="dropdown-toggle"><i class="bi bi-grid"></i></button>
-      <div class="dropdown-menu">
-        <button onclick="showSection('dashboard')"><i class="bi bi-house"></i> Dashboard</button>
-        <button onclick="showSection('invest')"><i class="bi bi-cash-coin"></i> Invest</button>
-        <button onclick="showSection('analytics')"><i class="bi bi-graph-up"></i> Analytics</button>
-        <button onclick="showSection('wallet')"><i class="bi bi-wallet2"></i> Wallet</button>
-        <button onclick="showSection('news')"><i class="bi bi-newspaper"></i> News</button>
-        <button onclick="showSection('team')"><i class="bi bi-people"></i> Team</button>
-        <button onclick="showSection('benefits')"><i class="bi bi-star"></i> Benefits</button>
-        <button onclick="showSection('about')"><i class="bi bi-info-circle"></i> About</button>
+      <button class="dropdown-toggle" onclick="toggleMenu()"><i class="bi bi-grid"></i></button>
+      <div class="dropdown-menu" id="menu">
+        <button onclick="showSection('dashboard')"><i class="bi bi-house"></i></button>
+        <button onclick="showSection('invest')"><i class="bi bi-cash-coin"></i></button>
+        <button onclick="showSection('analytics')"><i class="bi bi-graph-up"></i></button>
+        <button onclick="showSection('wallet')"><i class="bi bi-wallet2"></i></button>
+        <button onclick="showSection('news')"><i class="bi bi-newspaper"></i></button>
+        <button onclick="showSection('team')"><i class="bi bi-people"></i></button>
+        <button onclick="showSection('benefits')"><i class="bi bi-star"></i></button>
+        <button onclick="showSection('about')"><i class="bi bi-info-circle"></i></button>
+        <button onclick="showSection('support')"><i class="bi bi-question-circle"></i></button>
+        <button onclick="showSection('faq')"><i class="bi bi-book"></i></button>
+        <button onclick="showSection('referrals')"><i class="bi bi-link"></i></button>
+        <button onclick="showSection('settings')"><i class="bi bi-gear"></i></button>
       </div>
     </div>
   </header>
 
-  <div id="progress"></div>
   <input type="text" id="search-bar" placeholder="Search features...">
-  <div class="loader"></div>
+  <div class="loader" id="loader"></div>
 
   <main>
     <section id="dashboard" class="section active">
@@ -217,6 +227,7 @@
       <h2>Latest News</h2>
       <div class="card">
         <p>🎉 July 2025: Partnership with Ledger announced.</p>
+        <p>📊 New feature launched: Auto rebalancing tool!</p>
       </div>
     </section>
     <section id="team" class="section">
@@ -224,7 +235,8 @@
       <div class="card">
         <p>CEO: Maria Lefevre</p>
         <p>CTO: Dr. Rami Al-Mansour</p>
-        <p>Risk: Luca Steiner</p>
+        <p>Risk Officer: Luca Steiner</p>
+        <p>Marketing: Zainab Khoury</p>
       </div>
     </section>
     <section id="benefits" class="section">
@@ -233,11 +245,41 @@
         <li>✅ Full asset insurance</li>
         <li>📈 Stable ROI programs</li>
         <li>🔐 Advanced KYC security</li>
+        <li>🌍 Global investor network</li>
+        <li>📲 Mobile-first design</li>
       </ul>
     </section>
     <section id="about" class="section">
       <h2>About TrustFund Pro</h2>
-      <p>Based in Zurich, licensed since 2021. Trusted by over 18,000 investors globally. Audited quarterly.</p>
+      <p>Based in Zurich, licensed since 2021. Trusted by over 18,000 investors globally. Audited quarterly. Member of the European Investment Council.</p>
+    </section>
+    <section id="support" class="section">
+      <h2>Customer Support</h2>
+      <div class="card">
+        <p>24/7 Live chat support, Email, Ticketing system. Response time under 5 mins average.</p>
+      </div>
+    </section>
+    <section id="faq" class="section">
+      <h2>Frequently Asked Questions</h2>
+      <div class="card">
+        <p><strong>Q:</strong> How do I withdraw funds?</p>
+        <p><strong>A:</strong> Go to Wallet, click Withdraw, and confirm.</p>
+        <p><strong>Q:</strong> Can I cancel investment plans?</p>
+        <p><strong>A:</strong> Yes, depending on the plan’s terms.</p>
+      </div>
+    </section>
+    <section id="referrals" class="section">
+      <h2>Referral Program</h2>
+      <div class="card">
+        <p>Invite friends and earn 5% commission on every deposit they make!</p>
+        <p>Your referral link: <code>https://trustfund.pro/invite/abc123</code></p>
+      </div>
+    </section>
+    <section id="settings" class="section">
+      <h2>Settings</h2>
+      <div class="card">
+        <p>Update your email, password, 2FA, and notification preferences here.</p>
+      </div>
     </section>
   </main>
 
@@ -246,10 +288,10 @@
   </footer>
 
   <script>
-    let userProgress = 10;
-    function updateProgressBar(amount = 10) {
-      userProgress = Math.min(100, userProgress + amount);
-      document.getElementById("progress").style.width = userProgress + "%";
+    let menuVisible = false;
+    function toggleMenu() {
+      menuVisible = !menuVisible;
+      document.getElementById("menu").style.display = menuVisible ? "grid" : "none";
     }
 
     function showSection(id) {
@@ -257,8 +299,12 @@
         section.classList.remove('active');
       });
       document.getElementById(id).classList.add('active');
-      updateProgressBar(10);
+      toggleMenu();
     }
+
+    window.addEventListener('load', () => {
+      document.getElementById('loader').style.display = 'none';
+    });
 
     const ctx = document.getElementById('chart').getContext('2d');
     new Chart(ctx, {
