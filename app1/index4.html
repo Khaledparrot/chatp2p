@@ -202,6 +202,20 @@
         flex-direction: column;
       }
     }
+
+    .cursor {
+      display: inline-block;
+      width: 1px;
+      background-color: rgba(255,255,255,0.7);
+      animation: blink 1s infinite;
+      margin-left: 2px;
+    }
+    
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
   </style>
 </head>
 <body>
@@ -306,29 +320,29 @@
     const element = document.getElementById("typing-text");
 
     function typeEffect() {
-  const current = phrases[index];
-  const visibleText = current.substring(0, charIndex);
-  const padded = visibleText.padEnd(current.length, ' ');
-  element.textContent = padded + "|";
+      const current = phrases[index];
+      const visibleText = current.substring(0, charIndex);
+      element.innerHTML = visibleText + '<span class="cursor">|</span>';
+    
+      if (!deleting) {
+        charIndex++;
+        if (charIndex > current.length) {
+          deleting = true;
+          setTimeout(typeEffect, 1500);
+          return;
+        }
+      } else {
+        charIndex--;
+        if (charIndex < 0) {
+          deleting = false;
+          index = (index + 1) % phrases.length;
+          setTimeout(typeEffect, 300);
+          return;
+        }
+      }
+      setTimeout(typeEffect, deleting ? 30 : 70);
+    }
 
-  if (!deleting) {
-    charIndex++;
-    if (charIndex > current.length) {
-      deleting = true;
-      setTimeout(typeEffect, 1500);
-      return;
-    }
-  } else {
-    charIndex--;
-    if (charIndex < 0) {
-      deleting = false;
-      index = (index + 1) % phrases.length;
-      setTimeout(typeEffect, 300);
-      return;
-    }
-  }
-  setTimeout(typeEffect, deleting ? 30 : 70);
-}
     typeEffect();
   </script>
 </body>
