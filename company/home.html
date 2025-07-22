@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home - NovaTrust</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <header class="app-header">
+    <div class="logo-area">
+      <img src="logo.svg" alt="NovaTrust Logo" class="logo" />
+      <span class="brand">NovaTrust</span>
+    </div>
+    <div class="menu-toggle" onclick="toggleMenu()">
+      <img src="menu-icon.svg" alt="Menu" class="menu-icon" />
+    </div>
+  </header>
+  <nav id="dropdownMenu" class="dropdown-menu">
+    <a href="dashboard.html" class="icon-btn" title="Dashboard"><img src="icons/dashboard.svg" alt="Dashboard" /></a>
+    <a href="plans.html" class="icon-btn" title="Plans"><img src="icons/plans.svg" alt="Plans" /></a>
+    <a href="wallet.html" class="icon-btn" title="Wallet"><img src="icons/wallet.svg" alt="Wallet" /></a>
+    <a href="profile.html" class="icon-btn" title="Profile"><img src="icons/profile.svg" alt="Profile" /></a>
+    <a href="settings.html" class="icon-btn" title="Settings"><img src="icons/settings.svg" alt="Settings" /></a>
+  </nav>
+  <main class="welcome-text">
+    <h2>Welcome, <span id="userHome"></span></h2>
+    <p>Tap the menu icon to explore features.</p>
+  </main>
+</body>
+</html>
