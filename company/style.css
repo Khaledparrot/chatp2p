@@ -1,17 +1,19 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: #0a0f1c;
-  color: #fff;
+  background-color: #0a0f1c;
+  color: white;
+  min-height: 100vh;
+  padding: 0;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  height: 100vh;
-  text-align: center;
 }
-.app, .form-container, .dashboard {
+.centered, .form-container, .dashboard, .welcome-text {
   width: 90%;
   max-width: 400px;
+  margin-top: 60px;
+  text-align: center;
 }
 input, button {
   width: 100%;
@@ -21,7 +23,7 @@ input, button {
   border-radius: 6px;
 }
 button {
-  background-color: #007bff;
+  background-color: #28a745;
   color: white;
   font-size: 16px;
 }
@@ -33,4 +35,83 @@ button {
   text-decoration: none;
   margin: 5px;
   border-radius: 8px;
+}
+.btn.secondary {
+  background: #444;
+}
+.logo {
+  height: 30px;
+}
+.brand-title, .brand {
+  font-size: 24px;
+  font-weight: bold;
+}
+.app-header {
+  width: 100%;
+  background: #121824;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+}
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.menu-toggle {
+  cursor: pointer;
+}
+.dropdown-menu {
+  display: none;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  background-color: #1c2430;
+  width: 100%;
+  padding: 10px;
+  position: absolute;
+  top: 60px;
+  left: 0;
+  z-index: 999;
+}
+.dropdown-menu.show {
+  display: flex;
+}
+.icon-btn {
+  background: transparent;
+  border: none;
+  margin: 8px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.icon-btn img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+}
+.balance-box {
+  background: #1a222e;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+/* Mobile-first responsiveness */
+@media (max-width: 600px) {
+  .icon-btn {
+    width: 42px;
+    height: 42px;
+  }
+  .icon-btn img {
+    width: 20px;
+    height: 20px;
+  }
 }
