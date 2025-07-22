@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NovaTrust - Investir en Confiance</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* Combined CSS */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -30,13 +30,20 @@
       padding: 0.5rem 0; display: none; min-width: 160px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); border-radius: 6px; z-index: 100;
     }
-    .nav-item:hover .dropdown { display: block; }
+    .nav-item:hover .dropdown { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     .dropdown a {
       display: block; padding: 0.5rem 1rem; color: #ddd; font-size: 0.9rem;
     }
-    .dropdown a:hover { background: #2b3245; color: #fff; }
+    .dropdown a:hover {
+      background: #2b3245; color: #fff;
+    }
     .icon-btn {
       background: none; border: none; padding: 0.5rem; cursor: pointer;
+      color: #fcd535; font-size: 1.1rem;
     }
     .lang-dropdown { position: relative; margin: 0 1rem; }
     .lang-options {
@@ -51,16 +58,16 @@
     .lang-options a:hover { background: #2c3548; color: #fff; }
     .btn {
       padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: bold;
-      background: #2a3040; border: none; color: #fff; transition: background 0.3s;
+      background: #384054; border: none; color: #fff; transition: background 0.3s;
     }
-    .btn:hover { background: #3a4154; }
+    .btn:hover { background: #4a5470; }
     .btn.primary { background: #fcd535; color: #181a20; }
     .btn.primary:hover { background: #ffe770; }
     .hero {
       background: linear-gradient(145deg, #141a26, #0b0f1a); padding: 4rem 5%; text-align: center;
     }
-    .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; }
-    .hero p { margin-bottom: 2rem; color: #aaa; }
+    .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; line-height: 1.3; }
+    .hero p { margin-bottom: 2rem; color: #aaa; font-size: 1.1rem; }
     .features {
       padding: 3rem 5%; background-color: #0f141f; text-align: center;
     }
@@ -70,8 +77,15 @@
     }
     .feature-card {
       background-color: #1a1f2b; padding: 2rem; border-radius: 10px;
+      transition: transform 0.3s, box-shadow 0.3s;
     }
-    .feature-card img { height: 50px; margin-bottom: 1rem; }
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    .feature-card i {
+      font-size: 2rem; margin-bottom: 1rem; color: #fcd535;
+    }
     .download-section {
       padding: 3rem 5%; text-align: center; background-color: #12161d;
     }
@@ -81,18 +95,18 @@
     }
     .app-btn:hover { background: #3b4259; }
     .footer {
-      background-color: #0a0e17; padding: 2rem 5%;
+      background-color: #0a0e17; padding: 2rem 5%; text-align: center;
     }
     .footer-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 2rem;
     }
-    .footer-grid h3 { margin-bottom: 0.5rem; }
+    .footer-grid h3 { margin-bottom: 0.5rem; font-size: 1rem; }
     .footer-grid a {
-      display: block; color: #888; margin-bottom: 0.3rem;
+      display: block; color: #888; margin-bottom: 0.3rem; font-size: 0.9rem;
     }
     .footer-grid a:hover { color: #fff; }
     footer p {
-      text-align: center; margin-top: 2rem; font-size: 0.85rem; color: #555;
+      margin-top: 2rem; font-size: 0.85rem; color: #555;
     }
     @media (max-width: 768px) {
       .nav-menu { flex-direction: column; display: none; }
@@ -103,7 +117,7 @@
 <body>
   <header class="navbar">
     <div class="nav-left">
-      <img src="assets/logo.svg" alt="NovaTrust Logo" class="nav-logo">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Nova_company_logo.png" alt="NovaTrust Logo" class="nav-logo">
       <nav class="nav-menu">
         <div class="nav-item">
           <a href="#features">Fonctionnalités</a>
@@ -123,11 +137,11 @@
     </div>
     <div class="nav-right">
       <button class="icon-btn" id="toggleDarkMode" title="Mode Sombre">
-        <img src="assets/darkmode.svg" alt="Dark Mode" style="width: 20px; height: 20px;">
+        <i class="fas fa-moon"></i>
       </button>
       <div class="lang-dropdown">
         <button class="icon-btn" id="languageBtn" title="Changer de langue">
-          <img src="assets/lang.svg" alt="Langue" style="width: 20px; height: 20px;">
+          <i class="fas fa-globe"></i>
         </button>
         <div class="lang-options">
           <a href="#" data-lang="fr">Français</a>
@@ -135,29 +149,27 @@
           <a href="#" data-lang="ar">العربية</a>
         </div>
       </div>
-      <a href="#login" class="btn nav-btn">Se connecter</a>
+      <a href="#login" class="btn nav-btn">Connexion</a>
       <a href="#register" class="btn primary">S'inscrire</a>
     </div>
   </header>
 
   <section class="hero">
-    <div class="hero-content">
-      <h1>Investissez Intelligemment avec NovaTrust</h1>
-      <p>Une plateforme sécurisée pour vos placements financiers</p>
-      <a href="#register" class="btn primary">Commencer maintenant</a>
-    </div>
+    <h1>Investissez Intelligemment avec NovaTrust</h1>
+    <p>Une plateforme sécurisée et fluide pour vos placements financiers</p>
+    <a href="#register" class="btn primary">Commencer maintenant</a>
   </section>
 
   <section class="features" id="features">
     <h2>Nos Avantages</h2>
     <div class="feature-grid">
       <div class="feature-card">
-        <img src="assets/secure.svg" alt="Sécurité">
+        <i class="fas fa-shield-alt"></i>
         <h3>Sécurité Maximale</h3>
         <p>Vos données et fonds sont protégés 24/7</p>
       </div>
       <div class="feature-card">
-        <img src="assets/growth.svg" alt="Croissance">
+        <i class="fas fa-chart-line"></i>
         <h3>Plans Rentables</h3>
         <p>Des rendements stables et durables</p>
       </div>
@@ -168,8 +180,8 @@
     <h2>Disponible sur Mobile</h2>
     <p>Téléchargez notre application pour gérer vos placements n'importe où</p>
     <div class="store-buttons">
-      <button class="app-btn">📱 App Store</button>
-      <button class="app-btn">🤖 Google Play</button>
+      <button class="app-btn"><i class="fab fa-apple"></i> App Store</button>
+      <button class="app-btn"><i class="fab fa-google-play"></i> Google Play</button>
     </div>
   </section>
 
@@ -192,22 +204,15 @@
   </footer>
 
   <script>
-    // Dark Mode
     window.addEventListener('DOMContentLoaded', () => {
       if (localStorage.getItem('darkMode') === 'enabled') {
         document.body.classList.add('dark-mode');
       }
     });
-    const darkToggle = document.getElementById('toggleDarkMode');
-    if (darkToggle) {
-      darkToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        const mode = document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled';
-        localStorage.setItem('darkMode', mode);
-      });
-    }
-
-    // Language Selector
+    document.getElementById('toggleDarkMode')?.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
+    });
     const langBtn = document.getElementById('languageBtn');
     const langOptions = document.querySelector('.lang-options');
     if (langBtn && langOptions) {
@@ -220,13 +225,10 @@
         }
       });
     }
-    const langLinks = document.querySelectorAll('.lang-options a');
-    langLinks.forEach(link => {
+    document.querySelectorAll('.lang-options a').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
-        const lang = link.dataset.lang;
-        alert('Langue changée vers : ' + lang);
-        // Implémentation future
+        alert('Langue changée vers : ' + link.dataset.lang);
       });
     });
   </script>
