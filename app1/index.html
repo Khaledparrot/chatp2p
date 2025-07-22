@@ -4,8 +4,101 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NovaTrust - Investir en Confiance</title>
-  <link rel="stylesheet" href="style.css" />
-  <script defer src="script.js"></script>
+  <style>
+    /* Combined CSS */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0b0f1a;
+      color: #eaecef;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark-mode { background-color: #1c1f2a; color: #eaecef; }
+    .navbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem 5%; background-color: #12161d; position: sticky; top: 0; z-index: 10;
+    }
+    .nav-logo { height: 40px; }
+    .nav-menu { display: flex; gap: 2rem; }
+    .nav-item { position: relative; }
+    .nav-item a {
+      color: #ccc; font-weight: 500; padding: 0.5rem; display: inline-block;
+    }
+    .nav-item:hover > a { color: #fff; }
+    .dropdown {
+      position: absolute; top: 100%; left: 0; background: #1d2331;
+      padding: 0.5rem 0; display: none; min-width: 160px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); border-radius: 6px; z-index: 100;
+    }
+    .nav-item:hover .dropdown { display: block; }
+    .dropdown a {
+      display: block; padding: 0.5rem 1rem; color: #ddd; font-size: 0.9rem;
+    }
+    .dropdown a:hover { background: #2b3245; color: #fff; }
+    .icon-btn {
+      background: none; border: none; padding: 0.5rem; cursor: pointer;
+    }
+    .lang-dropdown { position: relative; margin: 0 1rem; }
+    .lang-options {
+      position: absolute; top: 100%; right: 0; background: #1d2331; display: none;
+      border-radius: 6px; overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+    .lang-dropdown:hover .lang-options { display: block; }
+    .lang-options a {
+      display: block; padding: 0.6rem 1rem; color: #ddd; font-size: 0.9rem;
+    }
+    .lang-options a:hover { background: #2c3548; color: #fff; }
+    .btn {
+      padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: bold;
+      background: #2a3040; border: none; color: #fff; transition: background 0.3s;
+    }
+    .btn:hover { background: #3a4154; }
+    .btn.primary { background: #fcd535; color: #181a20; }
+    .btn.primary:hover { background: #ffe770; }
+    .hero {
+      background: linear-gradient(145deg, #141a26, #0b0f1a); padding: 4rem 5%; text-align: center;
+    }
+    .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+    .hero p { margin-bottom: 2rem; color: #aaa; }
+    .features {
+      padding: 3rem 5%; background-color: #0f141f; text-align: center;
+    }
+    .feature-grid {
+      display: grid; gap: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    .feature-card {
+      background-color: #1a1f2b; padding: 2rem; border-radius: 10px;
+    }
+    .feature-card img { height: 50px; margin-bottom: 1rem; }
+    .download-section {
+      padding: 3rem 5%; text-align: center; background-color: #12161d;
+    }
+    .app-btn {
+      padding: 0.7rem 1.5rem; margin: 1rem; border-radius: 6px;
+      background: #2b3245; color: #fff; border: none; cursor: pointer;
+    }
+    .app-btn:hover { background: #3b4259; }
+    .footer {
+      background-color: #0a0e17; padding: 2rem 5%;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 2rem;
+    }
+    .footer-grid h3 { margin-bottom: 0.5rem; }
+    .footer-grid a {
+      display: block; color: #888; margin-bottom: 0.3rem;
+    }
+    .footer-grid a:hover { color: #fff; }
+    footer p {
+      text-align: center; margin-top: 2rem; font-size: 0.85rem; color: #555;
+    }
+    @media (max-width: 768px) {
+      .nav-menu { flex-direction: column; display: none; }
+      .nav-menu.active { display: flex; }
+    }
+  </style>
 </head>
 <body>
   <header class="navbar">
@@ -26,20 +119,6 @@
             <a href="#plan2">Long terme</a>
           </div>
         </div>
-        <div class="nav-item">
-          <a href="#team">Équipe</a>
-          <div class="dropdown">
-            <a href="#ceo">Fondateur</a>
-            <a href="#teamlist">Membres</a>
-          </div>
-        </div>
-        <div class="nav-item">
-          <a href="#faq">FAQ</a>
-          <div class="dropdown">
-            <a href="#support">Support</a>
-            <a href="#questions">Questions fréquentes</a>
-          </div>
-        </div>
       </nav>
     </div>
     <div class="nav-right">
@@ -56,8 +135,8 @@
           <a href="#" data-lang="ar">العربية</a>
         </div>
       </div>
-      <a href="login.html" class="btn nav-btn">Se connecter</a>
-      <a href="register.html" class="btn primary">S'inscrire</a>
+      <a href="#login" class="btn nav-btn">Se connecter</a>
+      <a href="#register" class="btn primary">S'inscrire</a>
     </div>
   </header>
 
@@ -65,7 +144,7 @@
     <div class="hero-content">
       <h1>Investissez Intelligemment avec NovaTrust</h1>
       <p>Une plateforme sécurisée pour vos placements financiers</p>
-      <a href="register.html" class="btn primary">Commencer maintenant</a>
+      <a href="#register" class="btn primary">Commencer maintenant</a>
     </div>
   </section>
 
@@ -81,11 +160,6 @@
         <img src="assets/growth.svg" alt="Croissance">
         <h3>Plans Rentables</h3>
         <p>Des rendements stables et durables</p>
-      </div>
-      <div class="feature-card">
-        <img src="assets/analytics.svg" alt="Statistiques">
-        <h3>Suivi en Temps Réel</h3>
-        <p>Gardez un œil sur vos investissements à tout moment</p>
       </div>
     </div>
   </section>
@@ -113,39 +187,48 @@
         <a href="#">Nous contacter</a>
         <a href="#">FAQ</a>
       </div>
-      <div>
-        <h3>Légal</h3>
-        <a href="#">Conditions</a>
-        <a href="#">Confidentialité</a>
-        <a href="#">Mentions légales</a>
-      </div>
     </div>
-    <p class="copyright">© 2025 NovaTrust. Tous droits réservés.</p>
+    <p>© 2025 NovaTrust. Tous droits réservés.</p>
   </footer>
 
   <script>
-    // Toggle dark mode
-    document.getElementById('toggleDarkMode').addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
+    // Dark Mode
+    window.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+      }
     });
+    const darkToggle = document.getElementById('toggleDarkMode');
+    if (darkToggle) {
+      darkToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const mode = document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled';
+        localStorage.setItem('darkMode', mode);
+      });
+    }
 
-    // Language menu toggle
+    // Language Selector
     const langBtn = document.getElementById('languageBtn');
     const langOptions = document.querySelector('.lang-options');
-    langBtn.addEventListener('mouseenter', () => {
-      langOptions.style.display = 'block';
+    if (langBtn && langOptions) {
+      langBtn.addEventListener('click', () => {
+        langOptions.style.display = langOptions.style.display === 'block' ? 'none' : 'block';
+      });
+      document.addEventListener('click', (e) => {
+        if (!langBtn.contains(e.target) && !langOptions.contains(e.target)) {
+          langOptions.style.display = 'none';
+        }
+      });
+    }
+    const langLinks = document.querySelectorAll('.lang-options a');
+    langLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const lang = link.dataset.lang;
+        alert('Langue changée vers : ' + lang);
+        // Implémentation future
+      });
     });
-    langBtn.addEventListener('mouseleave', () => {
-      langOptions.style.display = 'none';
-    });
-    langOptions.addEventListener('mouseenter', () => {
-      langOptions.style.display = 'block';
-    });
-    langOptions.addEventListener('mouseleave', () => {
-      langOptions.style.display = 'none';
-    });
-
-    // Hover nav items dropdowns handled by CSS
   </script>
 </body>
 </html>
