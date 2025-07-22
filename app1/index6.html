@@ -285,98 +285,217 @@
   </section>
 
 
-    <!-- Real-Time Users Section -->
-  <section class="user-count" style="background:#fff; padding:4rem 2rem; text-align:center;">
-    <div style="font-size:3rem; font-weight:bold; color:#2d3e50;">
-      Utilisateurs Actuels: <span id="userCount">8,241</span>
+  <!-- Real-Time Users Section -->
+<section class="user-count">
+  <div>
+    Utilisateurs Actuels : <span id="userCount">8,241</span>
+  </div>
+</section>
+
+<!-- Company Info Section -->
+<section class="company-info">
+  <h2>À propos de NovaTrust</h2>
+  <p>NovaTrust est une plateforme d’investissement de confiance, spécialisée dans les solutions de sécurité financière. Notre mission est la croissance durable et la protection de vos actifs.</p>
+</section>
+
+<!-- Investment Analysis Section -->
+<section class="analysis" id="analysis">
+  <h2>Analyse des Investissements</h2>
+  <canvas id="investmentChart"></canvas>
+</section>
+
+<!-- Leadership Section -->
+<section class="leadership" id="leadership">
+  <h2>Notre Équipe Dirigeante</h2>
+  <div class="leader-grid">
+    <div class="leader-card">
+      <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="CEO">
+      <h3>Jean Dupont</h3>
+      <p>PDG - Vision stratégique et développement global</p>
     </div>
-  </section>
-
-  <!-- Company Info Section with Vertical Animation -->
-  <section class="company-info" style="position:relative; background-image: url('https://images.unsplash.com/photo-1551836022-d5d88e9218df'); background-size:cover; background-repeat:no-repeat; background-position:center; color:#fff; padding:6rem 5%; animation:scrollBg 20s linear infinite;">
-    <h2 style="font-size:2.5rem; text-align:center; margin-bottom:1rem;">À propos de NovaTrust</h2>
-    <p style="max-width:800px; margin:auto; font-size:1.2rem; text-align:center;">NovaTrust est une plateforme d’investissement de confiance, spécialisée dans les solutions de sécurité financière, avec des milliers d’utilisateurs dans le monde. Nous nous engageons à la transparence, la croissance durable, et l'innovation technologique.</p>
-  </section>
-
-  <style>
-    @keyframes scrollBg {
-      0% { background-position-y: 0; }
-      100% { background-position-y: 100%; }
-    }
-    .dark-mode .company-info {
-      color: #f0f0f0;
-    }
-  </style>
-
-  <!-- Investment Analysis Section -->
-  <section class="analysis" style="padding:4rem 5%; background:#f9f9f9; text-align:center;">
-    <h2 style="font-size:2rem; margin-bottom:2rem;">Analyse des Investissements</h2>
-    <canvas id="investmentChart" style="max-width:800px; width:100%; height:auto;"></canvas>
-  </section>
-
-  <!-- Leadership Profiles Section -->
-  <section class="leadership" style="padding:4rem 5%; background:#fff;">
-    <h2 style="text-align:center; font-size:2rem; margin-bottom:2rem;">Notre Équipe Dirigeante</h2>
-    <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:2rem;">
-      <div style="background:#f4f4f4; border-radius:10px; padding:1.5rem; width:280px; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
-        <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="CEO" style="width:100px; border-radius:50%; margin-bottom:1rem;">
-        <h3>Jean Dupont</h3>
-        <p style="font-size:0.9rem; color:#666;">PDG - Vision stratégique et développement global</p>
-      </div>
-      <div style="background:#f4f4f4; border-radius:10px; padding:1.5rem; width:280px; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
-        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="CFO" style="width:100px; border-radius:50%; margin-bottom:1rem;">
-        <h3>Sophie Morel</h3>
-        <p style="font-size:0.9rem; color:#666;">Directrice Financière - Gestion des investissements</p>
-      </div>
-      <div style="background:#f4f4f4; border-radius:10px; padding:1.5rem; width:280px; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
-        <img src="https://randomuser.me/api/portraits/men/33.jpg" alt="CTO" style="width:100px; border-radius:50%; margin-bottom:1rem;">
-        <h3>Karim Bensalem</h3>
-        <p style="font-size:0.9rem; color:#666;">Directeur Technique - Sécurité & infrastructure</p>
-      </div>
+    <div class="leader-card">
+      <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="CFO">
+      <h3>Sophie Morel</h3>
+      <p>Directrice Financière - Gestion des investissements</p>
     </div>
-  </section>
+    <div class="leader-card">
+      <img src="https://randomuser.me/api/portraits/men/33.jpg" alt="CTO">
+      <h3>Karim Bensalem</h3>
+      <p>Directeur Technique - Sécurité & infrastructure</p>
+    </div>
+  </div>
+</section>
 
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- New Styles -->
+<style>
+  .user-count {
+    padding: 4rem 5%;
+    background: #ffffff;
+    text-align: center;
+    font-size: 3rem;
+    font-weight: bold;
+    color: #2d3e50;
+  }
 
-  <!-- JavaScript for chart and real-time user counter -->
-  <script>
-    // Real-time user counter (simulated)
-    let userCount = 8241;
-    function updateUserCount() {
-      userCount += Math.floor(Math.random() * 6); // simulate real-time
-      document.getElementById("userCount").textContent = userCount.toLocaleString("fr-FR");
-    }
-    setInterval(updateUserCount, 4000); // Update every 4s
+  .dark-mode .user-count {
+    background: #1e1e1e;
+    color: #fcd535;
+  }
 
-    // Chart.js investment graph
-    window.addEventListener('load', function () {
-      const ctx = document.getElementById('investmentChart').getContext('2d');
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
-          datasets: [{
-            label: 'Croissance (€)',
-            data: [10000, 15000, 20000, 25000, 30000, 35000, 42000],
-            backgroundColor: 'rgba(44, 130, 201, 0.2)',
-            borderColor: 'rgba(44, 130, 201, 1)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.3
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
+  .company-info {
+    padding: 4rem 5%;
+    background-image: url('https://images.unsplash.com/photo-1551836022-d5d88e9218df');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    color: #ffffff;
+    text-align: center;
+    animation: scrollBg 20s linear infinite;
+  }
+
+  @keyframes scrollBg {
+    0% { background-position-y: 0; }
+    100% { background-position-y: 100%; }
+  }
+
+  .dark-mode .company-info {
+    color: #e0e0e0;
+  }
+
+  .company-info h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .company-info p {
+    max-width: 800px;
+    margin: auto;
+    font-size: 1.2rem;
+  }
+
+  .analysis {
+    padding: 4rem 5%;
+    background: #f9f9f9;
+    text-align: center;
+  }
+
+  .dark-mode .analysis {
+    background: #1b1b1b;
+  }
+
+  .analysis h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  #investmentChart {
+    max-width: 800px;
+    width: 100%;
+    margin: auto;
+  }
+
+  .leadership {
+    padding: 4rem 5%;
+    background: #ffffff;
+  }
+
+  .dark-mode .leadership {
+    background: #1e1e1e;
+  }
+
+  .leadership h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .leader-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+  }
+
+  .leader-card {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    text-align: center;
+    width: 260px;
+    transition: transform 0.3s ease;
+  }
+
+  .leader-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .leader-card img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+  }
+
+  .leader-card h3 {
+    margin-bottom: 0.5rem;
+  }
+
+  .leader-card p {
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  .dark-mode .leader-card {
+    background: #2b2b2b;
+    color: #e0e0e0;
+  }
+
+  .dark-mode .leader-card p {
+    color: #aaa;
+  }
+</style>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Real-Time Users + Chart -->
+<script>
+  let userCount = 8241;
+  function updateUserCount() {
+    userCount += Math.floor(Math.random() * 10);
+    document.getElementById("userCount").textContent = userCount.toLocaleString("fr-FR");
+  }
+  setInterval(updateUserCount, 4000);
+
+  window.addEventListener('load', function () {
+    const ctx = document.getElementById('investmentChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
+        datasets: [{
+          label: 'Croissance (€)',
+          data: [10000, 16000, 22000, 28000, 32000, 38000, 45000],
+          backgroundColor: 'rgba(44, 130, 201, 0.2)',
+          borderColor: 'rgba(44, 130, 201, 1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
           }
         }
-      });
+      }
     });
-  </script>
+  });
+</script>
 
 
   <footer>
