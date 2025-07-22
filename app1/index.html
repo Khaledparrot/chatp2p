@@ -6,12 +6,17 @@
   <title>NovaTrust - Investissements Sécurisés</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    * {margin: 0; padding: 0; box-sizing: border-box;}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Segoe UI', sans-serif;
       background-color: #f4f5f9;
       color: #333;
       transition: background-color 0.3s, color 0.3s;
+      line-height: 1.6;
     }
     body.dark-mode {
       background-color: #121212;
@@ -22,7 +27,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 1rem 5%;
-      background: #fff;
+      background: #ffffff;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       position: sticky;
       top: 0;
@@ -36,7 +41,7 @@
     }
     .nav-menu {
       display: flex;
-      gap: 2rem;
+      gap: 1.5rem;
     }
     .nav-item {
       position: relative;
@@ -45,6 +50,7 @@
       color: inherit;
       font-weight: 500;
       text-decoration: none;
+      padding: 0.5rem;
     }
     .dropdown {
       display: none;
@@ -52,7 +58,7 @@
       top: 100%;
       left: 0;
       background: #fff;
-      padding: 0.5rem;
+      padding: 0.5rem 0;
       border-radius: 6px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
       transition: all 0.3s ease;
@@ -78,13 +84,13 @@
       border: none;
       font-size: 1.2rem;
       cursor: pointer;
-      margin: 0 0.5rem;
+      margin: 0 0.25rem;
       color: #666;
     }
     .dark-mode .icon-btn {
       color: #fcd535;
     }
-    .btn {
+    .btn, .btn.primary {
       padding: 0.5rem 1.2rem;
       border-radius: 8px;
       background: #0077ff;
@@ -92,16 +98,10 @@
       border: none;
       font-weight: 600;
       cursor: pointer;
+      transition: background 0.3s ease;
     }
-    .btn:hover {
+    .btn:hover, .btn.primary:hover {
       background: #005dd0;
-    }
-    .btn.primary {
-      background: #fcd535;
-      color: #181a20;
-    }
-    .btn.primary:hover {
-      background: #ffe770;
     }
     .lang-dropdown {
       position: relative;
@@ -136,12 +136,25 @@
       background: linear-gradient(to right, #0077ff, #00c2ff);
       color: #fff;
     }
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
     .features {
-      padding: 3rem 5%;
+      padding: 4rem 5%;
       background: #f9f9f9;
     }
     .dark-mode .features {
       background: #1b1b1b;
+    }
+    .features h2 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 2rem;
     }
     .feature-grid {
       display: grid;
@@ -165,8 +178,9 @@
     footer {
       padding: 2rem 5%;
       background: #121212;
-      color: #888;
+      color: #aaa;
       text-align: center;
+      font-size: 0.9rem;
     }
     .dark-mode footer {
       background: #000;
@@ -198,10 +212,10 @@
         </div>
       </div>
     </nav>
-    <div style="display: flex; align-items: center;">
-      <button class="icon-btn" id="toggleDarkMode"><i class="fas fa-moon"></i></button>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <button class="icon-btn" id="toggleDarkMode" title="Mode sombre"><i class="fas fa-moon"></i></button>
       <div class="lang-dropdown">
-        <button class="icon-btn"><i class="fas fa-globe"></i></button>
+        <button class="icon-btn" title="Langue"><i class="fas fa-globe"></i></button>
         <div class="lang-options">
           <a href="#" data-lang="fr">Français</a>
           <a href="#" data-lang="en">English</a>
@@ -209,7 +223,7 @@
         </div>
       </div>
       <a class="btn" href="#login">Connexion</a>
-      <a class="btn primary" href="#register">Inscription</a>
+      <a class="btn" href="#register">Inscription</a>
     </div>
   </header>
 
