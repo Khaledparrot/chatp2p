@@ -1,0 +1,36 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #0a0f1c;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+}
+.app, .form-container, .dashboard {
+  width: 90%;
+  max-width: 400px;
+}
+input, button {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 6px;
+}
+button {
+  background-color: #007bff;
+  color: white;
+  font-size: 16px;
+}
+.btn {
+  display: inline-block;
+  padding: 12px 20px;
+  background: #28a745;
+  color: white;
+  text-decoration: none;
+  margin: 5px;
+  border-radius: 8px;
+}
