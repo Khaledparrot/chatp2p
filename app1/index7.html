@@ -344,13 +344,50 @@ function typeEffect() {
 
     typeEffect();
   </script>
- <script>
+<script>
   fetch('sections.html')
     .then(response => response.text())
     .then(html => {
       document.getElementById('imported-sections').innerHTML = html;
+
+      // Now initialize the chart
+      const ctx = document.getElementById('investmentChart')?.getContext('2d');
+      if (ctx) {
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
+            datasets: [{
+              label: 'Croissance (€)',
+              data: [10000, 16000, 22000, 28000, 32000, 38000, 45000],
+              backgroundColor: 'rgba(44, 130, 201, 0.2)',
+              borderColor: 'rgba(44, 130, 201, 1)',
+              borderWidth: 2,
+              fill: true,
+              tension: 0.3
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      }
+
+      // Start user counter
+      let userCount = 8241;
+      function updateUserCount() {
+        userCount += Math.floor(Math.random() * 10);
+        document.getElementById("userCount").textContent = userCount.toLocaleString("fr-FR");
+      }
+      setInterval(updateUserCount, 4000);
     })
     .catch(error => console.error('Erreur lors du chargement des sections:', error));
 </script>
+
 </body>
 </html>
