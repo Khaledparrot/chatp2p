@@ -42,33 +42,44 @@
 .logo-container {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   text-decoration: none;
-  padding: 5px 0;
+  padding: 8px 0;
 }
 
 .logo-container img {
-  height: 60px;            /* Increased size */
+  height: 80px;              /* Make the image bigger */
   width: auto;
   object-fit: contain;
   transition: filter 0.3s ease;
-  filter: brightness(0) invert(0.3); /* visible in light mode */
+  filter: brightness(0) invert(0.3); /* good visibility in light mode */
 }
 
 .logo-container span {
-  font-size: 1.7rem;
+  font-size: 2rem;           /* Bigger matching text */
   font-weight: 700;
   color: #444;
   transition: color 0.3s ease;
 }
 
-/* Dark mode adjustments */
+/* Dark Mode Styling */
 body.dark-mode .logo-container img {
-  filter: brightness(0) invert(1); /* pure white in dark mode */
+  filter: brightness(0) invert(1); /* visible in dark mode */
 }
 
 body.dark-mode .logo-container span {
   color: #eee;
+}
+
+/* Optional: Adjust on very small screens */
+@media (max-width: 500px) {
+  .logo-container img {
+    height: 60px;
+  }
+
+  .logo-container span {
+    font-size: 1.5rem;
+  }
 }
 
 
