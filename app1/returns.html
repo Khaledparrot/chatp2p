@@ -8,33 +8,25 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
     }
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f5f9;
+      background: #f4f5f9;
       color: #333;
-      transition: background-color 0.3s, color 0.3s;
-      line-height: 1.6;
     }
     body.dark-mode {
-      background-color: #121212;
+      background: #121212;
       color: #e0e0e0;
     }
-    .navbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .navbar, footer {
+      background: #fff;
       padding: 1rem 5%;
-      background: #ffffff;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
     }
-    .dark-mode .navbar {
+    .dark-mode .navbar, .dark-mode footer {
       background: #1e1e1e;
     }
     .nav-logo {
@@ -48,10 +40,10 @@
       position: relative;
     }
     .nav-item a {
-      color: inherit;
-      font-weight: 500;
       text-decoration: none;
+      color: inherit;
       padding: 0.5rem;
+      font-weight: 500;
     }
     .dropdown {
       display: none;
@@ -59,13 +51,8 @@
       top: 100%;
       left: 0;
       background: #fff;
-      padding: 0.5rem 0;
       border-radius: 6px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
-    }
-    .dark-mode .dropdown {
-      background: #2a2a2a;
     }
     .nav-item:hover .dropdown {
       display: block;
@@ -74,163 +61,89 @@
       display: block;
       padding: 0.5rem 1rem;
       color: #333;
-      text-decoration: none;
-      white-space: nowrap;
     }
-    .dark-mode .dropdown a {
+    .dark-mode .dropdown, .dark-mode .dropdown a {
+      background: #2a2a2a;
       color: #e0e0e0;
     }
     .icon-btn {
       background: none;
       border: none;
       font-size: 1.2rem;
-      cursor: pointer;
-      margin: 0 0.25rem;
       color: #666;
+      cursor: pointer;
     }
     .dark-mode .icon-btn {
-      /*color: #fcd535;*/
       color: #ccc;
     }
-    .btn, .btn.primary {
-      padding: 0.5rem 1.2rem;
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
       border-radius: 8px;
       background: linear-gradient(135deg, #1c1c1c, #2d3e50);
-      color: white;
-      border: none;
+      color: #fff;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.3s ease;
-      text-decoration: none;
-    }
-    .btn:hover, .btn.primary:hover {
-  background: #3a4756; /* slightly softer solid color */
-  color: #fff;
-}
-
-    .lang-dropdown {
-      position: relative;
-    }
-    .lang-options {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      background: #fff;
-      border-radius: 6px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      display: none;
-    }
-    .dark-mode .lang-options {
-      background: #2a2a2a;
-    }
-    .lang-dropdown:hover .lang-options {
-      display: block;
-    }
-    .lang-options a {
-      display: block;
-      padding: 0.5rem 1rem;
-      color: #333;
-      text-decoration: none;
-    }
-    .dark-mode .lang-options a {
-      color: #e0e0e0;
     }
     .hero {
       padding: 4rem 5%;
       text-align: center;
       background: linear-gradient(135deg, #1c1c1c, #2d3e50);
-      color: #fff;
-      position: relative;
-      overflow: hidden;
+      color: white;
     }
-    .hero h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .hero p {
-      min-height: 2rem; /* or more depending on your font size */
-    }
-    
-    #typing-text::after {
-      content: "\00a0"; /* non-breaking space to prevent collapse */
-      visibility: hidden;
-    }
-    
-    .hero p span {
-      display: inline;
-      white-space: nowrap;
-      font-size: 1.2rem;
-    }
-
-    .features {
-      padding: 4rem 5%;
-      background: #f9f9f9;
-    }
-    .dark-mode .features {
-      background: #1b1b1b;
-    }
-    .features h2 {
+    .chart-toggle {
       text-align: center;
-      font-size: 2rem;
-      margin-bottom: 2rem;
+      margin: 2rem auto;
     }
-    .feature-grid {
-      display: grid;
-      gap: 2rem;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    }
-    .feature-card {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      transition: transform 0.3s ease;
-    }
-    .dark-mode .feature-card {
-      background: #2b2b2b;
-      color: #e0e0e0;
-    }
-    .feature-card:hover {
-      transform: translateY(-5px);
-    }
-    footer {
-      padding: 2rem 5%;
-      background: #121212;
-      color: #aaa;
-      text-align: center;
-      font-size: 0.9rem;
-    }
-    .dark-mode footer {
-      background: #000;
-    }
-    @media (max-width: 768px) {
-      .nav-menu {
-        display: none;
-        flex-direction: column;
-      }
-    }
-    
     .chart-container {
-      max-width: 700px;
-      margin: 3rem auto;
-      background: white;
+      max-width: 1000px;
+      margin: 2rem auto;
       padding: 2rem;
+      background: #fff;
       border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
     }
     .dark-mode .chart-container {
-      background: #2b2b2b;
+      background: #2a2a2a;
+    }
+    .table-container {
+      display: none;
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    .dark-mode .table-container {
+      background: #2a2a2a;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 1rem;
+      border-bottom: 1px solid #ddd;
+    }
+    .dark-mode th, .dark-mode td {
+      border-color: #444;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem 5%;
+      font-size: 0.9rem;
+      color: #aaa;
     }
   </style>
 </head>
 <body>
-  <!-- Navbar (same as before) -->
-  <header class="navbar">
+  <header class="navbar" style="display: flex; justify-content: space-between; align-items: center;">
     <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Nova_company_logo.png" alt="NovaTrust" class="nav-logo">
     <nav class="nav-menu">
       <div class="nav-item">
-        <a href="#">Accueil</a>
+        <a href="index.html">Accueil</a>
         <div class="dropdown">
           <a href="features.html">Fonctionnalités</a>
           <a href="download.html">Télécharger</a>
@@ -240,46 +153,68 @@
         <a href="#">Investir</a>
         <div class="dropdown">
           <a href="plans.html">Plans</a>
-          <a href="#returns">Rendement</a>
+          <a href="returns.html">Rendement</a>
         </div>
       </div>
       <div class="nav-item">
         <a href="#">À propos</a>
         <div class="dropdown">
-          <a href="#team">Notre Équipe</a>
-          <a href="#values">Valeurs</a>
+          <a href="team.html">Notre Équipe</a>
+          <a href="values.html">Valeurs</a>
         </div>
       </div>
       <div class="nav-item">
         <a href="#">Contact</a>
         <div class="dropdown">
-          <a href="#support">Support</a>
-          <a href="#faq">FAQ</a>
+          <a href="support.html">Support</a>
+          <a href="faq.html">FAQ</a>
         </div>
       </div>
     </nav>
-    <div style="display: flex; align-items: center; gap: 0.5rem;">
+    <div>
       <button class="icon-btn" id="toggleDarkMode" title="Mode sombre"><i class="fas fa-moon"></i></button>
-      <div class="lang-dropdown">
-        <button class="icon-btn" title="Langue"><i class="fas fa-globe"></i></button>
-        <div class="lang-options">
-          <a href="#" data-lang="fr">Français</a>
-          <a href="#" data-lang="en">English</a>
-          <a href="#" data-lang="ar">العربية</a>
-        </div>
-      </div>
-      <a class="btn" href="#login">Connexion</a>
-      <a class="btn" href="#register">Inscription</a>
     </div>
   </header>
 
   <section class="hero">
     <h1>Suivi de rendement</h1>
-    <p>Visualisez l’évolution de vos investissements.</p>
+    <p>Visualisez vos performances financières en un clic.</p>
   </section>
 
-  <div class="chart-container">
-    <canvas id="returnsChart"></canvas>
+  <div class="chart-toggle">
+    <label>
+      <input type="checkbox" id="viewToggle" />
+      Afficher sous forme de tableau
+    </label>
+  </div>
+
+  <div class="chart-container" id="chartsArea">
+    <canvas id="lineChart" height="100"></canvas>
+    <br>
+    <canvas id="barChart" height="100"></canvas>
+    <br>
+    <canvas id="pieChart" height="100"></canvas>
+  </div>
+
+  <div class="table-container" id="tableArea">
+    <h2 style="text-align:center">Rendement en tableau</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Mois</th>
+          <th>Rendement (€)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Janvier</td><td>1000</td></tr>
+        <tr><td>Février</td><td>1400</td></tr>
+        <tr><td>Mars</td><td>1900</td></tr>
+        <tr><td>Avril</td><td>2500</td></tr>
+        <tr><td>Mai</td><td>3200</td></tr>
+        <tr><td>Juin</td><td>4000</td></tr>
+        <tr><td>Juillet</td><td>5000</td></tr>
+      </tbody>
+    </table>
   </div>
 
   <footer>
@@ -287,6 +222,21 @@
   </footer>
 
   <script>
+    const viewToggle = document.getElementById('viewToggle');
+    const chartArea = document.getElementById('chartsArea');
+    const tableArea = document.getElementById('tableArea');
+
+    viewToggle.addEventListener('change', () => {
+      if (viewToggle.checked) {
+        chartArea.style.display = "none";
+        tableArea.style.display = "block";
+      } else {
+        chartArea.style.display = "block";
+        tableArea.style.display = "none";
+      }
+    });
+
+    // Dark Mode
     document.getElementById('toggleDarkMode').addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
       localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
@@ -296,29 +246,52 @@
         document.body.classList.add('dark-mode');
       }
 
-      const ctx = document.getElementById('returnsChart').getContext('2d');
-      new Chart(ctx, {
+      const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'];
+      const values = [1000, 1400, 1900, 2500, 3200, 4000, 5000];
+
+      new Chart(document.getElementById('lineChart'), {
         type: 'line',
         data: {
-          labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
+          labels: months,
           datasets: [{
-            label: 'Rendement (€)',
-            data: [1000, 1400, 1900, 2500, 3200, 4000, 5000],
-            backgroundColor: 'rgba(44, 130, 201, 0.2)',
-            borderColor: 'rgba(44, 130, 201, 1)',
-            borderWidth: 2,
+            label: 'Croissance mensuelle (€)',
+            data: values,
             fill: true,
-            tension: 0.3
+            borderColor: 'rgba(44, 130, 201, 1)',
+            backgroundColor: 'rgba(44, 130, 201, 0.2)',
+            tension: 0.4
           }]
         },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
+        options: { responsive: true }
+      });
+
+      new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Crypto', 'Actions', 'Immobilier', 'Startups'],
+          datasets: [{
+            label: 'Investissements (€)',
+            data: [2000, 3000, 1800, 2200],
+            backgroundColor: [
+              '#3498db', '#2ecc71', '#e67e22', '#9b59b6'
+            ]
+          }]
+        },
+        options: { responsive: true }
+      });
+
+      new Chart(document.getElementById('pieChart'), {
+        type: 'pie',
+        data: {
+          labels: ['Crypto', 'Actions', 'Immobilier', 'Startups'],
+          datasets: [{
+            data: [25, 35, 20, 20],
+            backgroundColor: [
+              '#3498db', '#2ecc71', '#e67e22', '#9b59b6'
+            ]
+          }]
+        },
+        options: { responsive: true }
       });
     });
   </script>
