@@ -214,7 +214,7 @@
 
 
 
-    .team-section {
+.team-section {
   padding: 4rem 8%;
   background: #f9f9f9;
   text-align: center;
@@ -247,7 +247,13 @@
   justify-content: space-between;
   height: 100%;
   min-height: 400px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+.team-member:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
 .dark-mode .team-member {
   background: #2b2b2b;
   color: #e0e0e0;
@@ -298,10 +304,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.3s ease, color 0.3s ease;
+  transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
   text-decoration: none;
 }
+
 .social-links a:hover {
+  transform: scale(1.1);
   background: #ccc;
   color: #000;
 }
@@ -310,59 +318,10 @@
   background: #2f2f2f;
   color: #ddd;
 }
+
 .dark-mode .social-links a:hover {
   background: #444;
   color: #fff;
-}
-
-
-  /* === ANIMATIONS === */
-
-.team-member {
-  opacity: 0;
-  transform: translateY(30px);
-  animation: fadeSlideUp 0.8s ease forwards;
-}
-
-.team-member:nth-child(1) { animation-delay: 0.1s; }
-.team-member:nth-child(2) { animation-delay: 0.2s; }
-.team-member:nth-child(3) { animation-delay: 0.3s; }
-.team-member:nth-child(4) { animation-delay: 0.4s; }
-/* Add more if needed */
-
-@keyframes fadeSlideUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.team-member:hover {
-  transform: translateY(-5px);
-  transition: transform 0.3s ease;
-}
-
-/* Animate social icons */
-.social-links a {
-  opacity: 0;
-  transform: scale(0.8);
-  animation: iconFadeIn 0.5s ease forwards;
-  animation-delay: 0.8s;
-}
-
-.team-member:hover .social-links a {
-  transform: scale(1.05);
-}
-
-.social-links a:nth-child(1) { animation-delay: 0.9s; }
-.social-links a:nth-child(2) { animation-delay: 1s; }
-.social-links a:nth-child(3) { animation-delay: 1.1s; }
-
-@keyframes iconFadeIn {
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
 }
 
 
