@@ -42,28 +42,29 @@
 .logo-container {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   text-decoration: none;
+  padding: 5px 0;
 }
 
 .logo-container img {
-  height: 42px;
+  height: 60px;            /* Increased size */
   width: auto;
   object-fit: contain;
   transition: filter 0.3s ease;
-  filter: brightness(0) invert(0.3); /* default light mode: gray look */
+  filter: brightness(0) invert(0.3); /* visible in light mode */
 }
 
 .logo-container span {
-  font-size: 1.3rem;
-  font-weight: 600;
+  font-size: 1.7rem;
+  font-weight: 700;
   color: #444;
   transition: color 0.3s ease;
 }
 
-/* Dark mode styling */
+/* Dark mode adjustments */
 body.dark-mode .logo-container img {
-  filter: brightness(0) invert(1); /* white in dark mode */
+  filter: brightness(0) invert(1); /* pure white in dark mode */
 }
 
 body.dark-mode .logo-container span {
