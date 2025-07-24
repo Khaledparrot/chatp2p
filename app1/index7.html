@@ -37,27 +37,41 @@
       background: #1e1e1e;
     }
 
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-      height: 50px; /* aligns with navbar height */
-    }
+/* logo */
     
-    .nav-brand img {
-      height: 48px;
-      width: auto;
-      object-fit: contain;
-      display: block;
-      transition: filter 0.3s ease, opacity 0.3s ease;
-      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));
-    }
-    
-    .dark-mode .nav-brand img {
-      filter: drop-shadow(0 1px 1px rgba(255,255,255,0.15));
-    }
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
 
-    
+.logo-container img {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+  transition: filter 0.3s ease;
+  filter: brightness(0) invert(0.3); /* default light mode: gray look */
+}
+
+.logo-container span {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #444;
+  transition: color 0.3s ease;
+}
+
+/* Dark mode styling */
+body.dark-mode .logo-container img {
+  filter: brightness(0) invert(1); /* white in dark mode */
+}
+
+body.dark-mode .logo-container span {
+  color: #eee;
+}
+
+
+/*   end logo */
 
     .nav-menu {
       display: flex;
@@ -235,9 +249,10 @@
 </head>
 <body>
   <header class="navbar">
-    <a href="index7.html" class="nav-brand">
-      <img src="log.png" alt="NovaTrust Logo">
-    </a>
+  <a href="index.html" class="logo-container">
+    <img src="log1.png" alt="NovaTrust Logo">
+    <span>NovaTrust</span>
+  </a>
 
     <nav class="nav-menu">
       <div class="nav-item">
