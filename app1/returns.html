@@ -288,6 +288,44 @@
       border-bottom: 1px solid #ddd;
     }
     .dark-mode th, .dark-mode td { border-color: #444; }
+
+    .plan-buttons {
+  text-align: center;
+  margin: 2rem auto;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.plan-btn {
+  padding: 0.7rem 1.5rem;
+  border: none;
+  font-weight: 600;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1c1c1c, #2d3e50);
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.plan-btn:hover {
+  background: #3a4756;
+  transform: translateY(-2px);
+}
+
+.plan-btn.active {
+  background: #2ecc71;
+  color: white;
+}
+
+.dark-mode .plan-btn {
+  background: linear-gradient(135deg, #222, #444);
+  color: #eee;
+}
+.dark-mode .plan-btn.active {
+  background: #27ae60;
+}
+
   </style>
 </head>
 <body>
@@ -343,14 +381,13 @@
     <p>Choisissez un plan et voyez l’évolution des graphiques.</p>
   </section>
 
-  <div class="selector">
-    <label for="planSelect">Sélectionnez un plan :</label>
-    <select id="planSelect">
-      <option value="debutant">Débutant (5%)</option>
-      <option value="pro">Pro (8%)</option>
-      <option value="elite">Élite (12%)</option>
-    </select>
+  <div class="plan-buttons">
+    <button class="plan-btn active" data-plan="debutant">Débutant</button>
+    <button class="plan-btn" data-plan="pro">Pro</button>
+    <button class="plan-btn" data-plan="elite">Élite</button>
   </div>
+
+
 
   <div class="selector chart-toggle">
     <label>
@@ -389,7 +426,6 @@
     const chartArea = document.getElementById('chartsArea');
     const tableArea = document.getElementById('tableArea');
     const viewToggle = document.getElementById('viewToggle');
-    const planSelect = document.getElementById('planSelect');
     const tableBody = document.getElementById('planTableBody');
 
     const baseMonths = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'];
@@ -431,7 +467,15 @@
       tableBody.innerHTML = data.map((val, idx) => `<tr><td>${baseMonths[idx]}</td><td>${val}</td></tr>`).join('');
     }
 
-    planSelect.addEventListener('change', () => renderPlan(planSelect.value));
+    const planButtons = document.querySelectorAll('.plan-btn');
+      planButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelector('.plan-btn.active')?.classList.remove('active');
+          btn.classList.add('active');
+          renderPlan(btn.dataset.plan);
+        });
+      });
+
 
     viewToggle.addEventListener('change', () => {
       chartArea.style.display = viewToggle.checked ? 'none' : 'block';
@@ -445,7 +489,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       if (localStorage.getItem('darkMode') === 'enabled') document.body.classList.add('dark-mode');
-      renderPlan(planSelect.value);
+      renderPlan('debutant');
     });
   </script>
 </body>
