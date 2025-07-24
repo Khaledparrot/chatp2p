@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Rendement - NovaTrust</title>
+  <title>Rendement Interactif - NovaTrust</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -211,65 +211,38 @@
       }
     }
 
-    /* === NEW STYLES ONLY === */
+    /* === NEW STYLES === */
     .chart-container {
       max-width: 1100px;
-      margin: 3rem auto;
+      margin: 2rem auto;
       background: #fff;
       padding: 3rem;
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.06);
     }
-    .dark-mode .chart-container {
-      background: #2a2a2a;
-    }
+    .dark-mode .chart-container { background: #2a2a2a; }
 
-    .table-container {
-      max-width: 1000px;
-      margin: 3rem auto;
-      padding: 2rem;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    }
-    .dark-mode .table-container {
-      background: #2a2a2a;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-    th, td {
-      padding: 1rem;
-      border-bottom: 1px solid #ddd;
-    }
-    .dark-mode th, .dark-mode td {
-      border-color: #444;
-    }
-
-    .chart-toggle {
+    .selector {
+      max-width: 300px;
+      margin: 2rem auto;
       text-align: center;
-      margin: 2rem auto 1rem auto;
-      font-size: 1.1rem;
     }
-    .chart-toggle input[type="checkbox"] {
-      transform: scale(1.3);
-      margin-left: 0.5rem;
+    .selector select {
+      padding: 0.5rem 1rem;
+      font-size: 1.1rem;
+      border-radius: 6px;
     }
 
     .analysis-section {
-      padding: 5rem 8%;
+      padding: 4rem 8%;
       background: #f5f7fa;
+      margin-top: 2rem;
     }
-    .dark-mode .analysis-section {
-      background: #1a1a1a;
-    }
+    .dark-mode .analysis-section { background: #1a1a1a; }
     .analysis-section h2 {
-      text-align: center;
       font-size: 2.2rem;
-      margin-bottom: 3rem;
+      margin-bottom: 2.5rem;
+      text-align: center;
     }
     .plan-analysis {
       display: flex;
@@ -280,23 +253,41 @@
     .plan-card {
       flex: 1 1 300px;
       background: #fff;
-      padding: 2rem;
+      padding: 1.8rem;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      max-width: 350px;
     }
-    .dark-mode .plan-card {
-      background: #2b2b2b;
-      color: #e0e0e0;
-    }
-    .plan-card h3 {
-      margin-bottom: 1rem;
-      font-size: 1.4rem;
-    }
-    .plan-card p {
+    .dark-mode .plan-card { background: #2b2b2b; color: #e0e0e0; }
+    .plan-card h3 { margin-bottom: 1rem; font-size: 1.4rem; }
+    .plan-card p { line-height: 1.6; }
+
+    .chart-toggle {
+      text-align: center;
+      margin: 1rem auto;
       font-size: 1rem;
-      line-height: 1.6;
     }
+    .chart-toggle input { transform: scale(1.2); margin-left: 0.5rem; }
+
+    .table-container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      display: none;
+    }
+    .dark-mode .table-container { background: #2a2a2a; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 0.8rem;
+      border-bottom: 1px solid #ddd;
+    }
+    .dark-mode th, .dark-mode td { border-color: #444; }
   </style>
 </head>
 <body>
@@ -347,13 +338,21 @@
     </div>
   </header>
 
-
   <section class="hero">
-    <h1>Suivi de rendement</h1>
-    <p>Visualisez vos performances financières en un clic.</p>
+    <h1>Rendement Interactif</h1>
+    <p>Choisissez un plan et voyez l’évolution des graphiques.</p>
   </section>
 
-  <div class="chart-toggle">
+  <div class="selector">
+    <label for="planSelect">Sélectionnez un plan :</label>
+    <select id="planSelect">
+      <option value="debutant">Débutant (5%)</option>
+      <option value="pro">Pro (8%)</option>
+      <option value="elite">Élite (12%)</option>
+    </select>
+  </div>
+
+  <div class="selector chart-toggle">
     <label>
       <input type="checkbox" id="viewToggle" />
       Afficher sous forme de tableau
@@ -361,76 +360,82 @@
   </div>
 
   <div class="chart-container" id="chartsArea">
-    <canvas id="lineChart" height="100"></canvas>
-    <br>
+    <canvas id="lineChart" height="100"></canvas><br>
     <canvas id="barChart" height="100"></canvas>
   </div>
 
-  <div class="table-container" id="tableArea" style="display: none;">
-    <h2 style="text-align:center">Rendement en tableau</h2>
+  <div class="table-container" id="tableArea">
+    <h2 style="text-align:center">Détails du plan sélectionné</h2>
     <table>
-      <thead>
-        <tr>
-          <th>Mois</th>
-          <th>Rendement (€)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Janvier</td><td>1000</td></tr>
-        <tr><td>Février</td><td>1400</td></tr>
-        <tr><td>Mars</td><td>1900</td></tr>
-        <tr><td>Avril</td><td>2500</td></tr>
-        <tr><td>Mai</td><td>3200</td></tr>
-        <tr><td>Juin</td><td>4000</td></tr>
-        <tr><td>Juillet</td><td>5000</td></tr>
-      </tbody>
+      <thead><tr><th>Mois</th><th>Valeur (€)</th></tr></thead>
+      <tbody id="planTableBody"></tbody>
     </table>
   </div>
 
   <section class="analysis-section">
     <h2>Analyse des rendements par plan</h2>
     <div class="plan-analysis">
-      <div class="plan-card">
-        <h3>Plan Débutant</h3>
-        <p>
-          Le graphique en ligne illustre une croissance modérée avec un rendement mensuel de 5%.
-          Parfait pour les investisseurs prudents, ce plan démontre une stabilité continue à long terme.
-        </p>
-      </div>
-      <div class="plan-card">
-        <h3>Plan Pro</h3>
-        <p>
-          La courbe devient plus dynamique à 8% de rendement mensuel. Les barres du graphique montrent une progression plus rapide,
-          adaptée aux profils intermédiaires cherchant des gains accélérés sans risques excessifs.
-        </p>
-      </div>
-      <div class="plan-card">
-        <h3>Plan Élite</h3>
-        <p>
-          Le plan Élite reflète une ascension forte dans les graphiques, correspondant à un rendement de 12% par mois.
-          Ce plan s’adresse aux investisseurs expérimentés, tolérant un risque plus élevé pour des profits maximaux.
-        </p>
-      </div>
+      <div class="plan-card"><h3>Plan Débutant</h3><p>Rendement stable de 5 % par mois avec croissance régulière, idéal pour un premier investissement.</p></div>
+      <div class="plan-card"><h3>Plan Pro</h3><p>Croissance accélérée à 8 % mensuel, adapté aux investisseurs intermédiaires.</p></div>
+      <div class="plan-card"><h3>Plan Élite</h3><p>Rendement élevé de 12 % par mois pour investisseurs confirmés et tolérants au risque.</p></div>
     </div>
   </section>
 
   <footer>
-  <p>&copy; 2025 NovaTrust. Tous droits réservés.</p>
+    <p>&copy; 2025 NovaTrust. Tous droits réservés.</p>
   </footer>
 
   <script>
-    const viewToggle = document.getElementById('viewToggle');
     const chartArea = document.getElementById('chartsArea');
     const tableArea = document.getElementById('tableArea');
+    const viewToggle = document.getElementById('viewToggle');
+    const planSelect = document.getElementById('planSelect');
+    const tableBody = document.getElementById('planTableBody');
+
+    const baseMonths = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'];
+
+    const planRates = {
+      debutant: 0.05,
+      pro: 0.08,
+      elite: 0.12
+    };
+
+    const initialValue = 1000;
+
+    function calculateGrowth(rate) {
+      return baseMonths.map((m, i) => Math.round(initialValue * Math.pow(1 + rate, i)));
+    }
+
+    const lineCtx = document.getElementById('lineChart').getContext('2d');
+    const barCtx = document.getElementById('barChart').getContext('2d');
+
+    const lineChart = new Chart(lineCtx, {
+      type: 'line',
+      data: { labels: baseMonths, datasets: [{ label: 'Valeur (€)', data: [], borderColor:'rgba(44,130,201,1)', backgroundColor:'rgba(44,130,201,0.2)', tension:0.4 }] },
+      options: { animation:{ duration:1000 }, responsive:true }
+    });
+
+    const barChart = new Chart(barCtx, {
+      type: 'bar',
+      data: { labels: baseMonths, datasets: [{ label: 'Valeur (€)', data: [], backgroundColor:'rgba(26,188,156,0.8)' }] },
+      options: { animation:{ duration:1200 }, responsive:true }
+    });
+
+    function renderPlan(plan) {
+      const data = calculateGrowth(planRates[plan]);
+      lineChart.data.datasets[0].data = data;
+      barChart.data.datasets[0].data = data;
+      lineChart.update();
+      barChart.update();
+
+      tableBody.innerHTML = data.map((val, idx) => `<tr><td>${baseMonths[idx]}</td><td>${val}</td></tr>`).join('');
+    }
+
+    planSelect.addEventListener('change', () => renderPlan(planSelect.value));
 
     viewToggle.addEventListener('change', () => {
-      if (viewToggle.checked) {
-        chartArea.style.display = "none";
-        tableArea.style.display = "block";
-      } else {
-        chartArea.style.display = "block";
-        tableArea.style.display = "none";
-      }
+      chartArea.style.display = viewToggle.checked ? 'none' : 'block';
+      tableArea.style.display = viewToggle.checked ? 'block' : 'none';
     });
 
     document.getElementById('toggleDarkMode')?.addEventListener('click', () => {
@@ -439,43 +444,8 @@
     });
 
     window.addEventListener('DOMContentLoaded', () => {
-      if (localStorage.getItem('darkMode') === 'enabled') {
-        document.body.classList.add('dark-mode');
-      }
-
-      const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'];
-      const values = [1000, 1400, 1900, 2500, 3200, 4000, 5000];
-
-      new Chart(document.getElementById('lineChart'), {
-        type: 'line',
-        data: {
-          labels: months,
-          datasets: [{
-            label: 'Croissance mensuelle (€)',
-            data: values,
-            fill: true,
-            borderColor: 'rgba(44, 130, 201, 1)',
-            backgroundColor: 'rgba(44, 130, 201, 0.2)',
-            tension: 0.4
-          }]
-        },
-        options: { responsive: true }
-      });
-
-      new Chart(document.getElementById('barChart'), {
-        type: 'bar',
-        data: {
-          labels: ['Crypto', 'Actions', 'Immobilier', 'Startups'],
-          datasets: [{
-            label: 'Investissements (€)',
-            data: [2000, 3000, 1800, 2200],
-            backgroundColor: [
-              '#3498db', '#2ecc71', '#e67e22', '#9b59b6'
-            ]
-          }]
-        },
-        options: { responsive: true }
-      });
+      if (localStorage.getItem('darkMode') === 'enabled') document.body.classList.add('dark-mode');
+      renderPlan(planSelect.value);
     });
   </script>
 </body>
