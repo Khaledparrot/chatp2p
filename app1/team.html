@@ -272,6 +272,46 @@
     .dark-mode .team-member p {
       color: #aaa;
     }
+
+
+
+    .social-links {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.social-links a {
+  color: #666;
+  font-size: 1.1rem;
+  background: #eaeaea;
+  border-radius: 50%;
+  padding: 0.5rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease, color 0.3s ease;
+  text-decoration: none;
+}
+
+.social-links a:hover {
+  background: #ccc;
+  color: #000;
+}
+
+.dark-mode .social-links a {
+  background: #2f2f2f;
+  color: #ddd;
+}
+
+.dark-mode .social-links a:hover {
+  background: #444;
+  color: #fff;
+}
+
   </style>
 </head>
 <body>
@@ -332,20 +372,38 @@
     <h2>Experts & Visionnaires</h2>
     <div class="team-grid">
       <div class="team-member">
-        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="CEO">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Jean Dupont">
         <h3>Jean Dupont</h3>
         <p>Directeur Général</p>
+        <p>Avec plus de 15 ans d'expérience dans la finance et la technologie, Jean dirige NovaTrust avec vision et rigueur.</p>
+        <div class="social-links">
+          <a href="https://linkedin.com/" target="_blank" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="https://twitter.com/" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="mailto:jean@novatrust.com" title="Email"><i class="fas fa-envelope"></i></a>
+        </div>
       </div>
       <div class="team-member">
-        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="CTO">
+        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Claire Morel">
         <h3>Claire Morel</h3>
         <p>Directrice Technique</p>
+        <p>Claire est à la tête de notre architecture technique, garantissant fiabilité et sécurité de la plateforme.</p>
+        <div class="social-links">
+          <a href="https://linkedin.com/" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+          <a href="mailto:claire@novatrust.com"><i class="fas fa-envelope"></i></a>
+        </div>
       </div>
+
       <div class="team-member">
-        <img src="https://randomuser.me/api/portraits/men/50.jpg" alt="CFO">
+        <img src="https://randomuser.me/api/portraits/men/50.jpg" alt="Marc Lemoine">
         <h3>Marc Lemoine</h3>
         <p>Responsable Financier</p>
+        <p>Marc supervise la stratégie financière de NovaTrust avec précision, assurant une croissance stable et durable.</p>
+        <div class="social-links">
+          <a href="https://linkedin.com/" target="_blank" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="mailto:marc@novatrust.com" title="Email"><i class="fas fa-envelope"></i></a>
+        </div>
       </div>
+
     </div>
   </section>
 
