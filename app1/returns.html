@@ -7,26 +7,34 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
+     * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f4f5f9;
+      background-color: #f4f5f9;
       color: #333;
+      transition: background-color 0.3s, color 0.3s;
+      line-height: 1.6;
     }
     body.dark-mode {
-      background: #121212;
+      background-color: #121212;
       color: #e0e0e0;
     }
-    .navbar, footer {
-      background: #fff;
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       padding: 1rem 5%;
+      background: #ffffff;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
-    .dark-mode .navbar, .dark-mode footer {
+    .dark-mode .navbar {
       background: #1e1e1e;
     }
     .nav-logo {
@@ -40,10 +48,10 @@
       position: relative;
     }
     .nav-item a {
-      text-decoration: none;
       color: inherit;
-      padding: 0.5rem;
       font-weight: 500;
+      text-decoration: none;
+      padding: 0.5rem;
     }
     .dropdown {
       display: none;
@@ -51,8 +59,13 @@
       top: 100%;
       left: 0;
       background: #fff;
+      padding: 0.5rem 0;
       border-radius: 6px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    .dark-mode .dropdown {
+      background: #2a2a2a;
     }
     .nav-item:hover .dropdown {
       display: block;
@@ -61,63 +74,168 @@
       display: block;
       padding: 0.5rem 1rem;
       color: #333;
+      text-decoration: none;
+      white-space: nowrap;
     }
-    .dark-mode .dropdown, .dark-mode .dropdown a {
-      background: #2a2a2a;
+    .dark-mode .dropdown a {
       color: #e0e0e0;
     }
     .icon-btn {
       background: none;
       border: none;
       font-size: 1.2rem;
-      color: #666;
       cursor: pointer;
+      margin: 0 0.25rem;
+      color: #666;
     }
     .dark-mode .icon-btn {
+      /*color: #fcd535;*/
       color: #ccc;
     }
-    .btn {
-      padding: 0.5rem 1rem;
-      border: none;
+    .btn, .btn.primary {
+      padding: 0.5rem 1.2rem;
       border-radius: 8px;
       background: linear-gradient(135deg, #1c1c1c, #2d3e50);
-      color: #fff;
+      color: white;
+      border: none;
       font-weight: 600;
       cursor: pointer;
+      transition: background 0.3s ease;
+      text-decoration: none;
+    }
+    .btn:hover, .btn.primary:hover {
+  background: #3a4756; /* slightly softer solid color */
+  color: #fff;
+}
+
+    .lang-dropdown {
+      position: relative;
+    }
+    .lang-options {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+    .dark-mode .lang-options {
+      background: #2a2a2a;
+    }
+    .lang-dropdown:hover .lang-options {
+      display: block;
+    }
+    .lang-options a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: #333;
+      text-decoration: none;
+    }
+    .dark-mode .lang-options a {
+      color: #e0e0e0;
     }
     .hero {
       padding: 4rem 5%;
       text-align: center;
       background: linear-gradient(135deg, #1c1c1c, #2d3e50);
-      color: white;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
     }
-    .chart-toggle {
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      min-height: 2rem; /* or more depending on your font size */
+    }
+    
+    #typing-text::after {
+      content: "\00a0"; /* non-breaking space to prevent collapse */
+      visibility: hidden;
+    }
+    
+    .hero p span {
+      display: inline;
+      white-space: nowrap;
+      font-size: 1.2rem;
+    }
+
+    .features {
+      padding: 4rem 5%;
+      background: #f9f9f9;
+    }
+    .dark-mode .features {
+      background: #1b1b1b;
+    }
+    .features h2 {
       text-align: center;
-      margin: 2rem auto;
+      font-size: 2rem;
+      margin-bottom: 2rem;
     }
-    .chart-container {
-      max-width: 1000px;
-      margin: 2rem auto;
-      padding: 2rem;
+    .feature-grid {
+      display: grid;
+      gap: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    .feature-card {
       background: #fff;
+      padding: 2rem;
       border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease;
+    }
+    .dark-mode .feature-card {
+      background: #2b2b2b;
+      color: #e0e0e0;
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+    footer {
+      padding: 2rem 5%;
+      background: #121212;
+      color: #aaa;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    .dark-mode footer {
+      background: #000;
+    }
+    @media (max-width: 768px) {
+      .nav-menu {
+        display: none;
+        flex-direction: column;
+      }
+    }
+
+    /* === NEW STYLES ONLY === */
+    .chart-container {
+      max-width: 1100px;
+      margin: 3rem auto;
+      background: #fff;
+      padding: 3rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
     }
     .dark-mode .chart-container {
       background: #2a2a2a;
     }
+
     .table-container {
-      display: none;
-      max-width: 900px;
-      margin: 2rem auto;
+      max-width: 1000px;
+      margin: 3rem auto;
       padding: 2rem;
       background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
     }
     .dark-mode .table-container {
       background: #2a2a2a;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -130,20 +248,63 @@
     .dark-mode th, .dark-mode td {
       border-color: #444;
     }
-    footer {
+
+    .chart-toggle {
       text-align: center;
-      padding: 2rem 5%;
-      font-size: 0.9rem;
-      color: #aaa;
+      margin: 2rem auto 1rem auto;
+      font-size: 1.1rem;
+    }
+    .chart-toggle input[type="checkbox"] {
+      transform: scale(1.3);
+      margin-left: 0.5rem;
+    }
+
+    .analysis-section {
+      padding: 5rem 8%;
+      background: #f5f7fa;
+    }
+    .dark-mode .analysis-section {
+      background: #1a1a1a;
+    }
+    .analysis-section h2 {
+      text-align: center;
+      font-size: 2.2rem;
+      margin-bottom: 3rem;
+    }
+    .plan-analysis {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: space-around;
+    }
+    .plan-card {
+      flex: 1 1 300px;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      max-width: 350px;
+    }
+    .dark-mode .plan-card {
+      background: #2b2b2b;
+      color: #e0e0e0;
+    }
+    .plan-card h3 {
+      margin-bottom: 1rem;
+      font-size: 1.4rem;
+    }
+    .plan-card p {
+      font-size: 1rem;
+      line-height: 1.6;
     }
   </style>
 </head>
 <body>
-  <header class="navbar" style="display: flex; justify-content: space-between; align-items: center;">
+  <header class="navbar">
     <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Nova_company_logo.png" alt="NovaTrust" class="nav-logo">
     <nav class="nav-menu">
       <div class="nav-item">
-        <a href="index.html">Accueil</a>
+        <a href="#">Accueil</a>
         <div class="dropdown">
           <a href="features.html">Fonctionnalités</a>
           <a href="download.html">Télécharger</a>
@@ -159,22 +320,33 @@
       <div class="nav-item">
         <a href="#">À propos</a>
         <div class="dropdown">
-          <a href="team.html">Notre Équipe</a>
-          <a href="values.html">Valeurs</a>
+          <a href="#team">Notre Équipe</a>
+          <a href="#values">Valeurs</a>
         </div>
       </div>
       <div class="nav-item">
         <a href="#">Contact</a>
         <div class="dropdown">
-          <a href="support.html">Support</a>
-          <a href="faq.html">FAQ</a>
+          <a href="#support">Support</a>
+          <a href="#faq">FAQ</a>
         </div>
       </div>
     </nav>
-    <div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
       <button class="icon-btn" id="toggleDarkMode" title="Mode sombre"><i class="fas fa-moon"></i></button>
+      <div class="lang-dropdown">
+        <button class="icon-btn" title="Langue"><i class="fas fa-globe"></i></button>
+        <div class="lang-options">
+          <a href="#" data-lang="fr">Français</a>
+          <a href="#" data-lang="en">English</a>
+          <a href="#" data-lang="ar">العربية</a>
+        </div>
+      </div>
+      <a class="btn" href="#login">Connexion</a>
+      <a class="btn" href="#register">Inscription</a>
     </div>
   </header>
+
 
   <section class="hero">
     <h1>Suivi de rendement</h1>
@@ -192,11 +364,9 @@
     <canvas id="lineChart" height="100"></canvas>
     <br>
     <canvas id="barChart" height="100"></canvas>
-    <br>
-    <canvas id="pieChart" height="100"></canvas>
   </div>
 
-  <div class="table-container" id="tableArea">
+  <div class="table-container" id="tableArea" style="display: none;">
     <h2 style="text-align:center">Rendement en tableau</h2>
     <table>
       <thead>
@@ -217,8 +387,35 @@
     </table>
   </div>
 
+  <section class="analysis-section">
+    <h2>Analyse des rendements par plan</h2>
+    <div class="plan-analysis">
+      <div class="plan-card">
+        <h3>Plan Débutant</h3>
+        <p>
+          Le graphique en ligne illustre une croissance modérée avec un rendement mensuel de 5%.
+          Parfait pour les investisseurs prudents, ce plan démontre une stabilité continue à long terme.
+        </p>
+      </div>
+      <div class="plan-card">
+        <h3>Plan Pro</h3>
+        <p>
+          La courbe devient plus dynamique à 8% de rendement mensuel. Les barres du graphique montrent une progression plus rapide,
+          adaptée aux profils intermédiaires cherchant des gains accélérés sans risques excessifs.
+        </p>
+      </div>
+      <div class="plan-card">
+        <h3>Plan Élite</h3>
+        <p>
+          Le plan Élite reflète une ascension forte dans les graphiques, correspondant à un rendement de 12% par mois.
+          Ce plan s’adresse aux investisseurs expérimentés, tolérant un risque plus élevé pour des profits maximaux.
+        </p>
+      </div>
+    </div>
+  </section>
+
   <footer>
-    <p>&copy; 2025 NovaTrust. Tous droits réservés.</p>
+  <p>&copy; 2025 NovaTrust. Tous droits réservés.</p>
   </footer>
 
   <script>
@@ -236,11 +433,11 @@
       }
     });
 
-    // Dark Mode
-    document.getElementById('toggleDarkMode').addEventListener('click', () => {
+    document.getElementById('toggleDarkMode')?.addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
       localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
     });
+
     window.addEventListener('DOMContentLoaded', () => {
       if (localStorage.getItem('darkMode') === 'enabled') {
         document.body.classList.add('dark-mode');
@@ -272,20 +469,6 @@
           datasets: [{
             label: 'Investissements (€)',
             data: [2000, 3000, 1800, 2200],
-            backgroundColor: [
-              '#3498db', '#2ecc71', '#e67e22', '#9b59b6'
-            ]
-          }]
-        },
-        options: { responsive: true }
-      });
-
-      new Chart(document.getElementById('pieChart'), {
-        type: 'pie',
-        data: {
-          labels: ['Crypto', 'Actions', 'Immobilier', 'Startups'],
-          datasets: [{
-            data: [25, 35, 20, 20],
             backgroundColor: [
               '#3498db', '#2ecc71', '#e67e22', '#9b59b6'
             ]
