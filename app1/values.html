@@ -8,8 +8,7 @@
   <link rel="stylesheet" href="style.css" />
   <style>
 
-
-     * {
+    * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -215,10 +214,29 @@
 
 
 
-    
 
 
+
     
+    /* Hero style */
+    .hero-small {
+      padding: 3rem 5%;
+      background: linear-gradient(135deg, #1c1c1c, #2d3e50);
+      color: white;
+      text-align: center;
+    }
+
+    .hero-small h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .hero-small p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    /* Values section */
     .values-section {
       padding: 4rem 8%;
       background: #f4f5f9;
@@ -283,11 +301,12 @@
   </style>
 </head>
 <body>
+  <!-- Navbar (same as homepage) -->
   <header class="navbar">
     <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Nova_company_logo.png" alt="NovaTrust" class="nav-logo">
     <nav class="nav-menu">
       <div class="nav-item">
-        <a href="#">Accueil</a>
+        <a href="index.html">Accueil</a>
         <div class="dropdown">
           <a href="features.html">Fonctionnalités</a>
           <a href="download.html">Télécharger</a>
@@ -304,14 +323,14 @@
         <a href="#">À propos</a>
         <div class="dropdown">
           <a href="team.html">Notre Équipe</a>
-          <a href="#values">Valeurs</a>
+          <a href="values.html">Valeurs</a>
         </div>
       </div>
       <div class="nav-item">
         <a href="#">Contact</a>
         <div class="dropdown">
-          <a href="#support">Support</a>
-          <a href="#faq">FAQ</a>
+          <a href="support.html">Support</a>
+          <a href="faq.html">FAQ</a>
         </div>
       </div>
     </nav>
@@ -330,9 +349,15 @@
     </div>
   </header>
 
-  <!-- === Page Content === -->
+  <!-- Hero Section -->
+  <section class="hero-small">
+    <h1>Nos Valeurs</h1>
+    <p>Les fondations de la confiance, de l’innovation et de la sécurité financière chez NovaTrust.</p>
+  </section>
+
+  <!-- Main Section -->
   <section class="values-section">
-    <h2>Nos Valeurs</h2>
+    <h2>Ce en quoi nous croyons</h2>
     <div class="values-grid">
       <div class="value-card">
         <i class="fas fa-shield-alt"></i>
@@ -357,7 +382,7 @@
     </div>
   </section>
 
-  <!-- === Footer === -->
+  <!-- Footer -->
   <footer>
     <p>&copy; 2025 NovaTrust. Tous droits réservés.</p>
   </footer>
