@@ -4,24 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Support - NovaTrust</title>
-  
+
+  <!-- Apply dark mode before page renders -->
+  <script>
+    const mode = localStorage.getItem('darkMode');
+    if (mode === 'enabled') {
+      document.documentElement.classList.add('dark-mode');
+    } else if (mode === 'disabled') {
+      document.documentElement.classList.add('light-mode');
+    }
+  </script>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
   <style>
-       * {
+    * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
+
+    html.dark-mode body {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
     body {
       font-family: 'Segoe UI', sans-serif;
       background-color: #f4f5f9;
       color: #333;
       transition: background-color 0.3s, color 0.3s;
       line-height: 1.6;
-    }
-    body.dark-mode {
-      background-color: #121212;
-      color: #e0e0e0;
     }
 
     .navbar {
@@ -35,58 +48,55 @@
       top: 0;
       z-index: 1000;
     }
-    .dark-mode .navbar {
+
+    html.dark-mode .navbar {
       background: #1e1e1e;
     }
 
-/* logo */
-    
-.logo-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-}
+    /* logo */
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
 
-.logo-container img {
-  height: 42px;
-  width: auto;
-  object-fit: contain;
-  transition: filter 0.3s ease;
-  filter: brightness(0) invert(0.3); /* default light mode: gray look */
-}
+    .logo-container img {
+      height: 42px;
+      object-fit: contain;
+      filter: brightness(0) invert(0.3);
+    }
 
-.logo-container span {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #444;
-  transition: color 0.3s ease;
-}
+    .logo-container span {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #444;
+    }
 
-/* Dark mode styling */
-body.dark-mode .logo-container img {
-  filter: brightness(0) invert(1); /* white in dark mode */
-}
+    html.dark-mode .logo-container img {
+      filter: brightness(0) invert(1);
+    }
 
-body.dark-mode .logo-container span {
-  color: #eee;
-}
-
-/*   end logo */
+    html.dark-mode .logo-container span {
+      color: #eee;
+    }
 
     .nav-menu {
       display: flex;
       gap: 1.5rem;
     }
+
     .nav-item {
       position: relative;
     }
+
     .nav-item a {
       color: inherit;
       font-weight: 500;
       text-decoration: none;
       padding: 0.5rem;
     }
+
     .dropdown {
       display: none;
       position: absolute;
@@ -96,24 +106,27 @@ body.dark-mode .logo-container span {
       padding: 0.5rem 0;
       border-radius: 6px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
     }
-    .dark-mode .dropdown {
+
+    html.dark-mode .dropdown {
       background: #2a2a2a;
     }
+
     .nav-item:hover .dropdown {
       display: block;
     }
+
     .dropdown a {
       display: block;
       padding: 0.5rem 1rem;
       color: #333;
       text-decoration: none;
-      white-space: nowrap;
     }
-    .dark-mode .dropdown a {
+
+    html.dark-mode .dropdown a {
       color: #e0e0e0;
     }
+
     .icon-btn {
       background: none;
       border: none;
@@ -122,38 +135,38 @@ body.dark-mode .logo-container span {
       margin: 0 0.25rem;
       color: #666;
     }
-    .dark-mode .icon-btn {
-      /*color: #fcd535;*/
+
+    html.dark-mode .icon-btn {
       color: #ccc;
     }
+
     .btn, .btn.primary {
       padding: 0.5rem 1.2rem;
       border-radius: 8px;
       background: linear-gradient(135deg, #1c1c1c, #2d3e50);
-      color: white;
+      color: white !important;
       border: none;
       font-weight: 600;
       cursor: pointer;
       transition: background 0.3s ease;
       text-decoration: none;
+      display: inline-block;
     }
+
     .btn:hover, .btn.primary:hover {
-  background: #3a4756; /* slightly softer solid color */
-  color: #fff !important;
-}
-    /* Ensure link buttons in dark mode stay white */
-.dark-mode .btn,
-.dark-mode .btn.primary {
-  color: white;
-}
-.dark-mode .btn:hover,
-.dark-mode .btn.primary:hover {
-  color: white;
-}
+      background: #3a4756;
+      color: #fff !important;
+    }
+
+    html.dark-mode .btn,
+    html.dark-mode .btn.primary {
+      color: white !important;
+    }
 
     .lang-dropdown {
       position: relative;
     }
+
     .lang-options {
       position: absolute;
       top: 100%;
@@ -163,122 +176,33 @@ body.dark-mode .logo-container span {
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       display: none;
     }
-    .dark-mode .lang-options {
+
+    html.dark-mode .lang-options {
       background: #2a2a2a;
     }
+
     .lang-dropdown:hover .lang-options {
       display: block;
     }
+
     .lang-options a {
       display: block;
       padding: 0.5rem 1rem;
       color: #333;
       text-decoration: none;
     }
-    .dark-mode .lang-options a {
+
+    html.dark-mode .lang-options a {
       color: #e0e0e0;
     }
-    .hero {
-      padding: 4rem 5%;
-      text-align: center;
-      background: linear-gradient(135deg, #1c1c1c, #2d3e50);
-      color: #fff;
-      position: relative;
-      overflow: hidden;
-    }
-    .hero h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
 
-    .hero p {
-      min-height: 2rem; /* or more depending on your font size */
-    }
-    
-    #typing-text::after {
-      content: "\00a0"; /* non-breaking space to prevent collapse */
-      visibility: hidden;
-    }
-    
-    .hero p span {
-      display: inline;
-      white-space: nowrap;
-      font-size: 1.2rem;
-    }
-
-    .features {
-      padding: 4rem 5%;
-      background: #f9f9f9;
-    }
-    .dark-mode .features {
-      background: #1b1b1b;
-    }
-    .features h2 {
-      text-align: center;
-      font-size: 2rem;
-      margin-bottom: 2rem;
-    }
-    .feature-grid {
-      display: grid;
-      gap: 2rem;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    }
-    .feature-card {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      transition: transform 0.3s ease;
-    }
-    .dark-mode .feature-card {
-      background: #2b2b2b;
-      color: #e0e0e0;
-    }
-    .feature-card:hover {
-      transform: translateY(-5px);
-    }
-    footer {
-      padding: 2rem 5%;
-      background: #121212;
-      color: #aaa;
-      text-align: center;
-      font-size: 0.9rem;
-    }
-    .dark-mode footer {
-      background: #000;
-    }
-    @media (max-width: 768px) {
-      .nav-menu {
-        display: none;
-        flex-direction: column;
-      }
-    }
-
-    /* BOUTON GLOBAL */
-    .btn {
-      padding: 0.5rem 1.2rem;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #1c1c1c, #2d3e50);
-      color: white;
-      border: none;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      text-decoration: none;
-      display: inline-block;
-    }
-    .btn:hover {
-      background: #3a4756;
-      color: #fff;
-    }
-
-    /* SECTION */
     .support-hero {
       padding: 4rem 5%;
       text-align: center;
       background: linear-gradient(135deg, #1c1c1c, #2d3e50);
       color: #fff;
     }
+
     .support-hero h1 {
       font-size: 2.5rem;
       margin-bottom: 1rem;
@@ -288,6 +212,11 @@ body.dark-mode .logo-container span {
       padding: 4rem 5%;
       max-width: 800px;
       margin: 0 auto;
+      background: #f9f9f9;
+    }
+
+    html.dark-mode .support-section {
+      background: #1b1b1b;
     }
 
     .support-section h2 {
@@ -303,19 +232,21 @@ body.dark-mode .logo-container span {
       color: #2d3e50;
       text-decoration: underline;
     }
-    .dark-mode .support-section a {
+
+    html.dark-mode .support-section a {
       color: #90caf9;
     }
 
-    /* FORMULAIRE */
     .support-form {
       margin-top: 3rem;
     }
+
     .support-form form {
       display: flex;
       flex-direction: column;
       gap: 1rem;
     }
+
     .support-form input,
     .support-form textarea {
       padding: 0.75rem;
@@ -323,8 +254,9 @@ body.dark-mode .logo-container span {
       border: 1px solid #ccc;
       font-size: 1rem;
     }
-    .dark-mode .support-form input,
-    .dark-mode .support-form textarea {
+
+    html.dark-mode .support-form input,
+    html.dark-mode .support-form textarea {
       background: #2b2b2b;
       border: 1px solid #555;
       color: #fff;
@@ -337,24 +269,27 @@ body.dark-mode .logo-container span {
       text-align: center;
       font-size: 0.9rem;
     }
-    .dark-mode footer {
+
+    html.dark-mode footer {
       background: #000;
     }
 
-    .contact-section {
-  padding: 4rem 5%;
-  background: #f9f9f9;
-}
-
-.dark-mode .contact-section {
-  background: #1b1b1b;
-}
+    @media (max-width: 768px) {
+      .nav-menu {
+        display: none;
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
+
   <!-- Header -->
   <header class="navbar">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Nova_company_logo.png" alt="NovaTrust" class="nav-logo">
+    <a class="logo-container" href="index7.html">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Nova_company_logo.png" alt="NovaTrust">
+      <span>NovaTrust</span>
+    </a>
     <nav class="nav-menu">
       <div class="nav-item">
         <a href="index7.html">Accueil</a>
@@ -400,12 +335,13 @@ body.dark-mode .logo-container span {
     </div>
   </header>
 
-  <!-- Section principale de support -->
+  <!-- Hero -->
   <section class="support-hero">
     <h1>Support Client</h1>
     <p>Nous sommes là pour vous aider à chaque étape</p>
   </section>
 
+  <!-- Main Support Content -->
   <section class="support-section">
     <h2>Besoin d’aide ?</h2>
     <p>Notre équipe est disponible 24h/24 et 7j/7 pour répondre à toutes vos questions et vous accompagner dans vos démarches d’investissement.</p>
@@ -425,25 +361,19 @@ body.dark-mode .logo-container span {
     </div>
   </section>
 
+  <!-- Footer -->
   <footer>
     <p>&copy; 2025 NovaTrust. Tous droits réservés.</p>
   </footer>
 
-  <!-- Dark Mode Toggle -->
+  <!-- JS: Dark Mode -->
   <script>
-     document.getElementById('toggleDarkMode').addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
-      const state = document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled';
-      localStorage.setItem('darkMode', state);
+    document.getElementById('toggleDarkMode').addEventListener('click', () => {
+      const html = document.documentElement;
+      const isDark = html.classList.toggle('dark-mode');
+      html.classList.remove(isDark ? 'light-mode' : 'dark-mode');
+      localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
     });
-
-    window.addEventListener('DOMContentLoaded', () => {
-      if (localStorage.getItem('darkMode') === 'enabled') {
-        document.body.classList.add('dark-mode');
-      }
-    });
-
-
   </script>
 </body>
 </html>
