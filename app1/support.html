@@ -443,6 +443,14 @@ body.dark-mode .logo-container span {
     document.body.classList.add('dark-mode');
   }
 
+       // Apply smooth transition after load (to avoid flicker)
+  setTimeout(() => {
+    document.body.style.transition = 'background-color 0.3s, color 0.3s';
+  }, 50);
+
+  renderPlan('debutant');
+});
+
   </script>
 </body>
 </html>
