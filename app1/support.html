@@ -6,7 +6,7 @@
   <title>Support - NovaTrust</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-   * {
+    * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -243,77 +243,98 @@ body.dark-mode .logo-container span {
       }
     }
 
-    
-    .support-content {
+    /* BOUTON GLOBAL */
+    .btn {
+      padding: 0.5rem 1.2rem;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #1c1c1c, #2d3e50);
+      color: white;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn:hover {
+      background: #3a4756;
+      color: #fff;
+    }
+
+    /* SECTION */
+    .support-hero {
+      padding: 4rem 5%;
+      text-align: center;
+      background: linear-gradient(135deg, #1c1c1c, #2d3e50);
+      color: #fff;
+    }
+    .support-hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .support-section {
       padding: 4rem 5%;
       max-width: 800px;
       margin: 0 auto;
     }
 
-    .support-content h2 {
+    .support-section h2 {
       font-size: 1.8rem;
       margin-bottom: 1rem;
     }
 
-    .support-content p {
+    .support-section p {
       margin-bottom: 1.2rem;
     }
 
-    .support-content a {
+    .support-section a {
       color: #2d3e50;
       text-decoration: underline;
     }
-
-    .dark-mode .support-content a {
+    .dark-mode .support-section a {
       color: #90caf9;
     }
 
-    .btn-s {
-      display: inline-block;
-      margin-top: 1rem;
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #1c1c1c, #2d3e50);
-      color: white;
-      text-decoration: none;
-      font-weight: 600;
-      transition: background 0.3s ease;
-    }
-    .btn-s:hover {
-      background: #3a4756;
-    }
-
-    .contact-form {
+    /* FORMULAIRE */
+    .support-form {
       margin-top: 3rem;
     }
-    .contact-form form {
+    .support-form form {
       display: flex;
       flex-direction: column;
       gap: 1rem;
     }
-    .contact-form input,
-    .contact-form textarea {
+    .support-form input,
+    .support-form textarea {
       padding: 0.75rem;
       border-radius: 6px;
       border: 1px solid #ccc;
       font-size: 1rem;
     }
-    .dark-mode .contact-form input,
-    .dark-mode .contact-form textarea {
+    .dark-mode .support-form input,
+    .dark-mode .support-form textarea {
       background: #2b2b2b;
       border: 1px solid #555;
       color: #fff;
     }
+
+    footer {
+      padding: 2rem 5%;
+      background: #121212;
+      color: #aaa;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    .dark-mode footer {
+      background: #000;
+    }
   </style>
 </head>
 <body>
-
+  <!-- Header -->
   <header class="navbar">
-  <a href="index.html" class="logo-container">
-    <img src="log1.png" alt="NovaTrust Logo">
-    <span>NovaTrust</span>
-  </a>
-
+    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Nova_company_logo.png" alt="NovaTrust" class="nav-logo">
     <nav class="nav-menu">
       <div class="nav-item">
         <a href="index7.html">Accueil</a>
@@ -323,24 +344,24 @@ body.dark-mode .logo-container span {
         </div>
       </div>
       <div class="nav-item">
-        <a href="#">Investir</a>
+        <a href="plans.html">Investir</a>
         <div class="dropdown">
           <a href="plans.html">Plans</a>
           <a href="returns.html">Rendement</a>
         </div>
       </div>
       <div class="nav-item">
-        <a href="#">À propos</a>
+        <a href="team.html">À propos</a>
         <div class="dropdown">
           <a href="team.html">Notre Équipe</a>
           <a href="values.html">Valeurs</a>
         </div>
       </div>
       <div class="nav-item">
-        <a href="#">Contact</a>
+        <a href="support.html">Contact</a>
         <div class="dropdown">
           <a href="support.html">Support</a>
-          <a href="#faq">FAQ</a>
+          <a href="faq.html">FAQ</a>
         </div>
       </div>
     </nav>
@@ -349,30 +370,31 @@ body.dark-mode .logo-container span {
       <div class="lang-dropdown">
         <button class="icon-btn" title="Langue"><i class="fas fa-globe"></i></button>
         <div class="lang-options">
-          <a href="#" data-lang="fr">Français</a>
-          <a href="#" data-lang="en">English</a>
-          <a href="#" data-lang="ar">العربية</a>
+          <a href="#">Français</a>
+          <a href="#">English</a>
+          <a href="#">العربية</a>
         </div>
       </div>
-      <a class="btn" href="#login">Connexion</a>
-      <a class="btn" href="#register">Inscription</a>
+      <a class="btn" href="login.html">Connexion</a>
+      <a class="btn" href="register.html">Inscription</a>
     </div>
   </header>
 
-  <section class="hero">
+  <!-- Section principale de support -->
+  <section class="support-hero">
     <h1>Support Client</h1>
     <p>Nous sommes là pour vous aider à chaque étape</p>
   </section>
 
-  <section class="support-content">
+  <section class="support-section">
     <h2>Besoin d’aide ?</h2>
     <p>Notre équipe est disponible 24h/24 et 7j/7 pour répondre à toutes vos questions et vous accompagner dans vos démarches d’investissement.</p>
     <p>Vous pouvez aussi consulter la <a href="faq.html">FAQ</a>.</p>
     <p>Ou nous écrire directement à : <a href="mailto:support@novatrust.com">support@novatrust.com</a></p>
 
-    <a class="btn-s" href="faq.html">Consulter la FAQ</a>
+    <a class="btn" href="faq.html">Consulter la FAQ</a>
 
-    <div class="contact-form">
+    <div class="support-form">
       <h2>Formulaire de contact</h2>
       <form>
         <input type="text" placeholder="Votre nom" required>
@@ -387,6 +409,7 @@ body.dark-mode .logo-container span {
     <p>&copy; 2025 NovaTrust. Tous droits réservés.</p>
   </footer>
 
+  <!-- Dark Mode Toggle -->
   <script>
     document.getElementById('toggleDarkMode').addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
