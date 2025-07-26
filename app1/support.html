@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Support - NovaTrust</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
   <style>
-  * {
+    
+   * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -243,24 +243,16 @@ body.dark-mode .logo-container span {
         flex-direction: column;
       }
     }
-
-
+    
     .hero {
       padding: 4rem 5%;
       text-align: center;
       background: linear-gradient(135deg, #1c1c1c, #2d3e50);
       color: #fff;
-      position: relative;
-      overflow: hidden;
     }
-
     .hero h1 {
       font-size: 2.5rem;
       margin-bottom: 1rem;
-    }
-
-    .hero p {
-      font-size: 1.2rem;
     }
 
     .support-content {
@@ -298,14 +290,34 @@ body.dark-mode .logo-container span {
       font-weight: 600;
       transition: background 0.3s ease;
     }
-
     .btn:hover {
       background: #3a4756;
+    }
+
+    .contact-form {
+      margin-top: 3rem;
+    }
+    .contact-form form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .contact-form input,
+    .contact-form textarea {
+      padding: 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    .dark-mode .contact-form input,
+    .dark-mode .contact-form textarea {
+      background: #2b2b2b;
+      border: 1px solid #555;
+      color: #fff;
     }
   </style>
 </head>
 <body>
-  <!-- Header ici (même que les autres pages) -->
   <header class="navbar">
     <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Nova_company_logo.png" alt="NovaTrust" class="nav-logo">
     <nav class="nav-menu">
@@ -361,15 +373,22 @@ body.dark-mode .logo-container span {
   <section class="support-content">
     <h2>Besoin d’aide ?</h2>
     <p>Notre équipe est disponible 24h/24 et 7j/7 pour répondre à toutes vos questions et vous accompagner dans vos démarches d’investissement.</p>
-
-    <p>Vous pouvez consulter la <a href="faq.html">FAQ</a> pour trouver des réponses rapides à vos questions.</p>
-
-    <p>Pour toute autre demande, contactez-nous directement à : <a href="mailto:support@novatrust.com">support@novatrust.com</a></p>
+    <p>Vous pouvez aussi consulter la <a href="faq.html">FAQ</a>.</p>
+    <p>Ou nous écrire directement à : <a href="mailto:support@novatrust.com">support@novatrust.com</a></p>
 
     <a class="btn" href="faq.html">Consulter la FAQ</a>
+
+    <div class="contact-form">
+      <h2>Formulaire de contact</h2>
+      <form>
+        <input type="text" placeholder="Votre nom" required>
+        <input type="email" placeholder="Votre adresse email" required>
+        <textarea rows="5" placeholder="Votre message" required></textarea>
+        <button type="submit" class="btn">Envoyer le message</button>
+      </form>
+    </div>
   </section>
 
-  <!-- Footer ici (même que les autres pages) -->
   <footer>
     <p>&copy; 2025 NovaTrust. Tous droits réservés.</p>
   </footer>
