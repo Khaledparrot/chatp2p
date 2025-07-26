@@ -4,24 +4,35 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Support - NovaTrust</title>
+
+  <script>
+    if (localStorage.getItem('darkMode') === 'enabled') {
+      document.documentElement.classList.add('dark-mode');
+    }
+  </script>
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-    * {
+      * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f5f9;
-      color: #333;
-      transition: background-color 0.3s, color 0.3s;
-      line-height: 1.6;
-    }
-    body.dark-mode {
-      background-color: #121212;
-      color: #e0e0e0;
-    }
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #f4f5f9;
+        color: #333;
+        line-height: 1.6;
+        transition: background-color 0.3s, color 0.3s;
+        }
+
+        html.dark-mode body{
+        background-color: #121212;
+        color: #e0e0e0;
+      }
+
+
     .navbar {
       display: flex;
       justify-content: space-between;
@@ -420,15 +431,18 @@ body.dark-mode .logo-container span {
 
   <!-- Dark Mode Toggle -->
   <script>
-    document.getElementById('toggleDarkMode').addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
-      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
+     document.getElementById('toggleDarkMode')?.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', document.documentElement.classList.contains('dark-mode') ? 'enabled' : 'disabled');
     });
+
+
+
     window.addEventListener('DOMContentLoaded', () => {
-      if (localStorage.getItem('darkMode') === 'enabled') {
-        document.body.classList.add('dark-mode');
-      }
-    });
+  if (localStorage.getItem('darkMode') === 'enabled') {
+    document.body.classList.add('dark-mode');
+  }
+
   </script>
 </body>
 </html>
