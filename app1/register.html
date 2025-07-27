@@ -4,59 +4,75 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pré-inscription - NovaTrust</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     * {
       margin: 0; padding: 0; box-sizing: border-box;
     }
     html {
+      font-family: 'Segoe UI', sans-serif;
       background-color: #f4f5f9;
       color: #333;
       transition: background-color 0.3s, color 0.3s;
-      font-family: 'Segoe UI', sans-serif;
-      line-height: 1.6;
+      min-height: 100%;
     }
     html.dark-mode {
       background-color: #121212;
       color: #e0e0e0;
     }
-
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
     .navbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 1rem 5%;
-      background: #fff;
+      background: #ffffff;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       position: sticky;
       top: 0;
       z-index: 1000;
     }
-    .dark-mode .navbar {
+    html.dark-mode .navbar {
       background: #1e1e1e;
     }
-
-    .nav-logo {
-      height: 40px;
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
     }
-
+    .logo-container img {
+      height: 42px;
+      filter: brightness(0) invert(0.3);
+    }
+    .logo-container span {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #444;
+    }
+    html.dark-mode .logo-container img {
+      filter: brightness(0) invert(1);
+    }
+    html.dark-mode .logo-container span {
+      color: #eee;
+    }
     .nav-menu {
       display: flex;
       gap: 1.5rem;
     }
-
     .nav-item {
       position: relative;
     }
-
     .nav-item a {
       color: inherit;
       font-weight: 500;
       text-decoration: none;
       padding: 0.5rem;
     }
-
     .dropdown {
       display: none;
       position: absolute;
@@ -67,108 +83,143 @@
       border-radius: 6px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     }
+    html.dark-mode .dropdown {
+      background: #2a2a2a;
+    }
     .nav-item:hover .dropdown {
       display: block;
     }
-
     .dropdown a {
       display: block;
       padding: 0.5rem 1rem;
-      white-space: nowrap;
-      text-decoration: none;
       color: #333;
+      text-decoration: none;
     }
-
-    .dark-mode .dropdown {
-      background: #2a2a2a;
-    }
-
-    .dark-mode .dropdown a {
+    html.dark-mode .dropdown a {
       color: #e0e0e0;
     }
-
     .icon-btn {
       background: none;
       border: none;
       font-size: 1.2rem;
       cursor: pointer;
+      margin: 0 0.25rem;
       color: #666;
     }
-
-    .dark-mode .icon-btn {
+    html.dark-mode .icon-btn {
       color: #ccc;
     }
-
     .btn {
       padding: 0.6rem 1rem;
       border-radius: 8px;
       background: linear-gradient(135deg, #1c1c1c, #2d3e50);
       color: white;
-      font-weight: 600;
       border: none;
+      font-weight: 600;
       cursor: pointer;
       text-decoration: none;
       display: inline-block;
       transition: background 0.3s ease;
     }
-
     .btn:hover {
       background: #3a4756;
+      color: white;
     }
 
-    .form-section {
-      max-width: 700px;
-      margin: 3rem auto;
-      padding: 2rem;
+    .lang-dropdown {
+      position: relative;
+    }
+    .lang-options {
+      position: absolute;
+      top: 100%;
+      right: 0;
       background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+    html.dark-mode .lang-options {
+      background: #2a2a2a;
+    }
+    .lang-dropdown:hover .lang-options {
+      display: block;
+    }
+    .lang-options a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: #333;
+      text-decoration: none;
+    }
+    html.dark-mode .lang-options a {
+      color: #e0e0e0;
     }
 
-    .dark-mode .form-section {
+    .form-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 4rem 1rem;
+    }
+    .form-box {
+      max-width: 600px;
+      width: 100%;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    html.dark-mode .form-box {
       background: #1e1e1e;
     }
-
-    .form-section h1 {
+    .form-box h2 {
       text-align: center;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
-
-    form {
-      display: flex;
-      flex-direction: column;
+    .form-box form {
+      display: grid;
       gap: 1rem;
     }
-
     input, select {
-      padding: 0.75rem;
+      padding: 0.8rem;
       border-radius: 6px;
       border: 1px solid #ccc;
       font-size: 1rem;
+      width: 100%;
     }
-
-    .dark-mode input, .dark-mode select {
+    html.dark-mode input,
+    html.dark-mode select {
       background: #2b2b2b;
       border: 1px solid #555;
-      color: #fff;
+      color: white;
     }
-
-    .checkbox {
+    .phone-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .checkbox-group {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       font-size: 0.95rem;
     }
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+    }
+    .submit-btn {
+      width: 100%;
+      height: 50px;
+      font-size: 1rem;
+    }
 
     footer {
+      background: #121212;
+      color: #aaa;
       text-align: center;
       font-size: 0.9rem;
       padding: 2rem 5%;
-      background: #121212;
-      color: #aaa;
-      margin-top: 3rem;
     }
-    .dark-mode footer {
+    html.dark-mode footer {
       background: #000;
     }
   </style>
@@ -176,7 +227,10 @@
 <body>
   <!-- Header -->
   <header class="navbar">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Nova_company_logo.png" alt="NovaTrust" class="nav-logo">
+    <a class="logo-container" href="index7.html">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Nova_company_logo.png" alt="NovaTrust">
+      <span>NovaTrust</span>
+    </a>
     <nav class="nav-menu">
       <div class="nav-item">
         <a href="index7.html">Accueil</a>
@@ -193,6 +247,13 @@
         </div>
       </div>
       <div class="nav-item">
+        <a href="team.html">À propos</a>
+        <div class="dropdown">
+          <a href="team.html">Notre Équipe</a>
+          <a href="values.html">Valeurs</a>
+        </div>
+      </div>
+      <div class="nav-item">
         <a href="support.html">Contact</a>
         <div class="dropdown">
           <a href="support.html">Support</a>
@@ -204,64 +265,72 @@
       <button class="icon-btn" id="toggleDarkMode" title="Mode sombre"><i class="fas fa-moon"></i></button>
       <div class="lang-dropdown">
         <button class="icon-btn" title="Langue"><i class="fas fa-globe"></i></button>
-        <div class="dropdown">
+        <div class="lang-options">
           <a href="#">Français</a>
           <a href="#">English</a>
           <a href="#">العربية</a>
         </div>
       </div>
-      <a class="btn" href="login.html">Connexion</a>
     </div>
   </header>
 
-  <!-- Pre-Registration Form -->
-  <section class="form-section">
-    <h1>Pré-inscription</h1>
-    <form onsubmit="event.preventDefault(); window.location.href='register.html';">
-      <input type="text" placeholder="Prénom" required />
-      <input type="text" placeholder="Nom" required />
-      <input type="number" placeholder="Âge" min="18" required />
-      <select required>
-        <option value="">Type d’identification</option>
-        <option value="passport">Passeport</option>
-        <option value="id_card">Carte d'identité</option>
-      </select>
-      <input type="text" placeholder="Numéro d'identité" required />
-      <input type="date" placeholder="Date de validité" required />
-      <input type="email" placeholder="Adresse email" required />
-      
-      <div style="display: flex; gap: 1rem;">
-        <select style="flex: 1;" required>
-          <option value="+213">+213 (DZ)</option>
-          <option value="+33">+33 (FR)</option>
-          <option value="+212">+212 (MA)</option>
-          <option value="+1">+1 (US)</option>
-          <!-- add more if needed -->
+  <!-- Pre-registration Form -->
+  <div class="form-container">
+    <div class="form-box">
+      <h2>Pré-inscription</h2>
+      <form action="register.html" method="get">
+        <input type="text" placeholder="Prénom" required />
+        <input type="text" placeholder="Nom" required />
+        <label>Date de naissance</label>
+        <input type="date" required />
+
+        <label>Type de pièce d'identité</label>
+        <select required>
+          <option value="">-- Sélectionner --</option>
+          <option value="passport">Passeport</option>
+          <option value="id">Carte d’identité</option>
         </select>
-        <input style="flex: 2;" type="tel" placeholder="Numéro de téléphone" required />
-      </div>
+        <input type="text" placeholder="Numéro d'identité" required />
+        <label>Date d’émission</label>
+        <input type="date" required />
+        <label>Date d’expiration</label>
+        <input type="date" required />
 
-      <label class="checkbox">
-        <input type="checkbox" required />
-        J’accepte les conditions générales d’utilisation
-      </label>
+        <input type="email" placeholder="Adresse e-mail" required />
 
-      <button class="btn" type="submit">Continuer</button>
-    </form>
-  </section>
+        <div class="phone-group">
+          <select required>
+            <option value="+213">+213</option>
+            <option value="+33">+33</option>
+            <option value="+1">+1</option>
+            <option value="+44">+44</option>
+            <!-- Add more country codes if needed -->
+          </select>
+          <input type="tel" placeholder="Numéro de téléphone" required />
+        </div>
 
+        <div class="checkbox-group">
+          <input type="checkbox" id="terms" required />
+          <label for="terms">J'accepte les <a href="terms.html" target="_blank">conditions générales</a>.</label>
+        </div>
+
+        <button type="submit" class="btn submit-btn">Continuer</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
   <footer>
     <p>&copy; 2025 NovaTrust. Tous droits réservés.</p>
   </footer>
 
-  <!-- Dark mode logic -->
+  <!-- Dark Mode Script -->
   <script>
     const html = document.documentElement;
     document.getElementById('toggleDarkMode').addEventListener('click', () => {
       html.classList.toggle('dark-mode');
       localStorage.setItem('darkMode', html.classList.contains('dark-mode') ? 'enabled' : 'disabled');
     });
-
     if (localStorage.getItem('darkMode') === 'enabled') {
       html.classList.add('dark-mode');
     }
