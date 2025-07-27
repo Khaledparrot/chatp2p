@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Conditions Générales - NovaTrust</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f5f9;
+      color: #333;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    html.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: 2rem 5%;
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #888;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    .close-btn:hover {
+      color: #000;
+    }
+    html.dark-mode .close-btn:hover {
+      color: #fff;
+    }
+
+    .content {
+      max-width: 900px;
+      margin: 4rem auto 2rem;
+    }
+
+    .content h1 {
+      font-size: 2.2rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .content h2 {
+      margin-top: 2rem;
+      font-size: 1.4rem;
+      color: #2d3e50;
+    }
+    html.dark-mode .content h2 {
+      color: #90caf9;
+    }
+
+    .content p {
+      margin-top: 1rem;
+      line-height: 1.8;
+    }
+
+    .pdf-link {
+      display: inline-block;
+      margin-top: 2rem;
+      padding: 0.6rem 1rem;
+      background: linear-gradient(135deg, #1c1c1c, #2d3e50);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+
+    .pdf-link:hover {
+      background: #3a4756;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 4rem;
+      color: #888;
+    }
+    html.dark-mode footer {
+      color: #aaa;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- Close button -->
+  <button class="close-btn" onclick="window.location.href='index7.html'" title="Fermer">
+    <i class="fas fa-times"></i>
+  </button>
+
+  <!-- Page content -->
+  <div class="content">
+    <h1>Conditions Générales d’Utilisation</h1>
+
+    <p>Bienvenue sur NovaTrust. En accédant à notre site web et à nos services, vous acceptez nos conditions générales d’utilisation. Veuillez les lire attentivement.</p>
+
+    <h2>1. Acceptation des Conditions</h2>
+    <p>En utilisant ce site, vous reconnaissez avoir lu, compris et accepté l’ensemble des conditions générales décrites sur cette page.</p>
+
+    <h2>2. Services</h2>
+    <p>NovaTrust fournit une plateforme d’investissement. L’accès à certains services peut être soumis à une inscription préalable.</p>
+
+    <h2>3. Responsabilités</h2>
+    <p>L’utilisateur est responsable de l’exactitude des informations fournies. NovaTrust ne peut être tenu responsable des décisions d’investissement individuelles.</p>
+
+    <h2>4. Données Personnelles</h2>
+    <p>Nous respectons votre vie privée. Toutes les données collectées sont utilisées conformément à notre politique de confidentialité.</p>
+
+    <h2>5. Modifications</h2>
+    <p>NovaTrust se réserve le droit de modifier ces conditions à tout moment. Les utilisateurs seront informés des changements significatifs.</p>
+
+    <h2>6. Contact</h2>
+    <p>Pour toute question relative à nos conditions générales, veuillez nous contacter à <a href="mailto:support@novatrust.com">support@novatrust.com</a>.</p>
+
+    <!-- PDF download -->
+    <a class="pdf-link" href="novatrust-conditions.pdf" target="_blank" download>
+      Télécharger en PDF <i class="fas fa-file-pdf" style="margin-left: 6px;"></i>
+    </a>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 NovaTrust. Tous droits réservés.
+  </footer>
+
+  <!-- Dark mode -->
+  <script>
+    const html = document.documentElement;
+    if (localStorage.getItem("darkMode") === "enabled") {
+      html.classList.add("dark-mode");
+    }
+  </script>
+</body>
+</html>
