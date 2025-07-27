@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr" class="">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inscription - NovaTrust</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f5f9;
+      color: #333;
+      transition: background-color 0.3s, color 0.3s;
+      line-height: 1.6;
+      min-height: 100%;
+    }
+    html.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 5%;
+      background: #ffffff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    html.dark-mode .navbar {
+      background: #1e1e1e;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .logo-container img {
+      height: 42px;
+      filter: brightness(0) invert(0.3);
+    }
+    .logo-container span {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #444;
+    }
+    html.dark-mode .logo-container img {
+      filter: brightness(0) invert(1);
+    }
+    html.dark-mode .logo-container span {
+      color: #eee;
+    }
+
+    .nav-menu {
+      display: flex;
+      gap: 1.5rem;
+    }
+    .nav-item {
+      position: relative;
+    }
+    .nav-item a {
+      color: inherit;
+      font-weight: 500;
+      text-decoration: none;
+      padding: 0.5rem;
+    }
+    .dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #fff;
+      padding: 0.5rem 0;
+      border-radius: 6px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    html.dark-mode .dropdown {
+      background: #2a2a2a;
+    }
+    .nav-item:hover .dropdown {
+      display: block;
+    }
+    .dropdown a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: #333;
+      text-decoration: none;
+    }
+    html.dark-mode .dropdown a {
+      color: #e0e0e0;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      margin: 0 0.25rem;
+      color: #666;
+    }
+    html.dark-mode .icon-btn {
+      color: #ccc;
+    }
+
+    .btn {
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #1c1c1c, #2d3e50);
+      color: white;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.3s ease;
+    }
+    .btn:hover {
+      background: #3a4756;
+      color: white;
+    }
+
+    .lang-dropdown {
+      position: relative;
+    }
+    .lang-options {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+    html.dark-mode .lang-options {
+      background: #2a2a2a;
+    }
+    .lang-dropdown:hover .lang-options {
+      display: block;
+    }
+    .lang-options a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: #333;
+      text-decoration: none;
+    }
+    html.dark-mode .lang-options a {
+      color: #e0e0e0;
+    }
+
+    .register-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 4rem 1rem;
+    }
+    .register-box {
+      max-width: 450px;
+      width: 100%;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    html.dark-mode .register-box {
+      background: #1e1e1e;
+    }
+    .register-box h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .register-box input {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    html.dark-mode .register-box input {
+      background: #2b2b2b;
+      border: 1px solid #555;
+      color: #fff;
+    }
+    .register-box .btn {
+      width: 100%;
+      height: 50px;
+      font-size: 1rem;
+      margin-top: 1rem;
+    }
+    .login-link {
+      display: block;
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    footer {
+      background: #121212;
+      color: #aaa;
+      text-align: center;
+      font-size: 0.9rem;
+      padding: 2rem 5%;
+    }
+    html.dark-mode footer {
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="navbar">
+    <a class="logo-container" href="index7.html">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Nova_company_logo.png" alt="NovaTrust">
+      <span>NovaTrust</span>
+    </a>
+    <nav class="nav-menu">
+      <div class="nav-item">
+        <a href="index7.html">Accueil</a>
+        <div class="dropdown">
+          <a href="features.html">Fonctionnalités</a>
+          <a href="download.html">Télécharger</a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <a href="plans.html">Investir</a>
+        <div class="dropdown">
+          <a href="plans.html">Plans</a>
+          <a href="returns.html">Rendement</a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <a href="team.html">À propos</a>
+        <div class="dropdown">
+          <a href="team.html">Notre Équipe</a>
+          <a href="values.html">Valeurs</a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <a href="support.html">Contact</a>
+        <div class="dropdown">
+          <a href="support.html">Support</a>
+          <a href="faq.html">FAQ</a>
+        </div>
+      </div>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <button class="icon-btn" id="toggleDarkMode" title="Mode sombre"><i class="fas fa-moon"></i></button>
+      <div class="lang-dropdown">
+        <button class="icon-btn" title="Langue"><i class="fas fa-globe"></i></button>
+        <div class="lang-options">
+          <a href="#">Français</a>
+          <a href="#">English</a>
+          <a href="#">العربية</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Registration Section -->
+  <div class="register-container">
+    <div class="register-box">
+      <h2>Créer un compte</h2>
+      <form>
+        <input type="text" placeholder="Nom complet" required>
+        <input type="email" placeholder="Adresse e-mail" required>
+        <input type="password" placeholder="Mot de passe" required>
+        <input type="password" placeholder="Confirmer le mot de passe" required>
+        <button type="submit" class="btn">Inscription</button>
+      </form>
+      <a href="login.html" class="login-link">Déjà un compte ? <strong>Connexion</strong></a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 NovaTrust. Tous droits réservés.</p>
+  </footer>
+
+  <!-- Dark Mode Script -->
+  <script>
+    const html = document.documentElement;
+
+    // Toggle dark mode
+    document.getElementById('toggleDarkMode').addEventListener('click', () => {
+      html.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', html.classList.contains('dark-mode') ? 'enabled' : 'disabled');
+    });
+
+    // Apply saved mode immediately
+    if (localStorage.getItem('darkMode') === 'enabled') {
+      html.classList.add('dark-mode');
+    }
+  </script>
+</body>
+</html>
