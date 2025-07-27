@@ -223,26 +223,6 @@
       background: #000;
     }
 
-    .btn.submit-btn2 {
-  display: inline-block;
-  padding: 0.6rem 1.5rem;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #1c1c1c, #2d3e50);
-  color: white;
-  font-weight: 600;
-  text-align: center;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background 0.3s ease;
-}
-
-.btn.submit-btn2:hover {
-  background: #3a4756;
-  color: white;
-}
-
   </style>
 </head>
 <body>
@@ -335,7 +315,7 @@
           <label for="terms">J'accepte les <a href="terms.html" target="_blank">conditions générales</a>.</label>
         </div>
 
-        <button type="submit" class="btn submit-btn2"><a href="reg.html">Continuer</a></button>
+        <button type="submit" class="btn submit-btn2">Continuer</button>
       </form>
     </div>
   </div>
@@ -355,6 +335,12 @@
     if (localStorage.getItem('darkMode') === 'enabled') {
       html.classList.add('dark-mode');
     }
+
+      document.getElementById("preRegisterForm").addEventListener("submit", function(e) {
+    e.preventDefault(); // prevent default form behavior
+    // You can add form validation here if needed
+    window.location.href = "reg.html"; // redirect to registration page
+  });
   </script>
 </body>
 </html>
