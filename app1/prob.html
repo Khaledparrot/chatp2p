@@ -9,10 +9,26 @@
     .page { display: none; padding: 15px; }
     .active { display: block; }
     h1, h2 { text-align: center; }
-    #number-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin: 15px 0; }
-    .number { padding: 10px; background: #fff; border: 1px solid #ccc; text-align: center; cursor: pointer; }
+    #number-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin: 15px auto; max-width: 600px; }
+    .number {
+      padding: 10px;
+      background: white;
+      border: 1px solid #ccc;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 4px;
+    }
     .selected { background: #4caf50; color: white; }
-    button, select, input { width: 90%; max-width: 300px; display: block; margin: 10px auto; padding: 10px; font-size: 16px; border: none; border-radius: 5px; }
+    button, select, input {
+      width: 90%;
+      max-width: 300px;
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+    }
     button { background-color: #2196f3; color: white; }
     #counter, #result, #stats, #ev-result { text-align: center; margin-top: 10px; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
@@ -20,6 +36,7 @@
   </style>
 </head>
 <body>
+
   <!-- PAGE PRINCIPALE -->
   <div class="page active" id="main">
     <h1>Keno Tracker</h1>
@@ -34,7 +51,7 @@
       <option value="hot">🔥 Numéros fréquents</option>
       <option value="cold">❄️ Numéros peu tirés</option>
       <option value="balanced">⚖️ Mélange équilibré</option>
-      <option value="dormant">📉 Numéros dormants</option>
+      <option value="dormant">📉 Numéros absents récemment</option>
     </select>
 
     <div id="result"></div>
@@ -49,10 +66,10 @@
     <h1>Conseils Stratégiques</h1>
     <ul>
       <li>🎯 Jouez entre 3 et 6 numéros pour un bon équilibre risque/gain.</li>
-      <li>🔁 Conservez une stratégie stable pour repérer les tendances.</li>
-      <li>📊 Surveillez les fréquences : jouez chaud ou froid selon votre approche.</li>
-      <li>⏳ L’espérance de gain agit à long terme. Ne misez pas tout sur un tirage.</li>
-      <li>💶 Ne misez jamais plus que ce que vous êtes prêt à perdre.</li>
+      <li>🔁 Restez cohérent dans votre stratégie pour identifier des tendances.</li>
+      <li>📊 Alternez entre les numéros chauds et froids pour maximiser les chances.</li>
+      <li>💶 Ne misez jamais plus que ce que vous pouvez vous permettre de perdre.</li>
+      <li>⏳ Rappelez-vous : l'espérance de gain est une stratégie à long terme.</li>
     </ul>
     <button onclick="goToPage('main')">⬅️ Retour</button>
   </div>
@@ -159,7 +176,7 @@
 
     function calculateEV() {
       const k = parseInt(document.getElementById('k').value);
-      if (k < 1 || k > 6) return alert(\"Choisissez entre 1 et 6.\");
+      if (k < 1 || k > 6) return alert("Choisissez entre 1 et 6.");
       const C = (n, r) => [...Array(r)].reduce((acc, _, i) => acc * (n - i) / (i + 1), 1);
       const total = C(80, k);
       const win = C(20, k);
@@ -167,7 +184,7 @@
       const payout = [0, 3.8, 15, 68, 310, 1473, 7365][k] || 0;
       const ev = (prob * payout * 0.1).toFixed(5);
       document.getElementById('ev-result').innerHTML =
-        `<p>Probabilité : ${(prob * 100).toFixed(5)}%</p><p>EV pour 0.10€ : <strong>${ev} €</strong></p>`;
+        `<p>Probabilité de gain : ${(prob * 100).toFixed(5)}%</p><p>Espérance de gain pour 0.10€ : <strong>${ev} €</strong></p>`;
     }
 
     function goToPage(id) {
