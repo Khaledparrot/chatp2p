@@ -2,44 +2,51 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Keno Analyseur</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; color: #333; }
+    body { font-family: Arial, sans-serif; margin: 10px; background: #f5f5f5; color: #333; }
     h1, h2 { text-align: center; }
-    #number-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin-bottom: 20px; }
-    .number { padding: 10px; background: #fff; border: 1px solid #ccc; text-align: center; cursor: pointer; }
+    #number-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(30px, 1fr)); gap: 5px; margin-bottom: 10px; }
+    .number { padding: 10px; background: #fff; border: 1px solid #ccc; text-align: center; cursor: pointer; font-size: 14px; }
     .number.selected { background: #4caf50; color: white; }
-    button { padding: 10px 20px; margin-top: 10px; font-size: 16px; cursor: pointer; }
-    #result, #stats, #advice { margin-top: 30px; }
+    button { padding: 10px 20px; margin-top: 10px; font-size: 16px; cursor: pointer; display: block; margin-left: auto; margin-right: auto; }
+    #result, #stats, #advice, #counter { margin-top: 20px; text-align: center; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 1px solid #ccc; padding: 5px; text-align: center; }
+    th, td { border: 1px solid #ccc; padding: 5px; text-align: center; font-size: 12px; }
+    @media (max-width: 600px) {
+      .number { font-size: 12px; padding: 8px; }
+      button { font-size: 14px; padding: 8px 16px; }
+    }
   </style>
 </head>
 <body>
-  <h1>Keno Tracker et Prédicteur</h1>
+  <h1>Keno Tracker</h1>
   <h2>Sélectionnez les 20 numéros tirés</h2>
+  <div id="counter">Numéros sélectionnés : 0 / 20</div>
   <div id="number-grid"></div>
-  <div style="text-align:center">
-    <button onclick="submitRound()">Valider ce tirage</button>
-  </div>
-
+  <button onclick="submitRound()">Valider ce tirage</button>
   <div id="result"></div>
   <div id="stats"></div>
-  <div id="advice"></div>
 
   <script>
     const maxDrawn = 20;
-    const maxRounds = 10;
+    const analysisWindow = 10;
     let currentSelection = [];
     let rounds = JSON.parse(localStorage.getItem('kenoRounds') || '[]');
 
     const grid = document.getElementById('number-grid');
+    const counterDisplay = document.getElementById('counter');
     for (let i = 1; i <= 80; i++) {
       const cell = document.createElement('div');
       cell.className = 'number';
       cell.textContent = i;
       cell.onclick = () => toggleNumber(i, cell);
       grid.appendChild(cell);
+    }
+
+    function updateCounter() {
+      counterDisplay.textContent = `Numéros sélectionnés : ${currentSelection.length} / ${maxDrawn}`;
     }
 
     function toggleNumber(num, element) {
@@ -51,6 +58,7 @@
         currentSelection.push(num);
         element.classList.add('selected');
       }
+      updateCounter();
     }
 
     function submitRound() {
@@ -59,23 +67,24 @@
         return;
       }
       rounds.push([...currentSelection]);
-      if (rounds.length > maxRounds) rounds.shift();
+      if (rounds.length > analysisWindow) rounds.shift();
       localStorage.setItem('kenoRounds', JSON.stringify(rounds));
       currentSelection = [];
       document.querySelectorAll('.number').forEach(n => n.classList.remove('selected'));
+      updateCounter();
       showStats();
     }
 
     function showStats() {
-      if (rounds.length < maxRounds) {
-        document.getElementById('result').innerHTML = `<p>Il faut encore ${maxRounds - rounds.length} tirages pour l'analyse.</p>`;
+      if (rounds.length === 0) {
+        document.getElementById('result').innerHTML = `<p>Commencez à entrer des tirages pour l'analyse.</p>`;
         return;
       }
       let count = Array(81).fill(0);
       rounds.forEach(draw => draw.forEach(n => count[n]++));
       let resultHTML = '<h2>Statistiques des 10 derniers tirages</h2><table><tr><th>Numéro</th><th>Fréquence (%)</th></tr>';
       for (let i = 1; i <= 80; i++) {
-        const percent = ((count[i] / (maxDrawn * maxRounds)) * 100).toFixed(2);
+        const percent = ((count[i] / (Math.min(rounds.length, analysisWindow) * maxDrawn)) * 100).toFixed(2);
         resultHTML += `<tr><td>${i}</td><td>${percent}%</td></tr>`;
       }
       resultHTML += '</table>';
@@ -88,20 +97,11 @@
       for (let i = 1; i <= 80; i++) numCount.push({ num: i, freq: counts[i] });
       numCount.sort((a, b) => b.freq - a.freq);
       const suggestion = numCount.slice(0, 3).map(n => n.num).join(', ');
-      document.getElementById('result').innerHTML = `<h2>Suggestion</h2><p>Basé sur les tirages précédents, essayez : <strong>${suggestion}</strong></p>`;
-
-      // Advice block
-      document.getElementById('advice').innerHTML = `
-        <h2>Conseils</h2>
-        <ul>
-          <li>Privilégiez des paris avec 3 à 6 numéros pour un équilibre entre gain et probabilité.</li>
-          <li>Jouez de petites mises répétées au lieu de gros paris uniques.</li>
-          <li>Suivez les statistiques pour repérer les numéros fréquents.</li>
-          <li>Comprenez que même avec une bonne stratégie, le hasard joue un grand rôle.</li>
-        </ul>`;
+      document.getElementById('result').innerHTML = `<h2>Suggestion</h2><p>Basé sur les ${Math.min(rounds.length, analysisWindow)} derniers tirages, essayez : <strong>${suggestion}</strong></p>`;
     }
 
     // Load previous state
+    updateCounter();
     showStats();
   </script>
 </body>
