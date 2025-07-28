@@ -5,13 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Keno Analyseur</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 10px; background: #f5f5f5; color: #333; }
+    body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; color: #333; overflow-x: hidden; }
+    .page { display: none; padding: 10px; }
+    .active { display: block; }
     h1, h2 { text-align: center; }
     #number-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(30px, 1fr)); gap: 5px; margin-bottom: 10px; }
     .number { padding: 10px; background: #fff; border: 1px solid #ccc; text-align: center; cursor: pointer; font-size: 14px; }
     .number.selected { background: #4caf50; color: white; }
-    button { padding: 10px 20px; margin-top: 10px; font-size: 16px; cursor: pointer; display: block; margin-left: auto; margin-right: auto; }
-    #result, #stats, #advice, #counter { margin-top: 20px; text-align: center; }
+    button { padding: 10px 20px; margin: 10px auto; font-size: 16px; cursor: pointer; display: block; }
+    #result, #stats, #counter { margin-top: 20px; text-align: center; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     th, td { border: 1px solid #ccc; padding: 5px; text-align: center; font-size: 12px; }
     @media (max-width: 600px) {
@@ -21,13 +23,36 @@
   </style>
 </head>
 <body>
-  <h1>Keno Tracker</h1>
-  <h2>Sélectionnez les 20 numéros tirés</h2>
-  <div id="counter">Numéros sélectionnés : 0 / 20</div>
-  <div id="number-grid"></div>
-  <button onclick="submitRound()">Valider ce tirage</button>
-  <div id="result"></div>
-  <div id="stats"></div>
+  <div class="page active" id="main">
+    <h1>Keno Tracker</h1>
+    <h2>Sélectionnez les 20 numéros tirés</h2>
+    <div id="counter">Numéros sélectionnés : 0 / 20</div>
+    <div id="number-grid"></div>
+    <button onclick="submitRound()">Valider ce tirage</button>
+    <button onclick="clearAll()">Réinitialiser tout</button>
+    <div id="result"></div>
+    <div id="stats"></div>
+  </div>
+
+  <div class="page" id="advice">
+    <h1>Conseils Stratégiques</h1>
+    <ul>
+      <li>🎯 Jouez entre 3 et 6 numéros pour un bon équilibre entre fréquence et gain.</li>
+      <li>💡 Faites des petites mises répétées pour lisser le risque.</li>
+      <li>📈 Analysez les fréquences pour repérer les tendances sur les 10 derniers tirages.</li>
+      <li>⏳ Comprenez que l'espérance de gain s'applique à long terme, pas sur un seul tirage.</li>
+      <li>🔁 Ne changez pas vos numéros trop souvent : la régularité peut révéler des motifs.</li>
+    </ul>
+  </div>
+
+  <div class="page" id="calculator">
+    <h1>Calculateur de Chances & EV</h1>
+    <p>Sélectionnez le nombre de numéros joués (k) et obtenez la probabilité de gain si tous sont tirés, ainsi que l'espérance de gain (EV).</p>
+    <label for="k">Nombre de numéros joués (k) :</label>
+    <input type="number" id="k" min="1" max="10" value="3">
+    <button onclick="calculateEV()">Calculer</button>
+    <div id="ev-result"></div>
+  </div>
 
   <script>
     const maxDrawn = 20;
@@ -75,6 +100,17 @@
       showStats();
     }
 
+    function clearAll() {
+      localStorage.removeItem('kenoRounds');
+      rounds = [];
+      currentSelection = [];
+      document.querySelectorAll('.number').forEach(n => n.classList.remove('selected'));
+      updateCounter();
+      document.getElementById('stats').innerHTML = '';
+      document.getElementById('result').innerHTML = '';
+      alert('Historique réinitialisé.');
+    }
+
     function showStats() {
       if (rounds.length === 0) {
         document.getElementById('result').innerHTML = `<p>Commencez à entrer des tirages pour l'analyse.</p>`;
@@ -100,7 +136,44 @@
       document.getElementById('result').innerHTML = `<h2>Suggestion</h2><p>Basé sur les ${Math.min(rounds.length, analysisWindow)} derniers tirages, essayez : <strong>${suggestion}</strong></p>`;
     }
 
-    // Load previous state
+    function calculateEV() {
+      const k = parseInt(document.getElementById('k').value);
+      if (k < 1 || k > 10) return alert('Entrez un nombre entre 1 et 10');
+      const C = (n, r) => {
+        let num = 1, denom = 1;
+        for (let i = 0; i < r; i++) {
+          num *= (n - i);
+          denom *= (i + 1);
+        }
+        return num / denom;
+      }
+      const totalComb = C(80, k);
+      const winComb = C(20, k);
+      const prob = winComb / totalComb;
+      const payout = [0, 3.8, 15, 68, 310, 1473, 7365][k] || 0;
+      const ev = (prob * payout * 0.1).toFixed(4);
+      document.getElementById('ev-result').innerHTML = `
+        <p>Probabilité de gain (tous les ${k} tirés) : <strong>${(prob * 100).toFixed(5)}%</strong></p>
+        <p>Espérance de gain pour une mise de 0.10€ : <strong>${ev}€</strong></p>`;
+    }
+
+    function switchPage(direction) {
+      const pages = ['main', 'advice', 'calculator'];
+      let current = pages.findIndex(id => document.getElementById(id).classList.contains('active'));
+      document.getElementById(pages[current]).classList.remove('active');
+      current = (current + direction + pages.length) % pages.length;
+      document.getElementById(pages[current]).classList.add('active');
+    }
+
+    let touchStartX = 0;
+    document.body.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+    document.body.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 50) {
+        switchPage(dx > 0 ? -1 : 1);
+      }
+    });
+
     updateCounter();
     showStats();
   </script>
