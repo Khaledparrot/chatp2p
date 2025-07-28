@@ -258,31 +258,40 @@
 
 
     function suggest(freq) {
-      const strategy = document.getElementById('strategy').value;
-      const recent = rounds.at(-1) || [];
-      const total = rounds.length * maxDrawn;
-      const scored = [];
+  const strategy = document.getElementById('strategy')?.value || 'hot';
+  const recent = rounds.at(-1) || [];
+  const total = rounds.length * maxDrawn;
+  const scored = [];
 
-      for (let i = 1; i <= 80; i++) {
-        const age = rounds.slice().reverse().findIndex(r => r.includes(i)) + 1 || rounds.length + 1;
-        let score = 0;
-        const percent = freq[i] / total;
+  for (let i = 1; i <= 80; i++) {
+    const lastSeenIndex = rounds.slice().reverse().findIndex(r => r.includes(i));
+    const age = lastSeenIndex === -1 ? rounds.length + 1 : lastSeenIndex + 1;
+    const percent = total > 0 ? freq[i] / total : 0;
+    let score = 0;
 
-        if (strategy === 'hot') score = percent;
-        else if (strategy === 'cold') score = 1 - percent;
-        else if (strategy === 'balanced') score = percent * (age / rounds.length);
-        else if (strategy === 'dormant') score = age;
+    if (strategy === 'hot') score = percent;
+    else if (strategy === 'cold') score = 1 - percent;
+    else if (strategy === 'balanced') score = percent * (age / rounds.length);
+    else if (strategy === 'dormant') score = age;
 
-        if (recent.includes(i)) score *= 0.5;
+    if (recent.includes(i)) score *= 0.5;
 
-        scored.push({ num: i, score });
-      }
+    scored.push({ num: i, score });
+  }
 
-      scored.sort((a, b) => b.score - a.score);
-      const suggestion = scored.slice(0, 3).map(x => x.num).join(', ');
-      document.getElementById('result').innerHTML =
-        `<h2>Suggestion</h2><p>Essayez : <strong>${suggestion}</strong> (stratégie: ${strategy})</p>`;
-    }
+  scored.sort((a, b) => b.score - a.score);
+  const suggestion = scored.slice(0, 3).map(x => x.num).join(', ');
+  const label = {
+    hot: "🔥 Numéros fréquents",
+    cold: "❄️ Numéros peu tirés",
+    balanced: "⚖️ Mélange équilibré",
+    dormant: "📉 Numéros absents récemment"
+  }[strategy];
+
+  document.getElementById('result').innerHTML =
+    `<h2>Suggestion</h2><p>Stratégie : <strong>${label}</strong><br>Essayez : <strong>${suggestion}</strong></p>`;
+}
+
 
     function calculateEV() {
       const k = parseInt(document.getElementById('k').value);
