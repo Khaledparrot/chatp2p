@@ -229,19 +229,33 @@
       document.getElementById('stats').innerHTML = '';
     }
 
-    function showStats() {
-      if (rounds.length === 0) return;
-      const freq = Array(81).fill(0);
-      rounds.forEach(draw => draw.forEach(n => freq[n]++));
-      let html = '<h2>Statistiques</h2><table><tr><th>Numéro</th><th>%</th></tr>';
-      for (let i = 1; i <= 80; i++) {
-        let p = ((freq[i] / (rounds.length * maxDrawn)) * 100).toFixed(1);
-        html += `<tr><td>${i}</td><td>${p}%</td></tr>`;
-      }
-      html += '</table>';
-      document.getElementById('stats').innerHTML = html;
-      suggest(freq);
-    }
+  function showStats() {
+  if (rounds.length === 0) {
+    document.getElementById('stats').innerHTML = '';
+    document.getElementById('result').innerHTML = '';
+    return;
+  }
+
+  const freq = Array(81).fill(0);
+  rounds.forEach(draw => draw.forEach(n => freq[n]++));
+
+  let html = '<h2>Statistiques</h2><table><tr><th>Numéro</th><th>%</th></tr>';
+  for (let i = 1; i <= 80; i++) {
+    let p = ((freq[i] / (rounds.length * maxDrawn)) * 100).toFixed(1);
+    html += `<tr><td>${i}</td><td>${p}%</td></tr>`;
+  }
+  html += '</table>';
+  document.getElementById('stats').innerHTML = html;
+
+  // ❗️ Seulement suggérer si au moins 3 tirages (ou change à 10 si tu veux)
+  if (rounds.length >= 3) {
+    suggest(freq);
+  } else {
+    document.getElementById('result').innerHTML =
+      `<p style="color: gray;">Ajoutez au moins 3 tirages pour voir une suggestion intelligente.</p>`;
+  }
+}
+
 
     function suggest(freq) {
       const strategy = document.getElementById('strategy').value;
