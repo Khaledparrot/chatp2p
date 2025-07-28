@@ -73,7 +73,7 @@
     let currentSelection = [];
     let rounds = JSON.parse(localStorage.getItem('kenoRounds') || '[]');
 
-    // Créer les 80 cases
+    // Génère les 80 numéros
     const grid = document.getElementById('number-grid');
     for (let i = 1; i <= 80; i++) {
       const el = document.createElement('div');
