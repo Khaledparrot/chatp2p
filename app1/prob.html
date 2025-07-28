@@ -229,6 +229,14 @@
       document.getElementById('stats').innerHTML = '';
     }
 
+    document.getElementById('strategy').addEventListener('change', () => {
+  if (rounds.length >= 3) {
+    const freq = Array(81).fill(0);
+    rounds.forEach(draw => draw.forEach(n => freq[n]++));
+    suggest(freq);
+  }
+});
+
   function showStats() {
   if (rounds.length === 0) {
     document.getElementById('stats').innerHTML = '';
