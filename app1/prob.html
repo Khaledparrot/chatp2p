@@ -1,5 +1,3 @@
-// full HTML with improved smart number suggestion logic and strategy selector
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -48,10 +46,101 @@
     <button class="nav-btn" onclick="goToPage('calculator')">🧮 Accéder au calculateur</button>
   </div>
 
-  <!-- Other pages unchanged -->
+  <div class="page" id="advice">
+    <h1>Conseils Stratégiques</h1>
+    <ul>
+      <li>🎯 Jouez entre 3 et 6 numéros pour un bon équilibre entre fréquence et gain.</li>
+      <li>💡 Faites des petites mises répétées pour lisser le risque.</li>
+      <li>📈 Analysez les fréquences pour repérer les tendances sur les 10 derniers tirages.</li>
+      <li>⏳ Comprenez que l'espérance de gain s'applique à long terme, pas sur un seul tirage.</li>
+      <li>🔁 Ne changez pas vos numéros trop souvent : la régularité peut révéler des motifs.</li>
+    </ul>
+    <button class="nav-btn" onclick="goToPage('main')">⬅️ Retour</button>
+  </div>
+
+  <div class="page" id="calculator">
+    <h1>Calculateur de Chances & EV</h1>
+    <p>Entrez le nombre de numéros joués pour calculer vos chances si tous sont tirés, ainsi que l'espérance de gain (EV).</p>
+    <label for="k">Nombre de numéros joués (k) :</label>
+    <input type="number" id="k" min="1" max="10" value="3">
+    <button onclick="calculateEV()">Calculer</button>
+    <div id="ev-result"></div>
+    <button class="nav-btn" onclick="goToPage('main')">⬅️ Retour</button>
+  </div>
 
   <script>
-    // variables and number grid setup remain unchanged...
+    const maxDrawn = 20;
+    const analysisWindow = 10;
+    let currentSelection = [];
+    let rounds = JSON.parse(localStorage.getItem('kenoRounds') || '[]');
+
+    const grid = document.getElementById('number-grid');
+    const counterDisplay = document.getElementById('counter');
+    for (let i = 1; i <= 80; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'number';
+      cell.textContent = i;
+      cell.onclick = () => toggleNumber(i, cell);
+      grid.appendChild(cell);
+    }
+
+    function updateCounter() {
+      counterDisplay.textContent = `Numéros sélectionnés : ${currentSelection.length} / ${maxDrawn}`;
+    }
+
+    function toggleNumber(num, element) {
+      const idx = currentSelection.indexOf(num);
+      if (idx > -1) {
+        currentSelection.splice(idx, 1);
+        element.classList.remove('selected');
+      } else if (currentSelection.length < maxDrawn) {
+        currentSelection.push(num);
+        element.classList.add('selected');
+      }
+      updateCounter();
+    }
+
+    function submitRound() {
+      if (currentSelection.length !== maxDrawn) {
+        alert('Veuillez sélectionner exactement 20 numéros.');
+        return;
+      }
+      rounds.push([...currentSelection]);
+      if (rounds.length > analysisWindow) rounds.shift();
+      localStorage.setItem('kenoRounds', JSON.stringify(rounds));
+      currentSelection = [];
+      document.querySelectorAll('.number').forEach(n => n.classList.remove('selected'));
+      updateCounter();
+      showStats();
+    }
+
+    function clearAll() {
+      localStorage.removeItem('kenoRounds');
+      rounds = [];
+      currentSelection = [];
+      document.querySelectorAll('.number').forEach(n => n.classList.remove('selected'));
+      updateCounter();
+      document.getElementById('stats').innerHTML = '';
+      document.getElementById('result').innerHTML = '';
+      alert('Historique réinitialisé.');
+    }
+
+    function showStats() {
+      if (rounds.length === 0) {
+        document.getElementById('result').innerHTML = `<p>Commencez à entrer des tirages pour l'analyse.</p>`;
+        return;
+      }
+      let count = Array(81).fill(0);
+      rounds.forEach(draw => draw.forEach(n => count[n]++));
+      let resultHTML = '<h2>Statistiques des 10 derniers tirages</h2><table><tr><th>Numéro</th><th>Fréquence (%)</th></tr>';
+      for (let i = 1; i <= 80; i++) {
+        const percent = ((count[i] / (Math.min(rounds.length, analysisWindow) * maxDrawn)) * 100).toFixed(2);
+        resultHTML += `<tr><td>${i}</td><td>${percent}%</td></tr>`;
+      }
+      resultHTML += '</table>';
+      document.getElementById('stats').innerHTML = resultHTML;
+      suggestNumbers(count);
+    }
 
     function suggestNumbers(counts) {
       const strategy = document.getElementById('strategy').value;
@@ -72,7 +161,6 @@
         else if (strategy === "balanced") score = percent * (age / historyLength);
         else if (strategy === "dormant") score = age;
 
-        // Deprioritize if it appeared in last draw
         if (recent.includes(i)) score *= 0.5;
 
         numCount.push({ num: i, score });
@@ -82,6 +170,17 @@
       const label = document.querySelector(`#strategy option[value="${strategy}"]`).textContent;
       document.getElementById('result').innerHTML = `<h2>Suggestion</h2><p>Stratégie : <strong>${label}</strong><br>Essayez : <strong>${suggestion}</strong></p>`;
     }
-  </script>
-</body>
-</html>
+
+    function calculateEV() {
+      const k = parseInt(document.getElementById('k').value);
+      if (k < 1 || k > 10) return alert('Entrez un nombre entre 1 et 10');
+      const C = (n, r) => {
+        let num = 1, denom = 1;
+        for (let i = 0; i < r; i++) {
+          num *= (n - i);
+          denom *= (i + 1);
+        }
+        return num / denom;
+      }
+      const totalComb = C(80, k);
+      const winComb = C(20, k);
