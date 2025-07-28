@@ -1,29 +1,26 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Keno Analyseur</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; color: #333; overflow-x: hidden; }
-    .page { display: none; padding: 10px; }
+    body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; color: #333; }
+    .page { display: none; padding: 15px; }
     .active { display: block; }
     h1, h2 { text-align: center; }
-    #number-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(30px, 1fr)); gap: 5px; margin-bottom: 10px; }
-    .number { padding: 10px; background: #fff; border: 1px solid #ccc; text-align: center; cursor: pointer; font-size: 14px; }
-    .number.selected { background: #4caf50; color: white; }
-    button, .nav-btn, select { padding: 10px 20px; margin: 10px auto; font-size: 16px; cursor: pointer; display: block; text-align: center; background: #2196f3; color: white; border: none; border-radius: 5px; }
-    .nav-btn, select { width: 90%; max-width: 300px; background: #2196f3; color: white; }
-    #result, #stats, #counter { margin-top: 20px; text-align: center; }
+    #number-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin: 15px 0; }
+    .number { padding: 10px; background: #fff; border: 1px solid #ccc; text-align: center; cursor: pointer; }
+    .selected { background: #4caf50; color: white; }
+    button, select, input { width: 90%; max-width: 300px; display: block; margin: 10px auto; padding: 10px; font-size: 16px; border: none; border-radius: 5px; }
+    button { background-color: #2196f3; color: white; }
+    #counter, #result, #stats, #ev-result { text-align: center; margin-top: 10px; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 1px solid #ccc; padding: 5px; text-align: center; font-size: 12px; }
-    @media (max-width: 600px) {
-      .number { font-size: 12px; padding: 8px; }
-      button, select { font-size: 14px; padding: 8px 16px; }
-    }
+    th, td { border: 1px solid #ccc; padding: 4px; text-align: center; font-size: 12px; }
   </style>
 </head>
 <body>
+  <!-- PAGE PRINCIPALE -->
   <div class="page active" id="main">
     <h1>Keno Tracker</h1>
     <h2>Sélectionnez les 20 numéros tirés</h2>
@@ -37,35 +34,37 @@
       <option value="hot">🔥 Numéros fréquents</option>
       <option value="cold">❄️ Numéros peu tirés</option>
       <option value="balanced">⚖️ Mélange équilibré</option>
-      <option value="dormant">📉 Numéros absents récemment</option>
+      <option value="dormant">📉 Numéros dormants</option>
     </select>
 
     <div id="result"></div>
     <div id="stats"></div>
-    <button class="nav-btn" onclick="goToPage('advice')">📘 Voir les conseils</button>
-    <button class="nav-btn" onclick="goToPage('calculator')">🧮 Accéder au calculateur</button>
+
+    <button onclick="goToPage('advice')">📘 Conseils</button>
+    <button onclick="goToPage('calculator')">🧮 Calculateur</button>
   </div>
 
+  <!-- PAGE CONSEILS -->
   <div class="page" id="advice">
     <h1>Conseils Stratégiques</h1>
     <ul>
-      <li>🎯 Jouez entre 3 et 6 numéros pour un bon équilibre entre fréquence et gain.</li>
-      <li>💡 Faites des petites mises répétées pour lisser le risque.</li>
-      <li>📈 Analysez les fréquences pour repérer les tendances sur les 10 derniers tirages.</li>
-      <li>⏳ Comprenez que l'espérance de gain s'applique à long terme, pas sur un seul tirage.</li>
-      <li>🔁 Ne changez pas vos numéros trop souvent : la régularité peut révéler des motifs.</li>
+      <li>🎯 Jouez entre 3 et 6 numéros pour un bon équilibre risque/gain.</li>
+      <li>🔁 Conservez une stratégie stable pour repérer les tendances.</li>
+      <li>📊 Surveillez les fréquences : jouez chaud ou froid selon votre approche.</li>
+      <li>⏳ L’espérance de gain agit à long terme. Ne misez pas tout sur un tirage.</li>
+      <li>💶 Ne misez jamais plus que ce que vous êtes prêt à perdre.</li>
     </ul>
-    <button class="nav-btn" onclick="goToPage('main')">⬅️ Retour</button>
+    <button onclick="goToPage('main')">⬅️ Retour</button>
   </div>
 
+  <!-- PAGE CALCULATEUR -->
   <div class="page" id="calculator">
-    <h1>Calculateur de Chances & EV</h1>
-    <p>Entrez le nombre de numéros joués pour calculer vos chances si tous sont tirés, ainsi que l'espérance de gain (EV).</p>
-    <label for="k">Nombre de numéros joués (k) :</label>
-    <input type="number" id="k" min="1" max="10" value="3">
+    <h1>Calculateur EV & Probabilité</h1>
+    <label for="k">Combien de numéros joués ?</label>
+    <input type="number" id="k" min="1" max="6" value="3">
     <button onclick="calculateEV()">Calculer</button>
     <div id="ev-result"></div>
-    <button class="nav-btn" onclick="goToPage('main')">⬅️ Retour</button>
+    <button onclick="goToPage('main')">⬅️ Retour</button>
   </div>
 
   <script>
@@ -74,43 +73,36 @@
     let currentSelection = [];
     let rounds = JSON.parse(localStorage.getItem('kenoRounds') || '[]');
 
+    // Créer les 80 cases
     const grid = document.getElementById('number-grid');
-    const counterDisplay = document.getElementById('counter');
     for (let i = 1; i <= 80; i++) {
-      const cell = document.createElement('div');
-      cell.className = 'number';
-      cell.textContent = i;
-      cell.onclick = () => toggleNumber(i, cell);
-      grid.appendChild(cell);
+      const el = document.createElement('div');
+      el.className = 'number';
+      el.textContent = i;
+      el.onclick = () => toggleNumber(i, el);
+      grid.appendChild(el);
     }
 
-    function updateCounter() {
-      counterDisplay.textContent = `Numéros sélectionnés : ${currentSelection.length} / ${maxDrawn}`;
-    }
-
-    function toggleNumber(num, element) {
+    function toggleNumber(num, el) {
       const idx = currentSelection.indexOf(num);
       if (idx > -1) {
         currentSelection.splice(idx, 1);
-        element.classList.remove('selected');
+        el.classList.remove('selected');
       } else if (currentSelection.length < maxDrawn) {
         currentSelection.push(num);
-        element.classList.add('selected');
+        el.classList.add('selected');
       }
-      updateCounter();
+      document.getElementById('counter').textContent = `Numéros sélectionnés : ${currentSelection.length} / 20`;
     }
 
     function submitRound() {
-      if (currentSelection.length !== maxDrawn) {
-        alert('Veuillez sélectionner exactement 20 numéros.');
-        return;
-      }
+      if (currentSelection.length !== 20) return alert('Veuillez sélectionner exactement 20 numéros.');
       rounds.push([...currentSelection]);
       if (rounds.length > analysisWindow) rounds.shift();
       localStorage.setItem('kenoRounds', JSON.stringify(rounds));
       currentSelection = [];
       document.querySelectorAll('.number').forEach(n => n.classList.remove('selected'));
-      updateCounter();
+      document.getElementById('counter').textContent = 'Numéros sélectionnés : 0 / 20';
       showStats();
     }
 
@@ -119,68 +111,71 @@
       rounds = [];
       currentSelection = [];
       document.querySelectorAll('.number').forEach(n => n.classList.remove('selected'));
-      updateCounter();
-      document.getElementById('stats').innerHTML = '';
+      document.getElementById('counter').textContent = 'Numéros sélectionnés : 0 / 20';
       document.getElementById('result').innerHTML = '';
-      alert('Historique réinitialisé.');
+      document.getElementById('stats').innerHTML = '';
     }
 
     function showStats() {
-      if (rounds.length === 0) {
-        document.getElementById('result').innerHTML = `<p>Commencez à entrer des tirages pour l'analyse.</p>`;
-        return;
-      }
-      let count = Array(81).fill(0);
-      rounds.forEach(draw => draw.forEach(n => count[n]++));
-      let resultHTML = '<h2>Statistiques des 10 derniers tirages</h2><table><tr><th>Numéro</th><th>Fréquence (%)</th></tr>';
+      if (rounds.length === 0) return;
+      const freq = Array(81).fill(0);
+      rounds.forEach(draw => draw.forEach(n => freq[n]++));
+      let html = '<h2>Statistiques</h2><table><tr><th>Numéro</th><th>%</th></tr>';
       for (let i = 1; i <= 80; i++) {
-        const percent = ((count[i] / (Math.min(rounds.length, analysisWindow) * maxDrawn)) * 100).toFixed(2);
-        resultHTML += `<tr><td>${i}</td><td>${percent}%</td></tr>`;
+        let p = ((freq[i] / (rounds.length * maxDrawn)) * 100).toFixed(1);
+        html += `<tr><td>${i}</td><td>${p}%</td></tr>`;
       }
-      resultHTML += '</table>';
-      document.getElementById('stats').innerHTML = resultHTML;
-      suggestNumbers(count);
+      html += '</table>';
+      document.getElementById('stats').innerHTML = html;
+      suggest(freq);
     }
 
-    function suggestNumbers(counts) {
+    function suggest(freq) {
       const strategy = document.getElementById('strategy').value;
       const recent = rounds.at(-1) || [];
+      const total = rounds.length * maxDrawn;
+      const scored = [];
 
-      const historyLength = Math.min(rounds.length, analysisWindow);
-      const totalDraws = historyLength * maxDrawn;
-      const numCount = [];
       for (let i = 1; i <= 80; i++) {
-        const lastSeen = rounds.slice().reverse().findIndex(draw => draw.includes(i));
-        const age = lastSeen === -1 ? historyLength + 1 : lastSeen + 1;
-        const freq = counts[i];
-        const percent = freq / totalDraws;
+        const age = rounds.slice().reverse().findIndex(r => r.includes(i)) + 1 || rounds.length + 1;
         let score = 0;
+        const percent = freq[i] / total;
 
-        if (strategy === "hot") score = percent;
-        else if (strategy === "cold") score = 1 - percent;
-        else if (strategy === "balanced") score = percent * (age / historyLength);
-        else if (strategy === "dormant") score = age;
+        if (strategy === 'hot') score = percent;
+        else if (strategy === 'cold') score = 1 - percent;
+        else if (strategy === 'balanced') score = percent * (age / rounds.length);
+        else if (strategy === 'dormant') score = age;
 
         if (recent.includes(i)) score *= 0.5;
 
-        numCount.push({ num: i, score });
+        scored.push({ num: i, score });
       }
-      numCount.sort((a, b) => b.score - a.score);
-      const suggestion = numCount.slice(0, 3).map(n => n.num).join(', ');
-      const label = document.querySelector(`#strategy option[value="${strategy}"]`).textContent;
-      document.getElementById('result').innerHTML = `<h2>Suggestion</h2><p>Stratégie : <strong>${label}</strong><br>Essayez : <strong>${suggestion}</strong></p>`;
+
+      scored.sort((a, b) => b.score - a.score);
+      const suggestion = scored.slice(0, 3).map(x => x.num).join(', ');
+      document.getElementById('result').innerHTML =
+        `<h2>Suggestion</h2><p>Essayez : <strong>${suggestion}</strong> (stratégie: ${strategy})</p>`;
     }
 
     function calculateEV() {
       const k = parseInt(document.getElementById('k').value);
-      if (k < 1 || k > 10) return alert('Entrez un nombre entre 1 et 10');
-      const C = (n, r) => {
-        let num = 1, denom = 1;
-        for (let i = 0; i < r; i++) {
-          num *= (n - i);
-          denom *= (i + 1);
-        }
-        return num / denom;
-      }
-      const totalComb = C(80, k);
-      const winComb = C(20, k);
+      if (k < 1 || k > 6) return alert(\"Choisissez entre 1 et 6.\");
+      const C = (n, r) => [...Array(r)].reduce((acc, _, i) => acc * (n - i) / (i + 1), 1);
+      const total = C(80, k);
+      const win = C(20, k);
+      const prob = win / total;
+      const payout = [0, 3.8, 15, 68, 310, 1473, 7365][k] || 0;
+      const ev = (prob * payout * 0.1).toFixed(5);
+      document.getElementById('ev-result').innerHTML =
+        `<p>Probabilité : ${(prob * 100).toFixed(5)}%</p><p>EV pour 0.10€ : <strong>${ev} €</strong></p>`;
+    }
+
+    function goToPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    showStats();
+  </script>
+</body>
+</html>
