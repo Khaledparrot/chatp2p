@@ -12,7 +12,8 @@
     #number-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(30px, 1fr)); gap: 5px; margin-bottom: 10px; }
     .number { padding: 10px; background: #fff; border: 1px solid #ccc; text-align: center; cursor: pointer; font-size: 14px; }
     .number.selected { background: #4caf50; color: white; }
-    button { padding: 10px 20px; margin: 10px auto; font-size: 16px; cursor: pointer; display: block; }
+    button, .nav-btn { padding: 10px 20px; margin: 10px auto; font-size: 16px; cursor: pointer; display: block; text-align: center; background: #2196f3; color: white; border: none; border-radius: 5px; }
+    .nav-btn { width: 90%; max-width: 300px; }
     #result, #stats, #counter { margin-top: 20px; text-align: center; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     th, td { border: 1px solid #ccc; padding: 5px; text-align: center; font-size: 12px; }
@@ -32,6 +33,8 @@
     <button onclick="clearAll()">Réinitialiser tout</button>
     <div id="result"></div>
     <div id="stats"></div>
+    <button class="nav-btn" onclick="goToPage('advice')">📘 Voir les conseils</button>
+    <button class="nav-btn" onclick="goToPage('calculator')">🧮 Accéder au calculateur</button>
   </div>
 
   <div class="page" id="advice">
@@ -43,6 +46,7 @@
       <li>⏳ Comprenez que l'espérance de gain s'applique à long terme, pas sur un seul tirage.</li>
       <li>🔁 Ne changez pas vos numéros trop souvent : la régularité peut révéler des motifs.</li>
     </ul>
+    <button class="nav-btn" onclick="goToPage('main')">⬅️ Retour</button>
   </div>
 
   <div class="page" id="calculator">
@@ -52,6 +56,7 @@
     <input type="number" id="k" min="1" max="10" value="3">
     <button onclick="calculateEV()">Calculer</button>
     <div id="ev-result"></div>
+    <button class="nav-btn" onclick="goToPage('main')">⬅️ Retour</button>
   </div>
 
   <script>
@@ -155,6 +160,11 @@
       document.getElementById('ev-result').innerHTML = `
         <p>Probabilité de gain (tous les ${k} tirés) : <strong>${(prob * 100).toFixed(5)}%</strong></p>
         <p>Espérance de gain pour une mise de 0.10€ : <strong>${ev}€</strong></p>`;
+    }
+
+    function goToPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
     }
 
     function switchPage(direction) {
