@@ -183,185 +183,163 @@
   </div>
 
   <script>
-    const maxDrawn = 20;
-    const analysisWindow = 10;
-    let currentSelection = [];
-    let rounds = JSON.parse(localStorage.getItem('kenoRounds') || '[]');
+  const maxDrawn = 20;
+  const analysisWindow = 10;
+  let currentSelection = [];
+  let rounds = JSON.parse(localStorage.getItem('kenoRounds') || '[]');
 
-    // Génère les 80 numéros
-    const grid = document.getElementById('number-grid');
-    for (let i = 1; i <= 80; i++) {
-      const el = document.createElement('div');
-      el.className = 'number';
-      el.textContent = i;
-      el.onclick = () => toggleNumber(i, el);
-      grid.appendChild(el);
-    }
-
-    function toggleNumber(num, el) {
-      const idx = currentSelection.indexOf(num);
-      if (idx > -1) {
-        currentSelection.splice(idx, 1);
-        el.classList.remove('selected');
-      } else if (currentSelection.length < maxDrawn) {
-        currentSelection.push(num);
-        el.classList.add('selected');
-      }
-      document.getElementById('counter').textContent = `Numéros sélectionnés : ${currentSelection.length} / 20`;
-    }
-
-    function submitRound() {
-      if (currentSelection.length !== 20) return alert('Veuillez sélectionner exactement 20 numéros.');
-      rounds.push([...currentSelection]);
-      if (rounds.length > analysisWindow) rounds.shift();
-      localStorage.setItem('kenoRounds', JSON.stringify(rounds));
-      currentSelection = [];
-      document.querySelectorAll('.number').forEach(n => n.classList.remove('selected'));
-      document.getElementById('counter').textContent = 'Numéros sélectionnés : 0 / 20';
-      showStats();
-    }
-
-    function clearAll() {
-      localStorage.removeItem('kenoRounds');
-      rounds = [];
-      currentSelection = [];
-      document.querySelectorAll('.number').forEach(n => n.classList.remove('selected'));
-      document.getElementById('counter').textContent = 'Numéros sélectionnés : 0 / 20';
-      document.getElementById('result').innerHTML = '';
-      document.getElementById('stats').innerHTML = '';
-    }
-
-    document.getElementById('strategy').addEventListener('change', () => {
-  if (rounds.length >= 3) {
-    const freq = Array(81).fill(0);
-    rounds.forEach(draw => draw.forEach(n => freq[n]++));
-    suggest(freq);
+  const grid = document.getElementById('number-grid');
+  for (let i = 1; i <= 80; i++) {
+    const el = document.createElement('div');
+    el.className = 'number';
+    el.textContent = i;
+    el.onclick = () => toggleNumber(i, el);
+    grid.appendChild(el);
   }
-});
+
+  function toggleNumber(num, el) {
+    const idx = currentSelection.indexOf(num);
+    if (idx > -1) {
+      currentSelection.splice(idx, 1);
+      el.classList.remove('selected');
+    } else if (currentSelection.length < maxDrawn) {
+      currentSelection.push(num);
+      el.classList.add('selected');
+    }
+    document.getElementById('counter').textContent = `Numéros sélectionnés : ${currentSelection.length} / 20`;
+  }
+
+  function submitRound() {
+    if (currentSelection.length !== 20) return alert('Veuillez sélectionner exactement 20 numéros.');
+    rounds.push([...currentSelection]);
+    if (rounds.length > analysisWindow) rounds.shift();
+    localStorage.setItem('kenoRounds', JSON.stringify(rounds));
+    currentSelection = [];
+    document.querySelectorAll('.number').forEach(n => n.classList.remove('selected'));
+    document.getElementById('counter').textContent = 'Numéros sélectionnés : 0 / 20';
+    showStats();
+  }
+
+  function clearAll() {
+    localStorage.removeItem('kenoRounds');
+    rounds = [];
+    currentSelection = [];
+    document.querySelectorAll('.number').forEach(n => n.classList.remove('selected'));
+    document.getElementById('counter').textContent = 'Numéros sélectionnés : 0 / 20';
+    document.getElementById('result').innerHTML = '';
+    document.getElementById('stats').innerHTML = '';
+  }
+
+  document.getElementById('strategy').addEventListener('change', () => {
+    if (rounds.length >= 3) {
+      const freq = Array(81).fill(0);
+      rounds.forEach(draw => draw.forEach(n => freq[n]++));
+      suggest(freq);
+    }
+  });
 
   function showStats() {
-  if (rounds.length === 0) {
-    document.getElementById('stats').innerHTML = '';
-    document.getElementById('result').innerHTML = '';
-    return;
+    if (rounds.length === 0) {
+      document.getElementById('stats').innerHTML = '';
+      document.getElementById('result').innerHTML = '';
+      return;
+    }
+
+    const freq = Array(81).fill(0);
+    rounds.forEach(draw => draw.forEach(n => freq[n]++));
+
+    let html = '<h2>Statistiques</h2><table><tr><th>Numéro</th><th>Apparitions</th><th>%</th></tr>';
+    for (let i = 1; i <= 80; i++) {
+      const count = freq[i];
+      const percent = ((count / (rounds.length * maxDrawn)) * 100).toFixed(1);
+      html += `<tr><td>${i}</td><td>${count}</td><td>${percent}%</td></tr>`;
+    }
+    html += '</table>';
+    document.getElementById('stats').innerHTML = html;
+
+    if (rounds.length >= 3) {
+      suggest(freq);
+    } else {
+      document.getElementById('result').innerHTML =
+        `<p style="color: gray;">Ajoutez au moins 3 tirages pour voir une suggestion intelligente.</p>`;
+    }
   }
 
-  const freq = Array(81).fill(0);
-  rounds.forEach(draw => draw.forEach(n => freq[n]++));
+  function suggest(freq) {
+    const strategy = document.getElementById('strategy')?.value || 'hot';
+    const recent = rounds.at(-1) || [];
+    const total = rounds.length * maxDrawn;
+    const sugCount = parseInt(document.getElementById('sugCount')?.value || 3);
+    const scored = [];
 
-  let html = '<h2>Statistiques</h2><table><tr><th>Numéro</th><th>Apparitions</th><th>%</th></tr>';
-for (let i = 1; i <= 80; i++) {
-  const count = freq[i];
-  const percent = ((count / (rounds.length * maxDrawn)) * 100).toFixed(1);
-  html += `<tr><td>${i}</td><td>${count}</td><td>${percent}%</td></tr>`;
-}
+    for (let i = 1; i <= 80; i++) {
+      const count = freq[i];
+      const percent = total > 0 ? count / total : 0;
+      const lastSeenIndex = rounds.slice().reverse().findIndex(r => r.includes(i));
+      const age = lastSeenIndex === -1 ? rounds.length + 1 : lastSeenIndex + 1;
 
-  html += '</table>';
-  document.getElementById('stats').innerHTML = html;
+      let score = 0;
 
-  // ❗️ Seulement suggérer si au moins 3 tirages (ou change à 10 si tu veux)
-  if (rounds.length >= 3) {
-    suggest(freq);
-  } else {
+      if (strategy === 'hot') {
+        if (count === 0) continue;
+        score = percent;
+      } else if (strategy === 'cold') {
+        score = 1 - percent;
+      } else if (strategy === 'balanced') {
+        score = percent * (age / rounds.length);
+      } else if (strategy === 'dormant') {
+        score = age;
+      }
+
+      if (strategy !== 'hot' && recent.includes(i)) {
+        score *= 0.5;
+      }
+
+      scored.push({ num: i, score });
+    }
+
+    scored.sort((a, b) => b.score - a.score);
+    const topScore = scored[0]?.score ?? 0;
+    const topGroup = scored.filter(n => Math.abs(n.score - topScore) < 0.0001);
+
+    const suggestion = pickRandom(topGroup.length >= sugCount ? topGroup : scored, sugCount).join(', ');
+
+    const label = {
+      hot: "🔥 Numéros fréquents",
+      cold: "❄️ Numéros peu tirés",
+      balanced: "⚖️ Mélange équilibré",
+      dormant: "📉 Numéros absents récemment"
+    }[strategy];
+
     document.getElementById('result').innerHTML =
-      `<p style="color: gray;">Ajoutez au moins 3 tirages pour voir une suggestion intelligente.</p>`;
+      `<h2>Suggestion</h2><p>Stratégie : <strong>${label}</strong><br>Essayez : <strong>${suggestion}</strong></p>`;
   }
-}
-
-
- function suggest(freq) {
-  const strategy = document.getElementById('strategy')?.value || 'hot';
-  const recent = rounds.at(-1) || [];
-  const total = rounds.length * maxDrawn;
-  const sugCount = parseInt(document.getElementById('sugCount')?.value || 3);
-  const scored = [];
-
-  const averageFreq = total > 0 ? total / 80 : 0;
-
-  for (let i = 1; i <= 80; i++) {
-    const count = freq[i];
-    const percent = total > 0 ? count / total : 0;
-    const lastSeenIndex = rounds.slice().reverse().findIndex(r => r.includes(i));
-    const age = lastSeenIndex === -1 ? rounds.length + 1 : lastSeenIndex + 1;
-
-    let score = 0;
-
-    if (strategy === 'hot') {
-      if (count === 0) continue;
-      score = percent;
-    } else if (strategy === 'cold') {
-      score = 1 - percent;
-    } else if (strategy === 'balanced') {
-      score = percent * (age / rounds.length);
-    } else if (strategy === 'dormant') {
-      score = age;
-    }
-
-    if (strategy !== 'hot' && recent.includes(i)) {
-      score *= 0.5;
-    }
-
-    scored.push({ num: i, score });
-  }
-
-  scored.sort((a, b) => b.score - a.score);
-
-  const topScore = scored[0]?.score ?? 0;
-  const topGroup = scored.filter(n => Math.abs(n.score - topScore) < 0.0001);
 
   function pickRandom(arr, n) {
-    return [...arr].sort(() => Math.random() - 0.5).slice(0, n).map(x => x.num);
+    const shuffled = [...arr].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, n).map(x => x.num);
   }
 
-  const suggestion = pickRandom(topGroup.length >= sugCount ? topGroup : scored, sugCount).join(', ');
+  function calculateEV() {
+    const k = parseInt(document.getElementById('k').value);
+    if (k < 1 || k > 6) return alert("Choisissez entre 1 et 6.");
+    const C = (n, r) => [...Array(r)].reduce((acc, _, i) => acc * (n - i) / (i + 1), 1);
+    const total = C(80, k);
+    const win = C(20, k);
+    const prob = win / total;
+    const payout = [0, 3.8, 15, 68, 310, 1473, 7365][k] || 0;
+    const ev = (prob * payout * 0.1).toFixed(5);
+    document.getElementById('ev-result').innerHTML =
+      `<p>Probabilité de gain : ${(prob * 100).toFixed(5)}%</p><p>Espérance de gain pour 0.10€ : <strong>${ev} €</strong></p>`;
+  }
 
-  const label = document.querySelector(`#strategy option[value="${strategy}"]`)?.textContent || '';
-  document.getElementById('result').innerHTML =
-    `<h2>Suggestion</h2><p>Stratégie : <strong>${label}</strong><br>Essayez : <strong>${suggestion}</strong></p>`;
-}
+  function goToPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
 
+  showStats();
+</script>
 
-
-
-// Choisir aléatoirement parmi les meilleurs si plusieurs égalités
-function pickRandom(arr, n) {
-  const shuffled = [...arr].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, n).map(x => x.num);
-}
-
-const suggestion = pickRandom(topCandidates.length >= 3 ? topCandidates : scored, 3).join(', ');
-
-  const label = {
-    hot: "🔥 Numéros fréquents",
-    cold: "❄️ Numéros peu tirés",
-    balanced: "⚖️ Mélange équilibré",
-    dormant: "📉 Numéros absents récemment"
-  }[strategy];
-
-  document.getElementById('result').innerHTML =
-    `<h2>Suggestion</h2><p>Stratégie : <strong>${label}</strong><br>Essayez : <strong>${suggestion}</strong></p>`;
-}
-
-
-    function calculateEV() {
-      const k = parseInt(document.getElementById('k').value);
-      if (k < 1 || k > 6) return alert("Choisissez entre 1 et 6.");
-      const C = (n, r) => [...Array(r)].reduce((acc, _, i) => acc * (n - i) / (i + 1), 1);
-      const total = C(80, k);
-      const win = C(20, k);
-      const prob = win / total;
-      const payout = [0, 3.8, 15, 68, 310, 1473, 7365][k] || 0;
-      const ev = (prob * payout * 0.1).toFixed(5);
-      document.getElementById('ev-result').innerHTML =
-        `<p>Probabilité de gain : ${(prob * 100).toFixed(5)}%</p><p>Espérance de gain pour 0.10€ : <strong>${ev} €</strong></p>`;
-    }
-
-    function goToPage(id) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-
-    showStats();
-  </script>
 </body>
 </html>
