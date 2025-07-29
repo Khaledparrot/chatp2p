@@ -267,34 +267,65 @@ for (let i = 1; i <= 80; i++) {
 }
 
 
-    function suggest(freq) {
+   function suggest(freq) {
   const strategy = document.getElementById('strategy')?.value || 'hot';
   const recent = rounds.at(-1) || [];
   const total = rounds.length * maxDrawn;
   const scored = [];
 
+  const averageFreq = total > 0 ? total / 80 : 0;
+
   for (let i = 1; i <= 80; i++) {
+    const count = freq[i];
+    const percent = total > 0 ? count / total : 0;
+
     const lastSeenIndex = rounds.slice().reverse().findIndex(r => r.includes(i));
     const age = lastSeenIndex === -1 ? rounds.length + 1 : lastSeenIndex + 1;
-    const percent = total > 0 ? freq[i] / total : 0;
+
     let score = 0;
 
-    if (strategy === 'hot') score = percent;
-    else if (strategy === 'cold') score = 1 - percent;
-    else if (strategy === 'balanced') score = percent * (age / rounds.length);
-    else if (strategy === 'dormant') score = age;
+    // Calcul du score selon la stratégie
+    if (strategy === 'hot') {
+      if (count === 0) continue; // ne jamais suggérer un numéro jamais tiré
+      score = percent;
+    }
+    else if (strategy === 'cold') {
+      score = 1 - percent;
+    }
+    else if (strategy === 'balanced') {
+      score = percent * (age / rounds.length); // combiner fréquence et dormance
+    }
+    else if (strategy === 'dormant') {
+      score = age;
+    }
 
-    // if (recent.includes(i)) score *= 0.5; //last number inclouded
-    if (strategy !== 'hot' && recent.includes(i)) score *= 0.5;
-
+    // Réduire le score s'il a été vu au dernier tirage (sauf pour hot)
+    if (strategy !== 'hot' && recent.includes(i)) {
+      score *= 0.5;
+    }
 
     scored.push({ num: i, score });
   }
 
+  // Trier par score décroissant
   scored.sort((a, b) => b.score - a.score);
 
-const topScore = scored[0].score;
-const topCandidates = scored.filter(x => x.score === topScore);
+  // Ajouter un peu d'aléatoire si égalité
+  const topScore = scored[0]?.score ?? 0;
+  const topGroup = scored.filter(n => Math.abs(n.score - topScore) < 0.0001);
+
+  // Fonction pour sélectionner aléatoirement dans les meilleurs
+  function pickRandom(arr, n) {
+    return [...arr].sort(() => Math.random() - 0.5).slice(0, n).map(x => x.num);
+  }
+
+  const suggestion = pickRandom(topGroup.length >= 3 ? topGroup : scored, 3).join(', ');
+
+  // Affichage
+  const label = document.querySelector(`#strategy option[value="${strategy}"]`)?.textContent || '';
+  document.getElementById('result').innerHTML =
+    `<h2>Suggestion</h2><p>Stratégie : <strong>${label}</strong><br>Essayez : <strong>${suggestion}</strong></p>`;
+}
 
 // Choisir aléatoirement parmi les meilleurs si plusieurs égalités
 function pickRandom(arr, n) {
