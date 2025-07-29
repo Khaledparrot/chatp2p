@@ -269,7 +269,7 @@ for (let i = 1; i <= 80; i++) {
 }
 
 
-   function suggest(freq) {
+ function suggest(freq) {
   const strategy = document.getElementById('strategy')?.value || 'hot';
   const recent = rounds.at(-1) || [];
   const total = rounds.length * maxDrawn;
@@ -319,6 +319,7 @@ for (let i = 1; i <= 80; i++) {
   document.getElementById('result').innerHTML =
     `<h2>Suggestion</h2><p>Stratégie : <strong>${label}</strong><br>Essayez : <strong>${suggestion}</strong></p>`;
 }
+
 
 
 
