@@ -247,11 +247,13 @@
   const freq = Array(81).fill(0);
   rounds.forEach(draw => draw.forEach(n => freq[n]++));
 
-  let html = '<h2>Statistiques</h2><table><tr><th>Numéro</th><th>%</th></tr>';
-  for (let i = 1; i <= 80; i++) {
-    let p = ((freq[i] / (rounds.length * maxDrawn)) * 100).toFixed(1);
-    html += `<tr><td>${i}</td><td>${p}%</td></tr>`;
-  }
+  let html = '<h2>Statistiques</h2><table><tr><th>Numéro</th><th>Apparitions</th><th>%</th></tr>';
+for (let i = 1; i <= 80; i++) {
+  const count = freq[i];
+  const percent = ((count / (rounds.length * maxDrawn)) * 100).toFixed(1);
+  html += `<tr><td>${i}</td><td>${count}</td><td>${percent}%</td></tr>`;
+}
+
   html += '</table>';
   document.getElementById('stats').innerHTML = html;
 
@@ -288,7 +290,18 @@
   }
 
   scored.sort((a, b) => b.score - a.score);
-  const suggestion = scored.slice(0, 3).map(x => x.num).join(', ');
+
+const topScore = scored[0].score;
+const topCandidates = scored.filter(x => x.score === topScore);
+
+// Choisir aléatoirement parmi les meilleurs si plusieurs égalités
+function pickRandom(arr, n) {
+  const shuffled = [...arr].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, n).map(x => x.num);
+}
+
+const suggestion = pickRandom(topCandidates.length >= 3 ? topCandidates : scored, 3).join(', ');
+
   const label = {
     hot: "🔥 Numéros fréquents",
     cold: "❄️ Numéros peu tirés",
