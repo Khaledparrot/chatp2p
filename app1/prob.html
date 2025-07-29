@@ -284,7 +284,9 @@ for (let i = 1; i <= 80; i++) {
     else if (strategy === 'balanced') score = percent * (age / rounds.length);
     else if (strategy === 'dormant') score = age;
 
-    if (recent.includes(i)) score *= 0.5;
+    // if (recent.includes(i)) score *= 0.5; //last number inclouded
+    if (strategy !== 'hot' && recent.includes(i)) score *= 0.5;
+
 
     scored.push({ num: i, score });
   }
