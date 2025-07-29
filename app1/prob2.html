@@ -1,0 +1,290 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Keno Analyseur</title>
+  <style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    background: #f8f9fa;
+    color: #222;
+  }
+
+  .page {
+    display: none;
+    padding: 20px 15px;
+    max-width: 600px;
+    margin: auto;
+  }
+
+  .active {
+    display: block;
+  }
+
+  h1, h2 {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+  #number-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+
+  .number {
+    padding: 12px 0;
+    background: #ffffff;
+    border: 1px solid #ddd;
+    text-align: center;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .number.selected {
+    background-color: #28a745;
+    color: white;
+    border-color: #218838;
+  }
+
+  button, select, input {
+    width: 100%;
+    max-width: 400px;
+    margin: 10px auto;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    display: block;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  button {
+    background-color: #007bff;
+    color: white;
+  }
+
+  button:hover {
+    background-color: #0069d9;
+  }
+
+  select, input {
+    background: #ffffff;
+    border: 1px solid #ccc;
+  }
+
+  #counter, #result, #stats, #ev-result {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 16px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 13px;
+  }
+
+  th, td {
+    border: 1px solid #ccc;
+    padding: 6px 4px;
+    text-align: center;
+  }
+
+  ul {
+    padding-left: 20px;
+    line-height: 1.6;
+    font-size: 15px;
+  }
+
+  @media (max-width: 480px) {
+    .number {
+      font-size: 13px;
+      padding: 10px 0;
+    }
+
+    button, select, input {
+      font-size: 15px;
+      padding: 10px;
+    }
+
+    h1 {
+      font-size: 20px;
+    }
+
+    h2 {
+      font-size: 18px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="page active" id="main">
+  <h1>Keno Tracker</h1>
+  <h2>Sélectionnez les 20 numéros tirés</h2>
+  <div id="counter">Numéros sélectionnés : 0 / 20</div>
+  <div id="number-grid"></div>
+  <button onclick="submitRound()">Valider ce tirage</button>
+  <button onclick="clearAll()">Réinitialiser tout</button>
+
+  <label for="sugCount">Combien de numéros suggérer ?</label>
+  <input type="number" id="sugCount" min="1" max="20" value="3" />
+
+  <label for="minRounds">Nombre minimum de tirages pour suggérer :</label>
+  <input type="number" id="minRounds" min="1" max="50" value="3" />
+
+  <label for="strategy">Stratégie de suggestion :</label>
+  <select id="strategy">
+    <option value="hot">🔥 Numéros fréquents</option>
+    <option value="cold">❄️ Numéros peu tirés</option>
+    <option value="balanced">⚖️ Mélange équilibré</option>
+    <option value="dormant">📉 Numéros absents récemment</option>
+  </select>
+
+  <div id="result"></div>
+  <div id="stats"></div>
+</div>
+
+<script>
+const maxDrawn = 20;
+const analysisWindow = 50;
+let currentSelection = [];
+let rounds = JSON.parse(localStorage.getItem('kenoRounds') || '[]');
+
+const grid = document.getElementById('number-grid');
+for (let i = 1; i <= 80; i++) {
+  const el = document.createElement('div');
+  el.className = 'number';
+  el.textContent = i;
+  el.onclick = () => toggleNumber(i, el);
+  grid.appendChild(el);
+}
+
+function toggleNumber(num, el) {
+  const idx = currentSelection.indexOf(num);
+  if (idx > -1) {
+    currentSelection.splice(idx, 1);
+    el.classList.remove('selected');
+  } else if (currentSelection.length < maxDrawn) {
+    currentSelection.push(num);
+    el.classList.add('selected');
+  }
+  document.getElementById('counter').textContent = `Numéros sélectionnés : ${currentSelection.length} / 20`;
+}
+
+function submitRound() {
+  if (currentSelection.length !== 20) return alert('Veuillez sélectionner exactement 20 numéros.');
+  rounds.push([...currentSelection]);
+  if (rounds.length > analysisWindow) rounds.shift();
+  localStorage.setItem('kenoRounds', JSON.stringify(rounds));
+  currentSelection = [];
+  document.querySelectorAll('.number').forEach(n => n.classList.remove('selected'));
+  document.getElementById('counter').textContent = 'Numéros sélectionnés : 0 / 20';
+  showStats();
+}
+
+function clearAll() {
+  localStorage.removeItem('kenoRounds');
+  rounds = [];
+  currentSelection = [];
+  document.querySelectorAll('.number').forEach(n => n.classList.remove('selected'));
+  document.getElementById('counter').textContent = 'Numéros sélectionnés : 0 / 20';
+  document.getElementById('result').innerHTML = '';
+  document.getElementById('stats').innerHTML = '';
+}
+
+document.getElementById('strategy').addEventListener('change', () => {
+  const minRounds = parseInt(document.getElementById('minRounds')?.value || 3);
+  if (rounds.length >= minRounds) {
+    const freq = Array(81).fill(0);
+    rounds.forEach(draw => draw.forEach(n => freq[n]++));
+    suggest(freq);
+  }
+});
+
+function showStats() {
+  const freq = Array(81).fill(0);
+  rounds.forEach(draw => draw.forEach(n => freq[n]++));
+
+  let html = '<h2>Statistiques</h2><table><tr><th>Numéro</th><th>Apparitions</th><th>%</th></tr>';
+  for (let i = 1; i <= 80; i++) {
+    const count = freq[i];
+    const percent = ((count / (rounds.length * maxDrawn)) * 100).toFixed(1);
+    html += `<tr><td>${i}</td><td>${count}</td><td>${percent}%</td></tr>`;
+  }
+  html += '</table>';
+  document.getElementById('stats').innerHTML = html;
+
+  const minRounds = parseInt(document.getElementById('minRounds')?.value || 3);
+  if (rounds.length >= minRounds) {
+    suggest(freq);
+  } else {
+    document.getElementById('result').innerHTML =
+      `<p style="color: gray;">Ajoutez au moins ${minRounds} tirages pour voir une suggestion intelligente.</p>`;
+  }
+}
+
+function suggest(freq) {
+  const strategy = document.getElementById('strategy')?.value || 'hot';
+  const sugCount = parseInt(document.getElementById('sugCount')?.value || 3);
+  const recent = rounds.at(-1) || [];
+  const total = rounds.length * maxDrawn;
+  const scored = [];
+
+  for (let i = 1; i <= 80; i++) {
+    const count = freq[i];
+    const percent = total > 0 ? count / total : 0;
+    const lastSeenIndex = rounds.slice().reverse().findIndex(r => r.includes(i));
+    const age = lastSeenIndex === -1 ? rounds.length + 1 : lastSeenIndex + 1;
+
+    let score = 0;
+    if (strategy === 'hot') {
+      if (count === 0) continue;
+      score = percent;
+    } else if (strategy === 'cold') {
+      score = 1 - percent;
+    } else if (strategy === 'balanced') {
+      score = percent * (age / rounds.length);
+    } else if (strategy === 'dormant') {
+      score = age;
+    }
+
+    if (strategy !== 'hot' && recent.includes(i)) score *= 0.5;
+    scored.push({ num: i, score });
+  }
+
+  scored.sort((a, b) => b.score - a.score);
+  const topScore = scored[0]?.score ?? 0;
+  const topGroup = scored.filter(n => Math.abs(n.score - topScore) < 0.0001);
+
+  const suggestion = pickRandom(topGroup.length >= sugCount ? topGroup : scored, sugCount).join(', ');
+
+  const label = {
+    hot: "🔥 Numéros fréquents",
+    cold: "❄️ Numéros peu tirés",
+    balanced: "⚖️ Mélange équilibré",
+    dormant: "📉 Numéros absents récemment"
+  }[strategy];
+
+  document.getElementById('result').innerHTML =
+    `<h2>Suggestion</h2><p>Stratégie : <strong>${label}</strong><br>Essayez : <strong>${suggestion}</strong></p>`;
+}
+
+function pickRandom(arr, n) {
+  const shuffled = [...arr].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, n).map(x => x.num);
+}
+
+showStats();
+</script>
+</body>
+</html>
