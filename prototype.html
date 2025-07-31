@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calculateur Aluminium Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f3f4f6;
+      overflow: hidden;
+    }
+
+    /* Header and Settings */
+    .header {
+      height: 40px;
+      background: #111827;
+      color: white;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 0 10px;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+    }
+
+    .header button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .settings-menu {
+      position: absolute;
+      top: 40px;
+      right: 10px;
+      background: white;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      border-radius: 6px;
+      display: none;
+      flex-direction: column;
+      min-width: 180px;
+      z-index: 1001;
+    }
+
+    .settings-menu button {
+      padding: 10px;
+      font-size: 14px;
+      border: none;
+      background: none;
+      text-align: left;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .settings-menu button:hover {
+      background: #f3f4f6;
+    }
+
+    /* Side Tabs */
+    #leftTab, #rightTab {
+      position: fixed;
+      top: 40px;
+      bottom: 0;
+      width: 240px;
+      background: white;
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+      z-index: 100;
+    }
+
+    #leftTab {
+      left: 0;
+      border-right: 1px solid #ddd;
+      transform: translateX(-100%);
+    }
+
+    #rightTab {
+      right: 0;
+      border-left: 1px solid #ddd;
+      transform: translateX(100%);
+    }
+
+    .tab-visible {
+      transform: translateX(0) !important;
+    }
+
+    #mainTab {
+      position: absolute;
+      top: 40px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 10px;
+      overflow: hidden;
+      background: #f9fafb;
+      transition: margin 0.3s ease;
+    }
+
+    #mainTab.left-open { margin-left: 240px; }
+    #mainTab.right-open { margin-right: 240px; }
+
+    .tab-toggle {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #1f2937;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      padding: 6px 10px;
+      z-index: 2000;
+      opacity: 0.85;
+    }
+
+    .tab-toggle.left { left: 5px; }
+    .tab-toggle.right { right: 5px; }
+
+    /* Scrollable content inside tabs */
+    #objectList, #materialList {
+      padding: 10px;
+    }
+
+    .object-card {
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      background: white;
+    }
+
+    .object-card img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+    }
+
+    .object-card-name {
+      padding: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    /* Module List Scroll Area */
+    #moduleContainer {
+      height: calc(100% - 60px);
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+
+    /* PDF Button */
+    .footer-btn {
+      position: absolute;
+      bottom: 10px;
+      right: 20px;
+    }
+
+    .footer-btn button {
+      padding: 10px 14px;
+      background: #10b981;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+
+    #settingsMenu button {
+  background: none;
+  border: none;
+  padding: 10px 15px;
+  text-align: left;
+  width: 100%;
+  font-size: 14px;
+  cursor: pointer;
+  color: #111;
+}
+#settingsMenu button:hover {
+  background-color: #f3f4f6;
+}
+
+  </style>
+</head>
+<body>
+
+<!-- 🔝 Header with Settings -->
+<div class="header">
+  <button onclick="toggleSettings()">⚙️</button>
+  <div id="settingsMenu" class="settings-menu">
+    <button onclick="openModal('modalAddMaterial')">➕ Ajouter matériau</button>
+    <button onclick="openModal('modalAddObject')">📦 Ajouter objet</button>
+    <button onclick="openModal('modalManageObjects')">🧾 Gérer objets</button>
+    <button onclick="openModal('modalPdfModel')">🖨️ Modèle PDF</button>
+  </div>
+</div>
+
+<!-- 📂 Left Menu: Object Types -->
+<div id="leftTab">
+  <div style="padding: 10px;"><strong>Types d'objet</strong></div>
+  <div id="objectList"></div>
+</div>
+
+<!-- 🎨 Right Menu: Materials -->
+<div id="rightTab">
+  <div style="padding: 10px;"><strong>Matériaux</strong></div>
+  <div id="materialList"></div>
+</div>
+
+<!-- 🔄 Toggle Buttons -->
+<button class="tab-toggle left" onclick="toggleTab('leftTab')">☰</button>
+<button class="tab-toggle right" onclick="toggleTab('rightTab')">☰</button>
+
+<!-- 📐 Center Working Area -->
+<div id="mainTab">
+  <div id="moduleContainer"></div>
+  <div class="footer-bar" id="footerBar" style="display: none; position: absolute; bottom: 10px; left: 10px; right: 10px; justify-content: space-between; align-items: center;">
+    <div id="totalGlobalText" style="font-weight: bold; font-size: 14px;">Total: 0 DA</div>
+    <button onclick="generatePdf()" style="padding: 10px 14px; background: #10b981; color: white; font-weight: bold; font-size: 14px; border: none; border-radius: 4px; cursor: pointer;">📄 Export PDF</button>
+  </div>
+
+</div>
+<!-- ✅ Module UI + Logic -->
+<script>
+let materials = JSON.parse(localStorage.getItem("materials") || "[]");
+let objects = JSON.parse(localStorage.getItem("objects") || "[]");
+let modules = [];
+
+function toggleSettings() {
+  const menu = document.getElementById("settingsMenu");
+  const rightTab = document.getElementById("rightTab");
+  const main = document.getElementById("mainTab");
+
+  // ✅ Always hide the Matériaux menu if it’s open
+  if (rightTab.classList.contains("tab-visible")) {
+    rightTab.classList.remove("tab-visible");
+    main.classList.remove("right-open");
+  }
+
+  // ✅ Toggle settings menu visibility
+  if (menu.style.display === "flex") {
+    menu.style.display = "none";
+  } else {
+    menu.style.display = "flex";
+    menu.style.flexDirection = "column";
+  }
+}
+
+
+function toggleTab(id) {
+  const tab = document.getElementById(id);
+  const main = document.getElementById("mainTab");
+  const isLeft = (id === "leftTab");
+  const openClass = isLeft ? "left-open" : "right-open";
+
+  if (tab.classList.contains("tab-visible")) {
+    tab.classList.remove("tab-visible");
+    main.classList.remove(openClass);
+  } else {
+    tab.classList.add("tab-visible");
+    main.classList.add(openClass);
+  }
+}
+
+function openModal(id) {
+  alert("Fonction non implémentée : " + id);
+}
+
+function renderObjectList() {
+  const container = document.getElementById("objectList");
+  container.innerHTML = "";
+  objects.forEach((obj, i) => {
+    const div = document.createElement("div");
+    div.className = "object-card";
+    div.innerHTML = `
+      <img src="${obj.image}" />
+      <div class="object-card-name">${obj.name}</div>
+    `;
+    div.onclick = () => addModule(i);
+    container.appendChild(div);
+  });
+}
+
+
+function renderMaterialList() {
+  const container = document.getElementById("materialList");
+  container.innerHTML = "";
+
+  if (!materials || materials.length === 0) {
+    container.innerHTML = "<p>Aucun matériau disponible.</p>";
+    return;
+  }
+
+  // Group materials by category
+  const grouped = {};
+  materials.forEach(mat => {
+    if (!grouped[mat.category]) grouped[mat.category] = [];
+    grouped[mat.category].push(mat);
+  });
+
+  // Define display order of categories
+  const categoryOrder = ["aluminium", "glass", "accessoire"];
+  const categoryNames = {
+    aluminium: "--Aluminium--",
+    glass: "--Verre--",
+    accessoire: "--Accessoires--"
+  };
+
+  categoryOrder.forEach(cat => {
+    const list = grouped[cat];
+    if (!list) return;
+
+    // Category Header
+    const catTitle = document.createElement("h4");
+    catTitle.textContent = categoryNames[cat] || cat;
+    catTitle.style = "margin: 10px 0 6px 0; border-bottom: 1px solid #ccc; padding-bottom: 4px;";
+    container.appendChild(catTitle);
+
+    // Sort materials by name
+    list.sort((a, b) => a.name.localeCompare(b.name));
+
+    // Render each material
+    list.forEach((mat, index) => {
+      const div = document.createElement("div");
+      div.style.cssText = `
+        border:1px solid #ccc; 
+        padding:8px; 
+        margin-bottom:8px; 
+        border-radius:6px; 
+        background:#fff; 
+        display:flex; 
+        justify-content:space-between; 
+        align-items:center;
+      `;
+
+      const info = document.createElement("div");
+      info.style.display = "flex";
+      info.style.alignItems = "center";
+      info.style.gap = "10px";
+
+      const colorDot = document.createElement("div");
+      colorDot.style.cssText = `
+        width: 14px; 
+        height: 14px; 
+        border-radius: 50%; 
+        background: ${mat.color || '#ccc'};
+        border: 1px solid #aaa;
+      `;
+
+      const textInfo = document.createElement("div");
+      textInfo.innerHTML = `
+        <strong>${mat.name}</strong><br>
+        <small>Prix: ${mat.price} DA</small>
+      `;
+
+      info.appendChild(colorDot);
+      info.appendChild(textInfo);
+
+      const actions = document.createElement("div");
+      actions.innerHTML = `
+        <button onclick="openEditMaterial(${materials.indexOf(mat)})" style="margin-right:6px; background:#3b82f6; color:white; border:none; padding:4px 6px; border-radius:4px; cursor:pointer;">✏️</button>
+        <button onclick="deleteMaterial(${materials.indexOf(mat)})" style="background:#ef4444; color:white; border:none; padding:4px 6px; border-radius:4px; cursor:pointer;">🗑️</button>
+      `;
+
+      div.appendChild(info);
+      div.appendChild(actions);
+      container.appendChild(div);
+    });
+  });
+}
+
+
+function openEditMaterial(index) {
+  const mat = materials[index];
+  document.getElementById("editMaterialIndex").value = index;
+  document.getElementById("editMaterialName").value = mat.name;
+  document.getElementById("editMaterialPrice").value = mat.price;
+  document.getElementById("editMaterialCategory").value = mat.category;
+//   document.getElementById("editMaterialColor").value = mat.color || "";
+  document.getElementById("editMaterialColor").value = mat.color || "#ffffff";
+
+  document.getElementById("modalEditMaterialPopup").style.display = "flex";
+}
+
+function closeEditMaterialModal() {
+  document.getElementById("modalEditMaterialPopup").style.display = "none";
+}
+
+function saveEditedMaterial() {
+  const index = parseInt(document.getElementById("editMaterialIndex").value);
+  const name = document.getElementById("editMaterialName").value.trim();
+  const price = parseFloat(document.getElementById("editMaterialPrice").value);
+  const category = document.getElementById("editMaterialCategory").value;
+  const color = document.getElementById("editMaterialColor").value.trim();
+
+  if (!name || isNaN(price) || !category) {
+    alert("Tous les champs sont obligatoires.");
+    return;
+  }
+
+  materials[index] = { name, price, category, color };
+  localStorage.setItem("materials", JSON.stringify(materials));
+  renderMaterialList();
+  closeEditMaterialModal();
+}
+
+function deleteMaterial(index) {
+  if (!confirm("Supprimer ce matériau ?")) return;
+  materials.splice(index, 1);
+  localStorage.setItem("materials", JSON.stringify(materials));
+  renderMaterialList();
+}
+
+
+function saveMaterial(index) {
+  const mats = JSON.parse(localStorage.getItem("materials") || "[]");
+
+  const name = document.querySelector(`input[data-index="${index}"][data-field="name"]`).value.trim();
+  const price = parseFloat(document.querySelector(`input[data-index="${index}"][data-field="price"]`).value);
+  const category = document.querySelector(`select[data-index="${index}"][data-field="category"]`).value;
+  const color = document.querySelector(`input[data-index="${index}"][data-field="color"]`).value;
+
+  if (!name || isNaN(price) || !category || !color) {
+    alert("Veuillez remplir tous les champs.");
+    return;
+  }
+
+  mats[index] = { name, price, category, color };
+  localStorage.setItem("materials", JSON.stringify(mats));
+  renderMaterialList();
+  alert("Matériau mis à jour !");
+}
+
+
+function deleteMaterial(index) {
+  if (!confirm("Supprimer ce matériau ?")) return;
+
+  const list = JSON.parse(localStorage.getItem("materials") || "[]");
+  list.splice(index, 1);
+  localStorage.setItem("materials", JSON.stringify(list));
+
+  // ✅ Update global array + refresh menu
+  materials = list;
+  renderMaterialList();
+}
+
+
+
+function addModule(index) {
+  const obj = objects[index];
+  const id = Date.now();
+  const module = {
+    id, object: obj, image: obj.image, types: obj.types,
+    data: { width: 0, height: 0, countWidth: 0, countHeight: 0, quantity: 1, materials: {} }
+  };
+  modules.push(module);
+  renderModules();
+}
+
+function removeModule(id) {
+  modules = modules.filter(m => m.id !== id);
+  renderModules();
+}
+
+function renderModules() {
+  const container = document.getElementById("moduleContainer");
+  container.innerHTML = "";
+
+  modules.forEach(mod => {
+    const div = document.createElement("div");
+    div.className = "module-block";
+    div.style.cssText = "display: flex; gap: 12px; margin-bottom: 12px; background: #fff; border-radius: 6px; padding: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); position: relative;";
+
+    const left = document.createElement("div");
+    left.innerHTML = `<img src="${mod.image}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px;">`;
+
+    const right = document.createElement("div");
+    right.style.flex = "1";
+
+    let fieldsHTML = `
+      <div style="display:flex; flex-wrap:wrap; gap: 12px;">
+        <div style="flex: 1; min-width: 120px;">
+          <label>Largeur (cm)</label>
+          <input type="number" data-id="${mod.id}" name="width" value="${mod.data.width}" style="width:100%">
+        </div>
+        <div style="flex: 1; min-width: 120px;">
+          <label>Nombre Largeur</label>
+          <input type="number" data-id="${mod.id}" name="countWidth" value="${mod.data.countWidth}" style="width:100%">
+        </div>
+        <div style="flex: 1; min-width: 120px;">
+          <label>Hauteur (cm)</label>
+          <input type="number" data-id="${mod.id}" name="height" value="${mod.data.height}" style="width:100%">
+        </div>
+        <div style="flex: 1; min-width: 120px;">
+          <label>Nombre Hauteur</label>
+          <input type="number" data-id="${mod.id}" name="countHeight" value="${mod.data.countHeight}" style="width:100%">
+        </div>
+        <div style="flex: 1; min-width: 120px;">
+          <label>Quantité</label>
+          <input type="number" data-id="${mod.id}" name="quantity" value="${mod.data.quantity}" style="width:100%">
+        </div>
+    `;
+
+    mod.types.forEach(cat => {
+      const options = materials
+        .filter(m => m.category === cat)
+        .map(m => {
+          const selected = mod.data.materials[cat] === m.name ? "selected" : "";
+          return `<option value="${m.name}" ${selected}>${m.name}</option>`;
+        }).join('');
+
+      fieldsHTML += `
+        <div style="flex: 1; min-width: 120px;">
+          <label>${cat.charAt(0).toUpperCase() + cat.slice(1)}</label>
+          <select data-id="${mod.id}" name="material_${cat}" style="width:100%">
+            <option disabled ${!mod.data.materials[cat] ? "selected" : ""}>Choisir ${cat}</option>
+            ${options}
+          </select>
+        </div>`;
+    });
+
+    fieldsHTML += `</div>`;
+
+    const resultID = `result-${mod.id}`;
+    const resultText = mod.data.total ? `Total: ${mod.data.total} DA` : "";
+
+    right.innerHTML = `
+      ${fieldsHTML}
+      <div style="margin-top:10px;">
+        <button onclick="calculatePrice(${mod.id})">🧮 Calculer</button>
+        <span id="${resultID}" style="font-weight:bold; margin-left:12px;">${resultText}</span>
+      </div>
+    `;
+
+    const closeBtn = document.createElement("button");
+    closeBtn.textContent = "×";
+    closeBtn.title = "Supprimer";
+    closeBtn.onclick = () => removeModule(mod.id);
+    closeBtn.style.cssText = "position:absolute;top:6px;right:8px;background:#ef4444;color:white;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:14px;";
+
+    div.appendChild(left);
+    div.appendChild(right);
+    div.appendChild(closeBtn);
+    container.appendChild(div);
+  });
+
+  // ✅ Update total and show/hide footer bar
+  const footerBar = document.getElementById("footerBar");
+  if (modules.length === 0) {
+    footerBar.style.display = "none";
+  } else {
+    let totalGlobal = 0;
+    modules.forEach(mod => {
+      if (mod.data.total) {
+        totalGlobal += parseFloat(mod.data.total);
+      }
+    });
+    document.getElementById("totalGlobalText").textContent = `Total global: ${totalGlobal.toFixed(2)} DA`;
+    footerBar.style.display = "flex";
+  }
+  updateFooterBar();
+}
+
+
+function updateFooterBar() {
+  const footerBar = document.getElementById("footerBar");
+  const totalText = document.getElementById("totalGlobalText");
+
+  if (!modules || modules.length === 0) {
+    footerBar.style.display = "none";
+    totalText.textContent = "";
+    return;
+  }
+
+  let totalGlobal = 0;
+  modules.forEach(mod => {
+    if (mod.data.total) {
+      totalGlobal += parseFloat(mod.data.total);
+    }
+  });
+
+  totalText.textContent = `Total global: ${totalGlobal.toFixed(2)} DA`;
+  footerBar.style.display = "flex";
+}
+
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+function calculatePrice(id) {
+  const mod = modules.find(m => m.id === id);
+  if (!mod) return;
+
+  const inputs = document.querySelectorAll(`[data-id="${id}"]`);
+  inputs.forEach(inp => {
+    const name = inp.name;
+    const val = inp.value;
+    if (name.startsWith("material_")) {
+      const cat = name.split("_")[1];
+      mod.data.materials[cat] = val;
+    } else {
+      mod.data[name] = parseFloat(val) || 0;
+    }
+  });
+
+  let total = 0;
+  mod.types.forEach(cat => {
+    const matName = mod.data.materials[cat];
+    if (!matName) return;
+    const mat = materials.find(m => m.name === matName && m.category === cat);
+    if (!mat) return;
+
+    if (cat === "glass") {
+      const surface = (mod.data.width * mod.data.height) / 100; // in cm²
+      const unit = surface * mod.data.countWidth * mod.data.countHeight * mod.data.quantity;
+      total += unit * mat.price;
+    } else {
+      const length = (mod.data.width * mod.data.countWidth + mod.data.height * mod.data.countHeight) / 100; // in cm
+      const unit = length * mod.data.quantity;
+      total += unit * mat.price;
+    }
+  });
+
+  document.getElementById("result-" + id).textContent = `Total: ${total.toFixed(2)} DA`;
+  mod.data.total = total.toFixed(2);
+
+  renderModules();
+}
+
+async function generatePdf() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  let y = 10, totalGlobal = 0;
+  for (let i = 0; i < modules.length; i++) {
+    const mod = modules[i];
+    const img = new Image();
+    img.src = mod.image;
+
+    const imgData = await new Promise(resolve => {
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 60;
+        canvas.height = 40;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, 60, 40);
+        resolve(canvas.toDataURL("image/jpeg"));
+      };
+    });
+
+    if (y + 60 > 280) {
+      doc.addPage();
+      y = 10;
+    }
+
+    doc.setFontSize(10);
+    doc.text(`Module ${i + 1}: ${mod.object.name}`, 10, y);
+    doc.addImage(imgData, 'JPEG', 140, y - 8, 50, 30);
+
+    y += 8;
+    doc.text(`Dimensions: ${mod.data.width}cm x ${mod.data.height}cm`, 10, y);
+    y += 6;
+    doc.text(`Nombre: ${mod.data.countWidth} x ${mod.data.countHeight}`, 10, y);
+    y += 6;
+
+    mod.types.forEach(cat => {
+      doc.text(`${cat}: ${mod.data.materials[cat] || "non choisi"}`, 10, y);
+      y += 6;
+    });
+
+    doc.setFont("bold");
+    doc.text(`Prix Total: ${mod.data.total || "0"} DA`, 10, y);
+    doc.setFont("normal");
+    totalGlobal += parseFloat(mod.data.total || "0");
+    y += 12;
+    doc.line(10, y, 190, y);
+    y += 10;
+  }
+
+  doc.setFontSize(12);
+  doc.setFont("bold");
+  doc.text(`Total Global: ${totalGlobal.toFixed(2)} DA`, 10, y);
+
+  doc.save("devis_aluminium.pdf");
+}
+
+// DEMO DATA
+if (!localStorage.getItem("materials")) {
+  localStorage.setItem("materials", JSON.stringify([
+    { name: "Alu Blanc", price: 2.5, category: "aluminium" },
+    { name: "Alu Noir", price: 3, category: "aluminium" },
+    { name: "Verre Clair", price: 0.5, category: "glass" },
+    { name: "Verre Fumé", price: 0.8, category: "glass" },
+    { name: "Poignée Standard", price: 1, category: "accessoire" }
+  ]));
+}
+
+if (!localStorage.getItem("objects")) {
+  localStorage.setItem("objects", JSON.stringify([
+    {
+      name: "Fenêtre 2 Battants",
+      image: "https://via.placeholder.com/150x100?text=Fenetre+2B",
+      types: ["aluminium", "glass"]
+    },
+    {
+      name: "Porte Coulissante",
+      image: "https://via.placeholder.com/150x100?text=Porte+Coulissante",
+      types: ["aluminium", "glass"]
+    },
+    {
+      name: "Vitre Fixe",
+      image: "https://via.placeholder.com/150x100?text=Vitre+Fixe",
+      types: ["glass"]
+    }
+  ]));
+}
+
+renderObjectList();
+renderMaterialList();
+
+function openModal(id) {
+  if (id === "modalAddObject") {
+    document.getElementById("modalAddObjectPopup").style.display = "flex";
+  } else {
+    alert("Fonction non implémentée : " + id);
+  }
+}
+
+// function closeAddObjectModal() {
+//   document.getElementById("modalAddObjectPopup").style.display = "none";
+//   document.getElementById("newObjectName").value = "";
+//   document.getElementById("newObjectImage").value = "";
+//   document.getElementById("newObjectImageFile").value = "";
+
+//   document.querySelectorAll('#materialCategories input').forEach(cb => cb.checked = false);
+// }
+
+function closeAddObjectModal() {
+  document.getElementById("modalAddObjectPopup").style.display = "none";
+
+  document.getElementById("newObjectName").value = "";
+
+  const fileInput = document.getElementById("newObjectImageFile");
+  if (fileInput) fileInput.value = "";
+
+  document.querySelectorAll('#materialCategories input').forEach(cb => cb.checked = false);
+}
+
+
+function saveNewObject() {
+  const name = document.getElementById("newObjectName").value.trim();
+  const fileInput = document.getElementById("newObjectImageFile");
+  const file = fileInput.files[0];
+  const types = Array.from(document.querySelectorAll('#materialCategories input:checked')).map(cb => cb.value);
+
+  if (!name || !file || types.length === 0) {
+    alert("Veuillez remplir tous les champs.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const base64Image = e.target.result;
+    const newObj = { name, image: base64Image, types };
+
+    // Store and update objects
+    const currentObjects = JSON.parse(localStorage.getItem("objects") || "[]");
+    currentObjects.push(newObj);
+    localStorage.setItem("objects", JSON.stringify(currentObjects));
+
+    // ✅ Force the global variable to update
+    objects = currentObjects;
+
+    // ✅ Immediately refresh UI
+    closeAddObjectModal();
+    renderObjectList();
+    alert("Objet ajouté !");
+  };
+
+  reader.readAsDataURL(file);
+}
+
+
+
+
+function openModal(id) {
+  if (id === "modalAddObject") {
+    document.getElementById("modalAddObjectPopup").style.display = "flex";
+  } else if (id === "modalAddMaterial") {
+    document.getElementById("modalAddMaterialPopup").style.display = "flex";
+  } else {
+    alert("Fonction non implémentée : " + id);
+  }
+}
+
+function closeAddMaterialModal() {
+  document.getElementById("modalAddMaterialPopup").style.display = "none";
+  document.getElementById("newMaterialName").value = "";
+  document.getElementById("newMaterialPrice").value = "";
+  document.getElementById("newMaterialCategory").value = "";
+  document.getElementById("newMaterialColor").value = "#000000";
+}
+
+
+function saveNewMaterial() {
+  const name = document.getElementById("newMaterialName").value.trim();
+  const price = parseFloat(document.getElementById("newMaterialPrice").value);
+  const category = document.getElementById("newMaterialCategory").value;
+  const color = document.getElementById("newMaterialColor").value;
+
+  if (!name || isNaN(price) || !category || !color) {
+    alert("Veuillez remplir tous les champs.");
+    return;
+  }
+
+  const newMat = { name, price, category, color };
+  const stored = JSON.parse(localStorage.getItem("materials") || "[]");
+  stored.push(newMat);
+  localStorage.setItem("materials", JSON.stringify(stored));
+
+  // ✅ Update global array + refresh menu
+  materials = stored;
+  closeAddMaterialModal();
+  renderMaterialList();
+  alert("Matériau ajouté !");
+}
+
+
+function openModal(id) {
+  if (id === "modalAddObject") {
+    document.getElementById("modalAddObjectPopup").style.display = "flex";
+  } else if (id === "modalAddMaterial") {
+    document.getElementById("modalAddMaterialPopup").style.display = "flex";
+  } else if (id === "modalManageObjects") {
+    document.getElementById("modalManageObjectsPopup").style.display = "flex";
+    renderManageObjects();
+  } else if (id === "modalPdfModel") {
+    alert("Fonctionnalité 'Modèle PDF' à venir !");
+  } else {
+    alert("Fonction non implémentée : " + id);
+  }
+}
+
+
+function closeManageObjectsModal() {
+  document.getElementById("modalManageObjectsPopup").style.display = "none";
+}
+
+function renderManageObjects() {
+  const container = document.getElementById("manageObjectList");
+  const list = JSON.parse(localStorage.getItem("objects") || "[]");
+
+  container.innerHTML = "";
+  list.forEach((obj, index) => {
+    const div = document.createElement("div");
+    div.style = "border:1px solid #ccc; padding:10px; border-radius:6px; margin-bottom:10px;";
+
+    div.innerHTML = `
+      <label>Nom:</label>
+      <input type="text" value="${obj.name}" data-idx="${index}" data-field="name" style="width:100%; margin-bottom:6px;"/>
+      
+      <label>Image actuelle:</label><br/>
+      <img src="${obj.image}" alt="aperçu" style="width:100%; max-height:100px; object-fit:cover; margin-bottom:6px;"><br/>
+      
+      <label>Changer l'image (optionnel):</label>
+      <input type="file" accept="image/*" data-idx="${index}" data-field="imageFile" style="width:100%; margin-bottom:6px;" />
+
+      <label>Catégories:</label><br/>
+      <label><input type="checkbox" value="aluminium" data-idx="${index}" data-cat="1"> Aluminium</label>
+      <label><input type="checkbox" value="glass" data-idx="${index}" data-cat="1"> Verre</label>
+      <label><input type="checkbox" value="accessoire" data-idx="${index}" data-cat="1"> Accessoire</label><br/>
+
+      <button onclick="saveEditedObject(${index})" style="margin-top:6px; background:#3b82f6; color:white; border:none; padding:5px 10px; border-radius:4px;">💾 Enregistrer</button>
+      <button onclick="deleteObject(${index})" style="margin-top:6px; background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:4px; margin-left:6px;">🗑 Supprimer</button>
+    `;
+
+    container.appendChild(div);
+
+    // Pre-check categories
+    const checkboxes = div.querySelectorAll("input[type='checkbox'][data-cat]");
+    checkboxes.forEach(cb => {
+      if (obj.types.includes(cb.value)) cb.checked = true;
+    });
+  });
+}
+
+function saveEditedObject(index) {
+  const list = JSON.parse(localStorage.getItem("objects") || "[]");
+
+  const name = document.querySelector(`input[data-idx="${index}"][data-field="name"]`).value.trim();
+  const imageFileInput = document.querySelector(`input[data-idx="${index}"][data-field="imageFile"]`);
+  const file = imageFileInput.files[0];
+
+  const cats = Array.from(document.querySelectorAll(`input[data-idx="${index}"][data-cat="1"]:checked`)).map(cb => cb.value);
+
+  if (!name || cats.length === 0) {
+    alert("Tous les champs doivent être remplis.");
+    return;
+  }
+
+  function saveImageAndUpdate(base64Image) {
+    list[index] = {
+      name,
+      image: base64Image || list[index].image, // keep old image if no file picked
+      types: cats
+    };
+
+    localStorage.setItem("objects", JSON.stringify(list));
+
+    objects = list;
+    renderObjectList();
+    renderManageObjects();
+    alert("Objet mis à jour !");
+  }
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      saveImageAndUpdate(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    saveImageAndUpdate(); // no new image
+  }
+}
+
+
+function deleteObject(index) {
+  if (!confirm("Supprimer cet objet ?")) return;
+
+  const list = JSON.parse(localStorage.getItem("objects") || "[]");
+  list.splice(index, 1);
+  localStorage.setItem("objects", JSON.stringify(list));
+  objects = list;
+  renderObjectList();
+  renderManageObjects();
+  renderMaterialList();
+}
+
+document.addEventListener("click", function (event) {
+  const settingsBtn = document.querySelector(".header button");
+  const settingsMenu = document.getElementById("settingsMenu");
+
+  const isClickInsideMenu = settingsMenu.contains(event.target);
+  const isClickOnButton = settingsBtn.contains(event.target);
+
+  if (!isClickInsideMenu && !isClickOnButton) {
+    settingsMenu.style.display = "none";
+  }
+});
+
+
+</script>
+
+<!-- 🧱 Modal: Add Object -->
+<div id="modalAddObjectPopup" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4); z-index:2000; align-items:center; justify-content:center;">
+  <div style="background:white; padding:20px; border-radius:8px; width:300px; position:relative;">
+    <h3 style="margin:0 0 10px 0;">Ajouter un objet</h3>
+    <button onclick="closeAddObjectModal()" style="position:absolute; top:8px; right:10px; border:none; background:#ef4444; color:white; border-radius:50%; width:20px; height:20px; cursor:pointer;">×</button>
+
+    <label>Nom de l'objet:</label>
+    <input type="text" id="newObjectName" style="width:100%; margin-bottom:10px;" />
+
+    <label>Image (fichier):</label>
+    <input type="file" id="newObjectImageFile" accept="image/*" style="width:100%; margin-bottom:10px;" />
+
+    <label>Catégories utilisées:</label>
+    <div id="materialCategories" style="margin-bottom:10px;">
+      <label><input type="checkbox" value="aluminium"> Aluminium</label><br/>
+      <label><input type="checkbox" value="glass"> Verre</label><br/>
+      <label><input type="checkbox" value="accessoire"> Accessoire</label>
+    </div>
+
+    <button onclick="saveNewObject()" style="width:100%; background:#10b981; color:white; border:none; padding:8px; border-radius:4px;">✅ Ajouter</button>
+  </div>
+</div>
+
+<!-- 🧱 Modal: Ajouter Matériau -->
+<div id="modalAddMaterialPopup" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4); z-index:2000; align-items:center; justify-content:center;">
+  <div style="background:white; padding:20px; border-radius:8px; width:300px; position:relative;">
+    <h3 style="margin:0 0 10px 0;">Ajouter un matériau</h3>
+    <button onclick="closeAddMaterialModal()" style="position:absolute; top:8px; right:10px; border:none; background:#ef4444; color:white; border-radius:50%; width:20px; height:20px; cursor:pointer;">×</button>
+
+    <label>Nom:</label>
+    <input type="text" id="newMaterialName" style="width:100%; margin-bottom:10px;" />
+
+    <label>Couleur:</label>
+    <input type="color" id="newMaterialColor" style="width:100%; margin-bottom:10px;" />
+
+
+    <label>Prix par unité (DA/cm ou DA/cm²):</label>
+    <input type="number" id="newMaterialPrice" style="width:100%; margin-bottom:10px;" />
+
+    <label>Catégorie:</label>
+    <select id="newMaterialCategory" style="width:100%; margin-bottom:10px;">
+      <option value="">-- Choisir --</option>
+      <option value="aluminium">Aluminium</option>
+      <option value="glass">Verre</option>
+      <option value="accessoire">Accessoire</option>
+    </select>
+
+    <button onclick="saveNewMaterial()" style="width:100%; background:#10b981; color:white; border:none; padding:8px; border-radius:4px;">✅ Ajouter</button>
+  </div>
+</div>
+
+
+<!-- 🧱 Modal: Gérer Objets -->
+<div id="modalManageObjectsPopup" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4); z-index:2000; align-items:center; justify-content:center;">
+  <div style="background:white; padding:20px; border-radius:8px; width:380px; max-height:90vh; overflow-y:auto; position:relative;">
+    <h3 style="margin:0 0 10px 0;">Gérer les objets</h3>
+    <button onclick="closeManageObjectsModal()" style="position:absolute; top:8px; right:10px; border:none; background:#ef4444; color:white; border-radius:50%; width:20px; height:20px; cursor:pointer;">×</button>
+    
+    <div id="manageObjectList"></div>
+  </div>
+</div>
+
+<!-- 🧱 Modal: Éditer Matériau -->
+<div id="modalEditMaterialPopup" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4); z-index:2000; align-items:center; justify-content:center;">
+  <div style="background:white; padding:20px; border-radius:8px; width:300px; position:relative;">
+    <h3 style="margin:0 0 10px 0;">Éditer Matériau</h3>
+    <button onclick="closeEditMaterialModal()" style="position:absolute; top:8px; right:10px; border:none; background:#ef4444; color:white; border-radius:50%; width:20px; height:20px; cursor:pointer;">×</button>
+
+    <input type="hidden" id="editMaterialIndex" />
+
+    <label>Nom:</label>
+    <input type="text" id="editMaterialName" style="width:100%; margin-bottom:10px;" />
+
+    <label>Prix par unité (DA):</label>
+    <input type="number" id="editMaterialPrice" style="width:100%; margin-bottom:10px;" />
+
+    <label>Catégorie:</label>
+    <select id="editMaterialCategory" style="width:100%; margin-bottom:10px;">
+      <option value="aluminium">Aluminium</option>
+      <option value="glass">Verre</option>
+      <option value="accessoire">Accessoire</option>
+    </select>
+
+    <label>Couleur:</label>
+    <input type="color" id="editMaterialColor" style="width:100%; margin-bottom:10px;" />
+
+    <button onclick="saveEditedMaterial()" style="width:100%; background:#10b981; color:white; border:none; padding:8px; border-radius:4px;">✅ Enregistrer</button>
+  </div>
+</div>
+
+
+</body>
+</html>
